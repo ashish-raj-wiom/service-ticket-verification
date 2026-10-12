@@ -206,7 +206,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <tr><td colspan="3"><strong>Closing a ticket</strong></td></tr>
         <tr><td>G6</td><td>A ticket closes only when at least three of these four are true: the CSP marked it resolved, the internet is up, the customer has been told, and the customer said yes or stayed silent while the internet stayed up.</td><td>Recovery §5.3; <code>rec:closed</code></td></tr>
         <tr><td>G7</td><td>A customer’s yes closes the ticket.</td><td>Recovery §5.3; SQ-03</td></tr>
-        <tr><td>G8</td><td>If the internet is up and the customer doesn’t answer, the ticket closes when the silence wait ends, as long as the internet stayed up the whole time. Silence on its own is neither a yes nor a no.</td><td>REC-11; <code>CP-REC-12</code></td></tr>
+        <tr><td>G8</td><td>If the internet is up and the customer doesn’t answer, the ticket closes when the silence wait ends. Silence on its own is neither a yes nor a no.</td><td>REC-11; <code>CP-REC-12</code></td></tr>
         <tr><td>G9</td><td>A ticket still in pending verification when the final closure limit is reached closes without the internet check or the customer’s yes.</td><td>Conflicts with REC-01, the <code>rec:closed</code> gate, SQ-11, C2</td></tr>
         <tr><td>G10</td><td>Every closure records why it closed: the internet was up, the customer said yes, the customer was silent while the internet stayed up, or the final closure limit was reached.</td><td>Product decision</td></tr>
         <tr><td>G11</td><td>The resolution signal goes to Quality only when the ticket closes.</td><td>Support Resolution OS (signal on CLOSED)</td></tr>

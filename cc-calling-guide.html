@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Early Close Calling Guide</title>
+<meta name="description" content="For the customer care team: what the first calls on early-closed no-internet tickets found, and the daily routine for checking them by phone.">
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column (~72ch) with wide tables and charts allowed to break out; sections are the real sequence of the argument */
+:root {
+  --bg: #f6f7f5;
+  --surface: #ffffff;
+  --ink: #16212b;
+  --muted: #5b6770;
+  --rule: #d9dedb;
+  --accent: #0e5c6b;
+  --accent-soft: #e2eef0;
+  --ok: #1d7648;
+  --ok-soft: #e3f2e9;
+  --wait: #9a5b00;
+  --wait-soft: #fbf0dc;
+  --bad: #b2291f;
+  --bad-soft: #fbe6e3;
+  --gov: #5a3f94;
+  --gov-soft: #eeeaf7;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1518; --surface: #161e22; --ink: #e3e8ea; --muted: #97a3aa; --rule: #2a353a;
+    --accent: #6cc0cf; --accent-soft: #15333a;
+    --ok: #6fd09b; --ok-soft: #173427; --wait: #f0b45a; --wait-soft: #3a2c14;
+    --bad: #f28b80; --bad-soft: #3d1c19; --gov: #b9a4ef; --gov-soft: #2a2340;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1518; --surface: #161e22; --ink: #e3e8ea; --muted: #97a3aa; --rule: #2a353a;
+  --accent: #6cc0cf; --accent-soft: #15333a;
+  --ok: #6fd09b; --ok-soft: #173427; --wait: #f0b45a; --wait-soft: #3a2c14;
+  --bad: #f28b80; --bad-soft: #3d1c19; --gov: #b9a4ef; --gov-soft: #2a2340;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 80px; }
+.col { max-width: 72ch; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--accent-soft); padding: 0.05em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+.eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+section { display: flex; flex-direction: column; gap: 18px; padding-block: 44px 8px; border-top: 1px solid var(--rule); margin-top: 44px; }
+.sec-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.sec-num { font-family: var(--mono); color: var(--accent); font-size: 0.9rem; font-weight: 600; }
+header.top { display: flex; flex-direction: column; gap: 16px; }
+.meta { color: var(--muted); font-size: 0.92rem; }
+.status { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+.pill { display: inline-block; font-family: var(--mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.pill.ok { color: var(--ok); background: var(--ok-soft); }
+.pill.wait { color: var(--wait); background: var(--wait-soft); }
+.pill.bad { color: var(--bad); background: var(--bad-soft); }
+.pill.gov { color: var(--gov); background: var(--gov-soft); }
+.pill.acc { color: var(--accent); background: var(--accent-soft); }
+
+.problem { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.problem .statement { font-family: var(--display); font-size: clamp(1.25rem, 2.6vw, 1.6rem); line-height: 1.3; font-weight: 500; text-wrap: balance; }
+.figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.fig { border-top: 3px solid var(--bad); padding-top: 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fig .n { font-family: var(--display); font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fig .l { font-size: 0.9rem; color: var(--muted); }
+.fig.neutral { border-top-color: var(--accent); }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--bg); }
+tr:last-child td { border-bottom: none; }
+td.c { text-align: center; }
+.y { color: var(--ok); font-weight: 700; }
+.x { color: var(--bad); font-weight: 700; }
+.p { color: var(--wait); font-weight: 700; }
+td .sub { display: block; color: var(--muted); font-size: 0.85rem; }
+.num { font-variant-numeric: tabular-nums; }
+
+.idea { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.way { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.way .k { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+
+.chart { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; overflow-x: auto; }
+.chart .cap { color: var(--muted); font-size: 0.88rem; margin-bottom: 10px; }
+pre.mermaid { margin: 0; background: transparent; text-align: center; }
+
+.clocks { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-x: auto; }
+.lane { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; min-width: 560px; }
+.lane .who { font-weight: 600; font-size: 0.9rem; }
+.bar { position: relative; height: 30px; display: grid; grid-template-columns: 30fr 12fr 38fr 20fr; }
+.seg { display: flex; align-items: center; padding-inline: 8px; font-size: 0.78rem; font-family: var(--mono); white-space: nowrap; overflow: hidden; }
+.seg.run { background: var(--accent-soft); color: var(--accent); border-left: 3px solid var(--accent); }
+.seg.stop { background: repeating-linear-gradient(135deg, var(--bg) 0 6px, var(--rule) 6px 7px); color: var(--muted); }
+.seg.none { background: transparent; }
+.ticks { display: grid; grid-template-columns: 150px 1fr; gap: 12px; min-width: 560px; }
+.ticks .row { display: grid; grid-template-columns: 30fr 12fr 38fr 20fr; font-size: 0.76rem; color: var(--muted); font-family: var(--mono); }
+.ticks .row span { border-left: 1px dashed var(--rule); padding-left: 6px; }
+
+.note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 0.95rem; }
+.note.warn { border-left-color: var(--wait); background: var(--wait-soft); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 0.88rem; color: var(--muted); align-items: center; }
+.qgroup { display: flex; flex-direction: column; gap: 10px; }
+ul.plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 560px) { .wrap { padding-inline: 16px; } .problem { padding: 18px; } }
+</style>
+<style id="readable">
+/* Readability: larger body text, narrower measure, roomier tables, zebra rows, a contents block */
+body { font-size: 17px; line-height: 1.7; }
+.wrap { max-width: 980px; }
+p, li { max-width: 72ch; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.2rem; margin-top: 10px; }
+section { gap: 20px; }
+table { font-size: 0.96rem; line-height: 1.6; }
+th, td { padding: 12px 14px; }
+tbody tr:nth-child(even) td { background: var(--bg); }
+tbody tr td[colspan] { background: var(--accent-soft) !important; color: var(--accent); }
+td:first-child { white-space: nowrap; font-weight: 600; }
+td[colspan]:first-child { white-space: normal; }
+.tablewrap table { min-width: 640px; }
+.note { line-height: 1.65; }
+.toc { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; }
+.toc ol { margin: 0; padding-left: 1.3em; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 4px 24px; }
+.toc a { text-decoration: none; }
+.toc a:hover, .toc a:focus-visible { text-decoration: underline; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">For the customer care team · Service tickets · No internet</div>
+  <h1>Early Close Calling Guide</h1>
+  <p class="col" style="font-size:1.1rem">Some tickets are marked resolved while the customer’s internet is still off. This guide shows what our first calls found, and how to check these tickets by phone every day until the system does it automatically.</p>
+  <div class="status">
+    <span class="pill wait">INTERNAL · CUSTOMER CARE</span>
+    <span class="pill acc">NO INTERNET · RECHARGE DONE, NO INTERNET</span>
+  </div>
+  <p class="meta">Ashish Raj · 12 Oct 2026 · Based on 20 calls made 8–12 Oct 2026. CSP and customer names are left out.</p>
+</header>
+
+<nav class="toc" aria-label="Contents">
+  <span class="eyebrow">Contents</span>
+  <ol>
+    <li><a href="#why">Why we are calling</a></li>
+    <li><a href="#findings">What the first calls found</a></li>
+    <li><a href="#daily">The daily routine</a></li>
+    <li><a href="#script">What to say</a></li>
+    <li><a href="#answers">What to do with each answer</a></li>
+    <li><a href="#codes">How to record it</a></li>
+    <li><a href="#rules">Rules to follow</a></li>
+  </ol>
+</nav>
+
+<section id="why">
+  <div class="sec-head"><span class="sec-num">01</span><h2>Why we are calling</h2></div>
+  <div class="col stack">
+    <p>When a CSP or technician marks a ticket resolved, Wiom closes it and tells the customer it is fixed. Wiom’s own data already shows whether the customer’s router is online at that moment, but today nothing acts on it.</p>
+    <p>In about one in three closures, the router is still offline when the ticket is closed. Those customers come back 3.4 times as often as the rest. Until the system checks this by itself, we check these tickets by phone.</p>
+  </div>
+</section>
+
+<section id="findings">
+  <div class="sec-head"><span class="sec-num">02</span><h2>What the first calls found</h2></div>
+  <p class="col">20 tickets marked resolved while the customer’s router was offline. The CSP was called first, and the customer in three cases.</p>
+  <div class="problem">
+    <p class="statement">Most of these were early closes. The CSP marked the ticket resolved, and the internet came back hours later. Meanwhile the customer had been told it was fixed.</p>
+    <div class="figs">
+      <div class="fig neutral"><span class="n num">14 of 20</span><span class="l">CSPs picked up. 6 did not</span></div>
+      <div class="fig"><span class="n num">20 of 20</span><span class="l">routers came back online after the ticket was closed</span></div>
+      <div class="fig"><span class="n num">~6 hours</span><span class="l">typical wait between “resolved” and the internet actually coming back (1 to 25 hours)</span></div>
+      <div class="fig"><span class="n num">9 of 20</span><span class="l">customers contacted us again about the same problem</span></div>
+    </div>
+  </div>
+
+  <h3>Why the CSPs closed early, in their own words</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Reason the CSP gave</th><th>CSPs</th><th>What they said</th></tr></thead>
+      <tbody>
+        <tr><td>Believed it was fixed: their own portal showed the customer online, or the repair did not hold</td><td class="num">5</td><td>“Mere OLT me online show ho rha hai” (my OLT shows it online) · “mere portal pe green show ho rha hai” (it shows green on my portal) · “wire jod diya tha… phir net nhi chala” (I joined the wire… then the net still didn’t work)</td></tr>
+        <tr><td>Nobody could say who closed it or why: the owner and the technician gave different accounts</td><td class="num">4</td><td>“Maine Owner ko bol diya close karne ko” (I told the owner to close it) · the owner “had no clue why it was resolved before”</td></tr>
+        <tr><td>Time or rating pressure</td><td class="num">2</td><td>“time over ho rha tha isliye maine app me resolve kar diya tha” (time was running out, so I marked it resolved) · “main agar nhi karunga resolve toh aap rating gira doge” (if I don’t resolve it you will lower my rating)</td></tr>
+        <tr><td>Closes on purpose when a whole area is down</td><td class="num">1</td><td>“jab bada issue hota hai toh mai aisa karta hu” (when it’s a big issue, this is what I do)</td></tr>
+        <tr><td>Fixed the router at the office and closed before putting it back</td><td class="num">1</td><td>“mai router office me le aaya… maine close kar diya office me hi” (I brought the router to the office and closed it there)</td></tr>
+        <tr><td>Not a field fault: the customer’s ISP plan had not been renewed</td><td class="num">1</td><td>The plan had expired; no renewal task had been raised</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Did the customers contact us again?</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>How they came back</th><th>Customers</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Reopened the same ticket</td><td class="num">5</td><td>One customer reopened it twice</td></tr>
+        <tr><td>Raised a new ticket while the router was still offline</td><td class="num">4</td><td>1.7 to 5 hours after the close. Two of these also reopened the old ticket</td></tr>
+        <tr><td>Raised a new ticket after the router was back online</td><td class="num">2</td><td>2 to 3 days later. Probably a new fault</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="meta">9 different customers in total, because two appear in two rows. A new ticket is not linked to the old one, so the CSP sees it as new work.</p>
+</section>
+
+<section id="daily">
+  <div class="sec-head"><span class="sec-num">03</span><h2>The daily routine</h2></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Step</th><th>When</th><th>What happens</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Get the list</td><td>10:30</td><td>A call sheet is shared every morning. It lists yesterday’s and this morning’s tickets that were marked resolved while the router was offline and are still offline. A quarter of the rows are marked “do not call”: leave those alone, they show whether calling makes a difference</td></tr>
+        <tr><td>2 · Check before calling</td><td>Before each call</td><td>If the sheet now shows the router back online, record <code>BACK-BEFORE-CALL</code> and move on</td></tr>
+        <tr><td>3 · Call the CSP</td><td>11:00–21:00</td><td>Ask what was done and why it was closed. See the script below</td></tr>
+        <tr><td>4 · Call the customer</td><td>11:00–21:00, 2 tries</td><td>Ask one yes-or-no question. See the script below</td></tr>
+        <tr><td>5 · Act</td><td>Same day</td><td>Follow the table in “What to do with each answer”</td></tr>
+        <tr><td>6 · Record</td><td>After each call</td><td>One outcome code in Status, and notes in Remarks</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="meta">Order of calling: “recharge done, no internet” tickets first, because the customer has already paid; then CSPs with several tickets on the list; then the longest offline.</p>
+</section>
+
+<section id="script">
+  <div class="sec-head"><span class="sec-num">04</span><h2>What to say</h2></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Who</th><th>Ask</th><th>Listen for</th></tr></thead>
+      <tbody>
+        <tr><td>CSP</td><td>“Ticket [number] aapne resolve kiya tha. Uss customer ke yaha kya kaam hua tha, aur ticket kab aur kisne close kiya?” (You resolved ticket [number]. What was done at this customer’s home, and who closed the ticket, and when?)</td><td>What was fixed, who closed it, and whether they checked with the customer. If they say their portal shows the customer online, ask for a screenshot and a photo of the label on the Wiom router</td></tr>
+        <tr><td>Customer</td><td>“Kya aapka internet abhi chal raha hai?” (Is your internet working now?)</td><td>A clear yes or no. If they are unsure, ask them to open any website or video and tell you</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">Keep it neutral with the CSP. We are finding out what happened, not blaming anyone.</div>
+</section>
+
+<section id="answers">
+  <div class="sec-head"><span class="sec-num">05</span><h2>What to do with each answer</h2></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Customer says</th><th>Router in the sheet</th><th>What you do</th></tr></thead>
+      <tbody>
+        <tr><td>Working</td><td>Online</td><td>Nothing more. Record <code>C-YES</code></td></tr>
+        <tr><td>Working</td><td>Still offline</td><td>Record <code>C-YES</code> and note “offline in sheet”. Ask the CSP for a photo of the router label. It may be a reading problem on Wiom’s side</td></tr>
+        <tr><td>Not working</td><td>Any</td><td>Reopen the Kapture ticket. Then call the CSP and tell them: it is the <strong>same ticket and the same issue</strong>, not a new one. Record <code>C-NO</code></td></tr>
+        <tr><td>Not reached</td><td>Still offline</td><td>Do not treat it as a yes. Try again the next day. If the router is still offline after 24 hours, call the CSP again. Record <code>C-DNP</code></td></tr>
+        <tr><td>Not reached</td><td>Online</td><td>Nothing more. Record <code>C-DNP</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="codes">
+  <div class="sec-head"><span class="sec-num">06</span><h2>How to record it</h2></div>
+  <p class="col">Pick one code for the Status column. Write what was said in Remarks, in the person’s own words where you can.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Code</th><th>Use when</th></tr></thead>
+      <tbody>
+        <tr><td><code>BACK-BEFORE-CALL</code></td><td>The router came back online before you called</td></tr>
+        <tr><td><code>C-YES</code></td><td>The customer says the internet works</td></tr>
+        <tr><td><code>C-NO</code></td><td>The customer says it does not work; you reopened the ticket</td></tr>
+        <tr><td><code>C-DNP</code></td><td>The customer did not pick up</td></tr>
+        <tr><td><code>CSP-DNP</code></td><td>The CSP did not pick up</td></tr>
+        <tr><td><code>EARLY-CLOSE</code></td><td>The CSP says they closed before fixing it, and fixed it later</td></tr>
+        <tr><td><code>BLOCKER</code></td><td>Something outside the CSP’s control: road works, area outage, home locked or power off</td></tr>
+        <tr><td><code>PORTAL-UP</code></td><td>The CSP closed because their own portal showed the customer online</td></tr>
+        <tr><td><code>ISP-PLAN</code></td><td>The customer’s ISP plan or recharge was the problem, not the line</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="sec-head"><span class="sec-num">07</span><h2>Rules to follow</h2></div>
+  <ul class="plain col">
+    <li><strong>Never tell a customer their internet is fixed</strong> unless they tell you it works.</li>
+    <li><strong>Silence is not a yes.</strong> A customer who doesn’t pick up has not confirmed anything.</li>
+    <li><strong>Call only between 11:00 and 21:00.</strong></li>
+    <li><strong>A reopened ticket is the same issue.</strong> Always tell the CSP so.</li>
+    <li><strong>Record the answer as said:</strong> yes, no, or not reached. Don’t record how someone sounded.</li>
+    <li><strong>The sheet has customer phone numbers and addresses.</strong> Keep it inside the team. Don’t forward or download it.</li>
+    <li><strong>The sheet’s router data runs about 2 hours behind.</strong> A very recent fix may not show yet.</li>
+  </ul>
+</section>
+
+<footer>
+  <p>Questions about this routine: Ashish Raj. The guardrails for the automatic version are on the <a href="https://ashish-raj-wiom.github.io/service-ticket-verification/">Service Ticket Verification</a> page. The calls feed the design of automatic verification for these tickets.</p>
+</footer>
+
+</div>
+
+</body>
+</html>

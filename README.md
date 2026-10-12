@@ -2,6 +2,7 @@
 
 Guardrails, calling findings and the offline verification routine for no-internet service tickets at Wiom.
 
-Live page: https://ashish-raj-wiom.github.io/service-ticket-verification/
+- Guardrails (for the solution team): https://ashish-raj-wiom.github.io/service-ticket-verification/
+- Early Close Calling Guide (for the customer care team): https://ashish-raj-wiom.github.io/service-ticket-verification/cc-calling-guide.html
 
-Source: `service-task-verification-prd/verification-flow.html`, built with `tools/build_pages.mjs`.
+Source: `service-task-verification-prd`, built with `tools/build_pages.mjs`.

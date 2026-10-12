@@ -212,9 +212,9 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <tr><td>G11</td><td>The resolution signal goes to Quality only when the ticket moves to the Closed state.</td><td>Support Resolution OS (signal on CLOSED)</td></tr>
 
         <tr><td colspan="3"><strong>When the customer says it isn’t working</strong></td></tr>
-        <tr><td>G12</td><td>A closed ticket is never reopened. A ticket can go back to the CSP only while it is in pending verification.</td><td>Nothing leaves <code>rec:closed</code></td></tr>
+        <tr><td>G12</td><td>A closed ticket stays closed, except within the repeat window (G14).</td><td>Lean register: nothing leaves <code>rec:closed</code> (conflict)</td></tr>
         <tr><td>G13</td><td>If the customer says it isn’t working while the ticket is in pending verification, even with the internet up, the same ticket goes back to the CSP. The CSP is told it is the same issue, not a new one.</td><td>REC-11; Recovery §10.2</td></tr>
-        <tr><td>G14</td><td>If the customer says it isn’t working after the ticket has closed, a new ticket opens. Within the repeat window it is linked to the closed ticket and treated as a failed fix, with more urgency. After the window, it is a fresh problem.</td><td>REC-12; C2 (the customer never has to raise it again)</td></tr>
+        <tr><td>G14</td><td>If the customer says it isn’t working within the repeat window after closure, the same ticket reopens and goes back to the CSP, who is told it is the same issue coming back. After the repeat window, a new ticket opens.</td><td>REC-12 treats a repeat as a new case (conflict); C2</td></tr>
 
         <tr><td colspan="3"><strong>Telling the customer</strong></td></tr>
         <tr><td>G15</td><td>The customer is told the internet is fixed only after Wiom’s verdict. Until then, they are told Wiom is checking.</td><td>REC-09; REC-15; C4</td></tr>

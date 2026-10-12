@@ -194,6 +194,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     <table>
       <thead><tr><th>ID</th><th>Guardrail</th><th>Related OS rules</th></tr></thead>
       <tbody>
+        <tr><td colspan="3"><strong>Revised guardrails</strong></td></tr>
         <tr><td>G1</td><td>A closed ticket can’t be reopened.</td><td>Recovery: nothing leaves <code>rec:closed</code></td></tr>
         <tr><td>G2</td><td>The CSP marking the ticket resolved is a mandatory step before closure.</td><td>Recovery §5.3 (work done is one of four proofs); C2</td></tr>
         <tr><td>G3</td><td>The customer saying yes closes the ticket.</td><td>Recovery §5.3; REC-23; SQ-03</td></tr>
@@ -207,6 +208,19 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <tr><td>G11</td><td>Internet up means steadily up across the 30 minutes after the CSP marks the ticket resolved, not a single ping. The 30 minutes is a parameter.</td><td>SQ-09; SQ-16; <code>CP-SQ-33</code>, <code>CP-SQ-34</code>; principle P2</td></tr>
         <tr><td>G12</td><td>V1 covers only no-internet tickets: ISD (internet supply down) and RDNI (recharge done, no internet).</td><td>SQ V1 limit: a ping can’t see speed</td></tr>
         <tr><td>G13</td><td>The customer is told the internet is fixed only after Wiom’s verdict. Until then, they are told Wiom is checking.</td><td>REC-09; REC-15; C4; SQ-16</td></tr>
+              <tr><td colspan="3"><strong>Carried over from the first set</strong></td></tr>
+        <tr><td>G14</td><td>Treat the CSP’s Resolved tap, or anyone’s closure, as a claim. It is never proof the internet works.</td><td>Recovery INV-REC-01, §10.1 (a CSP entry ranks lowest); SQ INV-SQ-16</td></tr>
+        <tr><td>G15</td><td>Close only when at least three of four proofs are in: work done, internet up, customer told, and the customer’s side (a yes, or silence while the internet stays up).</td><td>Recovery §5.3; the <code>rec:closed</code> state in the lean register</td></tr>
+        <tr><td>G16</td><td>Decide by fixed rules only. No scoring models, predictions or machine-learnt judgements of whether a CSP’s claim is true.</td><td>Recovery INV-REC-08</td></tr>
+        <tr><td>G17</td><td>Accept only a structured answer from the customer: a button, a key press, or an agent recording a plain yes or no. Tone, sentiment and free text are never evidence.</td><td>Recovery INV-REC-10</td></tr>
+        <tr><td>G18</td><td>Judge “customer told” on delivery, never on sending, and track delivery separately. If delivery fails, try another channel.</td><td>Recovery INV-REC-23, INV-REC-18, §5.3</td></tr>
+        <tr><td>G19</td><td>Keep the customer informed while the ticket is open.</td><td>Recovery INV-REC-09; C4</td></tr>
+        <tr><td>G20</td><td>Treat silence as neither yes nor no. Silence counts toward closing only while the internet stays up.</td><td>Recovery INV-REC-11, §5.3</td></tr>
+        <tr><td>G21</td><td>Expect the CSP to act, and run the CSP’s TAT clock, only inside the CSP’s working hours. Today that is the SR OS working window, 11:00–21:00 IST every day with no holiday exclusion, which already governs the 4-hour resolution TAT (<code>SR_RESOLUTION_SLA_WINDOW_STANDARD</code>, P91).</td><td>Quality OS v1.16.5 amendment §5.1a (SR OS v1.6.2)</td></tr>
+        <tr><td>G22</td><td>Treat the same problem coming back within 30 days of a closure (<code>CP-REC-03</code>) as a failed fix, not a fresh problem. It carries more urgency than a first-time problem. After 30 days, it is a new problem and is treated as one.</td><td>Recovery INV-REC-12 (REC-12); lean register, Failed recovery re-entry</td></tr>
+        <tr><td>G23</td><td>When a ticket in pending verification goes back to the CSP because the customer says the issue is still open, tell the CSP plainly that it is the <strong>same ticket and the same issue</strong> coming back, not a new one.</td><td>Product requirement; consistent with Recovery §10.2 (the case stays open)</td></tr>
+        <tr><td>G24</td><td>When the customer says the issue is still open, the CSP’s clock resumes from where it stopped. When the ticket finally closes, the CSP’s TAT is the working time the CSP spent across every round. Example: raised 11:00, resolved 15:00 (4 h), in verification until 17:00 (not counted), reopened 17:00, resolved again 20:00 (3 h), confirmed the next day. The CSP’s TAT is 7 hours.</td><td>Product requirement; the CSP’s TAT feeds Quality OS, outside the Customer OS</td></tr>
+        <tr><td>G25</td><td>Tag every closure with the reason it closed, so anyone can tell later how the fix was confirmed. Each way a ticket can close has its own reason: system verification said the internet is up; the customer confirmed the issue is resolved; the customer gave no response for 48 hours while the internet stayed up; or the ticket reached 7 days in pending verification.</td><td>Product decision</td></tr>
       </tbody>
     </table>
   </div>
@@ -247,7 +261,7 @@ flowchart TD
 
 <footer>
   <p>For the customer care team: the calling findings and the daily offline routine are in the <a href="https://ashish-raj-wiom.github.io/service-ticket-verification/cc-calling-guide.html">Early Close Calling Guide</a>.</p>
-  <p>Changes: 13 Oct 2026: guardrails replaced with the PM’s revised set of 13, three of them reworded to fit the OS. The earlier set is kept at <code>archive/verification-flow-v37-2026-10-13.html</code>.</p>
+  <p>Changes: 13 Oct 2026: added the PM’s revised guardrails as G1–G13 (three reworded to fit the OS). The first set follows as G14–G25; two of its rules were dropped because G10 and G11 now cover them.</p>
   <p>Changes: 12 Oct 2026: the calling findings and the offline routine moved to a separate page for the customer care team.</p>
   <p>Changes: 1 Oct 2026 (v11): reshaped into guardrails for the solution team. The earlier version, with the detailed flow, OS-fit tables and open questions, is kept at <code>archive/verification-flow-v10-2026-10-01.html</code> in the project folder.</p>
   <p>Sources: Customer OS lean register v9 · Recovery OS v3.0 · SQ Driver v2.0 · Continuity OS v2.0 · the closure and verification loop study (21 Sep 2026). The diagnosis behind this page: <a href="https://claude.ai/artifact/HrL374wt9cvNWQ46sa6oXJ">Service Tasks Closed While Down</a>.</p>

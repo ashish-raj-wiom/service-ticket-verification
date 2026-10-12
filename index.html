@@ -170,7 +170,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
     <p class="statement">When a CSP taps Resolved, Wiom’s system already checks whether the customer’s internet is up. Then it closes the service task either way. One in three closures happens while the system check says the internet is down, and those customers come back 3.4 times as often.</p>
     <div class="figs">
       <div class="fig"><span class="n num">14,390</span><span class="l">service tasks a month closed as “resolved, system verified” while the system check said the customer’s internet was down (33.9% of checks)</span></div>
-      <div class="fig"><span class="n num">17.9% vs 5.3%</span><span class="l">reopen rate after closing on a “down” check vs an “up” check. About 1,600 avoidable reopens a month</span></div>
+      <div class="fig"><span class="n num">17.9% vs 5.3%</span><span class="l">of customers came back with the same issue after a close on a “down” check vs an “up” check. About 1,600 avoidable repeat contacts a month</span></div>
       <div class="fig"><span class="n num">0</span><span class="l">customers asked whether the fix worked. The code has no working path for it</span></div>
     </div>
   </div>
@@ -199,13 +199,13 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <tr><td>G1</td><td>Version 1 covers only no-internet tickets: internet supply down (ISD) and recharge done but no internet (RDNI).</td><td>SQ V1 limit: a ping can’t see speed</td></tr>
 
         <tr><td colspan="3"><strong>Checking the fix</strong></td></tr>
-        <tr><td>G2</td><td>The CSP must mark the ticket Resolved before it can reach Closure. Resolved is a claim, never proof that the internet works.</td><td>REC-01; SQ-16; Recovery §10.1</td></tr>
+        <tr><td>G2</td><td>A ticket does not need the CSP to mark it Resolved to reach Closure. When Wiom already knows the issue is fixed (the internet is steadily up and the customer says yes), Wiom closes the ticket itself, never penalises the CSP for the missing tap, and shows the CSP that it did. When the CSP does mark it Resolved, that is a claim, never proof that the internet works.</td><td>REC-01; SQ-16; Recovery §5.3</td></tr>
         <tr><td>G3</td><td>The verdict is passed only if the internet stays up steadily through the check window after Resolved. A single ping is not enough.</td><td>SQ-09; SQ-16</td></tr>
         <tr><td>G4</td><td>Every decision follows fixed rules. No scoring models or predictions.</td><td>REC-08</td></tr>
         <tr><td>G5</td><td>The customer’s answer counts only as a plain yes or no: a button, a key press, or an agent recording it. Tone and free text are not answers.</td><td>REC-10</td></tr>
 
         <tr><td colspan="3"><strong>Closing a ticket</strong></td></tr>
-        <tr><td>G6</td><td>A ticket reaches Closure only when at least three of these four are true: the CSP marked it Resolved, the internet is up, the customer has been told, and the customer said yes or stayed silent while the internet stayed up. G9 is the one exception, pending the governors’ ruling.</td><td>Recovery §5.3; <code>rec:closed</code></td></tr>
+        <tr><td>G6</td><td>A ticket reaches Closure only when at least three of these four are true: the CSP marked it Resolved, the internet is up, the customer has been told, and the customer said yes or stayed silent while the internet stayed up. G8 and G9 are the two exceptions, pending the governors’ ruling: G8 closes on silence even if the internet dropped during the wait, and G9 closes on silence with the verdict failed.</td><td>Recovery §5.3; <code>rec:closed</code></td></tr>
         <tr><td>G7</td><td>If the customer says yes during Verification, the ticket reaches Closure immediately, whatever the verdict.</td><td>Recovery §5.3; SQ-03</td></tr>
         <tr><td>G8</td><td>If the verdict is passed and the customer doesn’t answer, the ticket reaches Closure 48 hours after Resolved. Silence on its own is neither a yes nor a no.</td><td>REC-11; <code>CP-REC-12</code></td></tr>
         <tr><td>G9</td><td>If the verdict is failed (internet down or no data) and the customer doesn’t answer, the ticket reaches Closure 7 days after Resolved.</td><td>Conflicts with REC-01, the <code>rec:closed</code> gate, SQ-11, C2</td></tr>
@@ -255,7 +255,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 <section id="flow">
   <div class="sec-head"><span class="sec-num">03</span><h2>Backend flow</h2></div>
-  <p class="col">The flow at its simplest, drawn from the table above. The guardrails set what must hold at every step. A complaint after Closure is a new ticket.</p>
+  <p class="col">The flow at its simplest, drawn from the table above. The guardrails set what must hold at every step. A complaint after Closure is a new ticket. Wiom can also close a ticket the CSP never marked Resolved (G2); the chart leaves that path out.</p>
   <div class="chart">
 <pre class="mermaid">
 flowchart TD
@@ -287,6 +287,7 @@ flowchart TD
 
 <footer>
   <p>For the customer care team: the calling findings and the daily offline routine are in the <a href="https://ashish-raj-wiom.github.io/service-ticket-verification/cc-calling-guide.html">Early Close Calling Guide</a>.</p>
+  <p>Changes, latest: G2 no longer needs the CSP’s Resolved tap for Closure; G6 names G8 and G9 as exceptions; the problem figure says “came back with the same issue” instead of “reopen”.</p>
   <p>Changes: 13 Oct 2026 (later): agreed words added; a ticket that reaches Closure is never Reopened; Verification ends as in the new table; the repeat window removed; the backend flow redrawn.</p>
   <p>Changes: 13 Oct 2026: guardrails merged into one set of 18 with no repeats, reworded, and every time limit made a parameter. The 25-guardrail version is kept at <code>archive/verification-flow-v40-2026-10-13.html</code>.</p>
   <p>Changes: 12 Oct 2026: the calling findings and the offline routine moved to a separate page for the customer care team.</p>

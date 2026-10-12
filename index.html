@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service Ticket Verification</title>
+<meta name="description" content="Guardrails, calling findings and the offline verification routine for no-internet service tickets at Wiom.">
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column (~72ch) with wide tables and charts allowed to break out; sections are the real sequence of the argument */
+:root {
+  --bg: #f6f7f5;
+  --surface: #ffffff;
+  --ink: #16212b;
+  --muted: #5b6770;
+  --rule: #d9dedb;
+  --accent: #0e5c6b;
+  --accent-soft: #e2eef0;
+  --ok: #1d7648;
+  --ok-soft: #e3f2e9;
+  --wait: #9a5b00;
+  --wait-soft: #fbf0dc;
+  --bad: #b2291f;
+  --bad-soft: #fbe6e3;
+  --gov: #5a3f94;
+  --gov-soft: #eeeaf7;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1518; --surface: #161e22; --ink: #e3e8ea; --muted: #97a3aa; --rule: #2a353a;
+    --accent: #6cc0cf; --accent-soft: #15333a;
+    --ok: #6fd09b; --ok-soft: #173427; --wait: #f0b45a; --wait-soft: #3a2c14;
+    --bad: #f28b80; --bad-soft: #3d1c19; --gov: #b9a4ef; --gov-soft: #2a2340;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1518; --surface: #161e22; --ink: #e3e8ea; --muted: #97a3aa; --rule: #2a353a;
+  --accent: #6cc0cf; --accent-soft: #15333a;
+  --ok: #6fd09b; --ok-soft: #173427; --wait: #f0b45a; --wait-soft: #3a2c14;
+  --bad: #f28b80; --bad-soft: #3d1c19; --gov: #b9a4ef; --gov-soft: #2a2340;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 80px; }
+.col { max-width: 72ch; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--mono); font-size: 0.86em; }
+code { background: var(--accent-soft); padding: 0.05em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+.eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+section { display: flex; flex-direction: column; gap: 18px; padding-block: 44px 8px; border-top: 1px solid var(--rule); margin-top: 44px; }
+.sec-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.sec-num { font-family: var(--mono); color: var(--accent); font-size: 0.9rem; font-weight: 600; }
+header.top { display: flex; flex-direction: column; gap: 16px; }
+.meta { color: var(--muted); font-size: 0.92rem; }
+.status { display: inline-flex; gap: 8px; flex-wrap: wrap; }
+.pill { display: inline-block; font-family: var(--mono); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.pill.ok { color: var(--ok); background: var(--ok-soft); }
+.pill.wait { color: var(--wait); background: var(--wait-soft); }
+.pill.bad { color: var(--bad); background: var(--bad-soft); }
+.pill.gov { color: var(--gov); background: var(--gov-soft); }
+.pill.acc { color: var(--accent); background: var(--accent-soft); }
+
+.problem { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.problem .statement { font-family: var(--display); font-size: clamp(1.25rem, 2.6vw, 1.6rem); line-height: 1.3; font-weight: 500; text-wrap: balance; }
+.figs { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.fig { border-top: 3px solid var(--bad); padding-top: 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.fig .n { font-family: var(--display); font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fig .l { font-size: 0.9rem; color: var(--muted); }
+.fig.neutral { border-top-color: var(--accent); }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--bg); }
+tr:last-child td { border-bottom: none; }
+td.c { text-align: center; }
+.y { color: var(--ok); font-weight: 700; }
+.x { color: var(--bad); font-weight: 700; }
+.p { color: var(--wait); font-weight: 700; }
+td .sub { display: block; color: var(--muted); font-size: 0.85rem; }
+.num { font-variant-numeric: tabular-nums; }
+
+.idea { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.way { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.way .k { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+
+.chart { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 18px; overflow-x: auto; }
+.chart .cap { color: var(--muted); font-size: 0.88rem; margin-bottom: 10px; }
+pre.mermaid { margin: 0; background: transparent; text-align: center; }
+
+.clocks { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow-x: auto; }
+.lane { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; min-width: 560px; }
+.lane .who { font-weight: 600; font-size: 0.9rem; }
+.bar { position: relative; height: 30px; display: grid; grid-template-columns: 30fr 12fr 38fr 20fr; }
+.seg { display: flex; align-items: center; padding-inline: 8px; font-size: 0.78rem; font-family: var(--mono); white-space: nowrap; overflow: hidden; }
+.seg.run { background: var(--accent-soft); color: var(--accent); border-left: 3px solid var(--accent); }
+.seg.stop { background: repeating-linear-gradient(135deg, var(--bg) 0 6px, var(--rule) 6px 7px); color: var(--muted); }
+.seg.none { background: transparent; }
+.ticks { display: grid; grid-template-columns: 150px 1fr; gap: 12px; min-width: 560px; }
+.ticks .row { display: grid; grid-template-columns: 30fr 12fr 38fr 20fr; font-size: 0.76rem; color: var(--muted); font-family: var(--mono); }
+.ticks .row span { border-left: 1px dashed var(--rule); padding-left: 6px; }
+
+.note { border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 8px 8px 0; font-size: 0.95rem; }
+.note.warn { border-left-color: var(--wait); background: var(--wait-soft); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: 0.88rem; color: var(--muted); align-items: center; }
+.qgroup { display: flex; flex-direction: column; gap: 10px; }
+ul.plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; }
+@media (max-width: 560px) { .wrap { padding-inline: 16px; } .problem { padding: 18px; } }
+</style>
+<style id="readable">
+/* Readability: larger body text, narrower measure, roomier tables, zebra rows, a contents block */
+body { font-size: 17px; line-height: 1.7; }
+.wrap { max-width: 980px; }
+p, li { max-width: 72ch; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.2rem; margin-top: 10px; }
+section { gap: 20px; }
+table { font-size: 0.96rem; line-height: 1.6; }
+th, td { padding: 12px 14px; }
+tbody tr:nth-child(even) td { background: var(--bg); }
+tbody tr td[colspan] { background: var(--accent-soft) !important; color: var(--accent); }
+td:first-child { white-space: nowrap; font-weight: 600; }
+td[colspan]:first-child { white-space: normal; }
+.tablewrap table { min-width: 640px; }
+.note { line-height: 1.65; }
+.toc { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; }
+.toc ol { margin: 0; padding-left: 1.3em; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 4px 24px; }
+.toc a { text-decoration: none; }
+.toc a:hover, .toc a:focus-visible { text-decoration: underline; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">Service tickets · Customer OS workflow WF-12 (verification subset)</div>
+  <h1>Service Ticket Verification: Guardrails</h1>
+  <p class="col" style="font-size:1.1rem">What any solution for checking a CSP’s Resolved tap must respect. This page sets limits; it does not prescribe the design.</p>
+  <div class="status">
+    <span class="pill wait">DRAFT FOR THE SOLUTION TEAM</span>
+    <span class="pill acc">NO INTERNET · RECHARGE DONE, NO INTERNET · PHASE 1</span>
+  </div>
+  <p class="meta">Ashish Raj · 1 Oct 2026 · Guardrails drawn from the <a href="https://github.com/shailpatel-wiom/customer-os-prd-kit">Customer OS PRD kit</a>. Numbers from the <a href="https://ashish-raj-wiom.github.io/closure-verification-loop-study/">closure and verification loop study</a> (22 Aug – 20 Sep 2026).</p>
+</header>
+<nav class="toc" aria-label="Contents">
+  <span class="eyebrow">Contents</span>
+  <ol><li><a href="#problem">The problem</a></li><li><a href="#guardrails">Guardrails</a></li><li><a href="#flow">Backend flow</a></li><li><a href="#findings">What the calls found</a></li><li><a href="#offline">Offline verification, until the system is built</a></li></ol>
+</nav>
+
+<section id="problem">
+  <div class="sec-head"><span class="sec-num">01</span><h2>The problem</h2></div>
+  <div class="problem">
+    <p class="statement">When a CSP taps Resolved, Wiom’s system already checks whether the customer’s internet is up. Then it closes the service task either way. One in three closures happens while the system check says the internet is down, and those customers come back 3.4 times as often.</p>
+    <div class="figs">
+      <div class="fig"><span class="n num">14,390</span><span class="l">service tasks a month closed as “resolved, system verified” while the system check said the customer’s internet was down (33.9% of checks)</span></div>
+      <div class="fig"><span class="n num">17.9% vs 5.3%</span><span class="l">reopen rate after closing on a “down” check vs an “up” check. About 1,600 avoidable reopens a month</span></div>
+      <div class="fig"><span class="n num">0</span><span class="l">customers asked whether the fix worked. The code has no working path for it</span></div>
+    </div>
+  </div>
+  <div class="col stack">
+    <p>Three things go wrong at once:</p>
+    <ul class="plain">
+      <li><strong>The check does not decide anything.</strong> The system check’s answer is fetched, stored and ignored. A “down” closes exactly like an “up”.</li>
+      <li><strong>The CSP never learns.</strong> The CSP app hides the result once the card is resolved, and the Technician app leaves the screen before the result exists. The CSP’s quality score always records a verified fix.</li>
+      <li><strong>The customer is told, not asked.</strong> They get a “resolved” message with no way to say “it is still not working”. Their only option is to call again.</li>
+    </ul>
+    <p>The worst subtype is recharge done but no internet: the customer has paid and still has no connection, and 49.1% of those close while the check says down.</p>
+  </div>
+</section>
+
+<section id="guardrails">
+  <div class="sec-head"><span class="sec-num">02</span><h2>Guardrails</h2></div>
+  <div class="col stack">
+    <p>What the solution must respect, whatever its design. Most come from the Customer OS documents in the <a href="https://github.com/shailpatel-wiom/customer-os-prd-kit">Customer OS PRD kit</a>; G11 to G14 are product decisions; G9 comes from the CSP-side Quality OS. “Recovery” is the Recovery OS v3.0, “SQ” is SQ Driver v2.0, and C4 is the Customer OS constitution’s clarity-of-state rule.</p>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>ID</th><th>The solution must</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td colspan="3"><strong>What counts as proof</strong></td></tr>
+        <tr><td>G1</td><td>Treat the CSP’s Resolved tap, or anyone’s closure, as a claim. It is never proof the internet works.</td><td>Recovery INV-REC-01, §10.1 (a CSP entry ranks lowest); SQ INV-SQ-16</td></tr>
+        <tr><td>G2</td><td>Close only when at least three of four proofs are in: work done, internet up, customer told, and the customer’s side (a yes, or silence while the internet stays up).</td><td>Recovery §5.3; the <code>rec:closed</code> state in the lean register</td></tr>
+        <tr><td>G3</td><td>Count “internet up” only on sustained evidence, never on one reading.</td><td>SQ INV-SQ-09, INV-SQ-11</td></tr>
+        <tr><td>G4</td><td>Decide by fixed rules only. No scoring models, predictions or machine-learnt judgements of whether a CSP’s claim is true.</td><td>Recovery INV-REC-08</td></tr>
+        <tr><td>G5</td><td>Accept only a structured answer from the customer: a button, a key press, or an agent recording a plain yes or no. Tone, sentiment and free text are never evidence.</td><td>Recovery INV-REC-10</td></tr>
+        <tr><td colspan="3"><strong>Telling and asking the customer</strong></td></tr>
+        <tr><td>G6</td><td>Judge “customer told” on delivery, never on sending, and track delivery separately. If delivery fails, try another channel.</td><td>Recovery INV-REC-23, INV-REC-18, §5.3</td></tr>
+        <tr><td>G7</td><td>Keep the customer informed while the ticket is open.</td><td>Recovery INV-REC-09; C4</td></tr>
+        <tr><td>G8</td><td>Treat silence as neither yes nor no. Silence counts toward closing only while the internet stays up.</td><td>Recovery INV-REC-11, §5.3</td></tr>
+        <tr><td colspan="3"><strong>The CSP’s working hours</strong></td></tr>
+        <tr><td>G9</td><td>Expect the CSP to act, and run the CSP’s TAT clock, only inside the CSP’s working hours. Today that is the SR OS working window, 11:00–21:00 IST every day with no holiday exclusion, which already governs the 4-hour resolution TAT (<code>SR_RESOLUTION_SLA_WINDOW_STANDARD</code>, P91).</td><td>Quality OS v1.16.5 amendment §5.1a (SR OS v1.6.2)</td></tr>
+        <tr><td colspan="3"><strong>Repeats</strong></td></tr>
+        <tr><td>G10</td><td>Treat the same problem coming back within 30 days of a closure (<code>CP-REC-03</code>) as a failed fix, not a fresh problem. It carries more urgency than a first-time problem. After 30 days, it is a new problem and is treated as one.</td><td>Recovery INV-REC-12 (REC-12); lean register, Failed recovery re-entry</td></tr>
+        <tr><td colspan="3"><strong>Reopen and the CSP’s TAT</strong></td></tr>
+        <tr><td>G11</td><td>When a ticket reopens because the customer says the issue is still open, tell the CSP plainly that it is the <strong>same ticket and the same issue</strong> coming back, not a new one.</td><td>Product requirement; consistent with Recovery §10.2 (the case stays open)</td></tr>
+        <tr><td>G12</td><td>Never let verification time count against the CSP’s TAT. The clock stops when the CSP marks the issue resolved, and stays stopped while the ticket waits in verification for the customer to confirm. The wait does not touch the CSP’s metrics.</td><td>Product requirement; the CSP’s TAT feeds Quality OS, outside the Customer OS</td></tr>
+        <tr><td>G13</td><td>When the customer says the issue is still open, the CSP’s clock resumes from where it stopped. When the ticket finally closes, the CSP’s TAT is the working time the CSP spent across every round. Example: raised 11:00, resolved 15:00 (4 h), in verification until 17:00 (not counted), reopened 17:00, resolved again 20:00 (3 h), confirmed the next day. The CSP’s TAT is 7 hours.</td><td>Product requirement; the CSP’s TAT feeds Quality OS, outside the Customer OS</td></tr>
+              <tr><td colspan="3"><strong>Closure reasons</strong></td></tr>
+        <tr><td>G14</td><td>Tag every closure with the reason it closed, so anyone can tell later how the fix was confirmed. Each path in the backend flow has its own reason: system verification said the internet is up; the customer confirmed the issue is resolved; or the customer gave no response while system verification said the internet is up.</td><td>Product decision</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="flow">
+  <div class="sec-head"><span class="sec-num">03</span><h2>Backend flow</h2></div>
+  <p class="col">The flow at its simplest. The guardrails above set what must hold at every step, including any situation this chart leaves out.</p>
+  <div class="chart">
+<pre class="mermaid">
+flowchart TD
+  A["CSP claims the job is done"] --> B["System verification starts at once"]
+  B --> C{"System verification: is the customer's internet up?"}
+  C -- "Up" --> D(["Ticket closed"])
+  D --> E["Quality gets the resolution signal"]
+  C -- "Down" --> F["Customer verification"]
+  F --> G{"What does the customer say?"}
+  G -- "Issue resolved" --> H(["Ticket closed"])
+  H --> E2["Quality gets the resolution signal"]
+  G -- "Not resolved" --> I["Ticket reopens"]
+  G -- "No response" --> NR{"System verification: is the internet up?"}
+  NR -- "Up" --> N(["Ticket closed"])
+  N --> E3["Quality gets the resolution signal"]
+  NR -- "Down" --> O(["Ticket remains open"])
+  I --> J["CSP is told: the same issue, on the same ticket"]
+  J --> K(["CSP TAT resumes"])
+  classDef closed stroke:#1d7648,stroke-width:2px
+  classDef back stroke:#b2291f,stroke-width:2px
+  class D,H,N closed
+  class K back
+  classDef open stroke:#9a5b00,stroke-width:2px
+  class O open
+</pre>
+  </div>
+</section>
+
+
+
+<section id="findings">
+  <div class="sec-head"><span class="sec-num">04</span><h2>What the calls found</h2></div>
+  <p class="col">Calls made 8–12 Oct 2026 on 20 tickets a CSP or technician marked resolved while the customer’s router was offline (no ping in the 15 minutes before the resolve and none in the 30 minutes after). The CSP was called first, and the customer in three cases. CSP and customer names are left out.</p>
+  <div class="problem">
+    <p class="statement">These were early closes, not fake fixes. In all 20 cases the router came back online after the close, a median of about 6 hours later. The CSP marked the ticket resolved first and fixed it afterwards.</p>
+    <div class="figs">
+      <div class="fig neutral"><span class="n num">14 of 20</span><span class="l">CSPs reached. 6 did not pick up</span></div>
+      <div class="fig"><span class="n num">20 of 20</span><span class="l">routers came back online after the ticket was closed</span></div>
+      <div class="fig"><span class="n num">~6 h</span><span class="l">median from “resolved” to the router’s first ping (range 1 to 25 hours). The customer had no internet for that time after being told it was fixed</span></div>
+      <div class="fig neutral"><span class="n num">0</span><span class="l">confirmed cases of the internet working while Wiom read it as down. One is still open</span></div>
+    </div>
+  </div>
+
+  <h3>Why the CSPs closed early, in their own words</h3>
+  <p class="col">Grouped by the reason each CSP gave on the call, one group per CSP. Only what was said on the calls is counted.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Reason the CSP gave</th><th>CSPs</th><th>What they said</th></tr></thead>
+      <tbody>
+        <tr><td>Believed it was fixed: their own portal or OLT showed the customer up, or the repair was done but did not hold</td><td class="num">5</td><td>“Mere OLT me online show ho rha hai” (my OLT shows it online) · “mere portal pe green show ho rha hai” (it shows green on my portal) · “wire jod diya tha… phir net nhi chala” (I joined the wire… then the net still didn’t work)</td></tr>
+        <tr><td>Nobody could say who closed it or why: the owner and the technician gave different accounts</td><td class="num">4</td><td>“Maine Owner ko bol diya close karne ko” (I told the owner to close it) · the owner “had no clue why it was resolved before” · “owner might have done it”</td></tr>
+        <tr><td>Time or rating pressure</td><td class="num">2</td><td>“time over ho rha tha isliye maine app me resolve kar diya tha” (time was running out, so I marked it resolved in the app) · “main agar nhi karunga resolve toh aap rating gira doge… aapne koi option bhi nhi diya” (if I don’t resolve it you will lower my rating… you gave me no other option)</td></tr>
+        <tr><td>Closes on purpose when a whole area is down</td><td class="num">1</td><td>“jab bada issue hota hai toh mai aisa karta hu” (when it’s a big issue, this is what I do) · “pehle option aata tha comment add karne ka, ab bus resolve ka option aata hai” (there used to be an option to add a comment, now there is only resolve)</td></tr>
+        <tr><td>Fixed the Netbox at the office and closed before reinstalling it</td><td class="num">1</td><td>“mai router office me le aaya… maine close kar diya office me hi” (I brought the router to the office… and closed it there)</td></tr>
+        <tr><td>Not a field fault: the customer’s ISP plan had not been renewed</td><td class="num">1</td><td>The ISP plan had expired, and no ISP renewal task was raised for it</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note"><strong>Is it about TAT?</strong> On these calls, only 2 of the 14 CSPs reached named time or rating as the reason. The two most common answers were that they believed it was fixed (5) and that nobody at the CSP could say who closed it or why (4). Twenty calls cannot settle the question. The calls point to more than one cause, and TAT pressure is one of them.</div>
+
+  <h3>What it means for the solution</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>#</th><th>Finding</th><th>What the solution should take from it</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>The harm is the hours between “resolved” and the real fix, about 6 at the median, while the customer has been told it is fixed</td><td>Keep the ticket open until the line is up. Most of these would then close by themselves within the day, and the customer would hear only the truth meanwhile</td></tr>
+        <tr><td>2</td><td>In every case the fix came hours after the CSP’s mark</td><td><strong>Decision needed.</strong> If the CSP’s time counts from the mark whenever the line comes up later, an early close still costs nothing. Count it to when the line actually came up, unless the line is up within the check window</td></tr>
+        <tr><td>3</td><td>CSPs closed because they had no other way to report a blocker</td><td>Give the CSP a way to say why it can’t be fixed now (road works, area outage, home switched off) that holds the ticket instead of closing it</td></tr>
+        <tr><td>4</td><td>CSPs trust their own portal or OLT, which is not the customer’s Netbox</td><td>Show the CSP what Wiom sees on the customer’s line, on the same ticket</td></tr>
+        <tr><td>5</td><td>Owners and technicians give different accounts of who closed the ticket and why</td><td>The check applies whoever taps Resolved</td></tr>
+        <tr><td>6</td><td>A “recharge done, no internet” case was an unrenewed ISP plan</td><td>Check the ISP plan before sending anyone to the customer</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Did the customers come back?</h3>
+  <p class="col"><strong>9 of the 20 did</strong>, up to 12 Oct 2026. Some came back on the same ticket; others raised a new ticket on the same router.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>How they came back</th><th>Customers</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Reopened the same ticket</td><td class="num">5</td><td>One customer reopened it twice</td></tr>
+        <tr><td>Raised a new ticket while the router was still offline</td><td class="num">4</td><td>1.7 to 5 hours after the close, before the line came back. Two of these customers also reopened the old ticket, so they are counted once in the total</td></tr>
+        <tr><td>Raised a new ticket after the router was back online</td><td class="num">2</td><td>2 to 3 days later. Probably a new fault</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="meta">Total: 9 different customers, because two appear in two rows. A new ticket on the same router is not linked to the old one today, so the CSP sees it as new work. CSPs also asked for fewer duplicate tickets for the same customer.</p>
+</section>
+
+<section id="offline">
+  <div class="sec-head"><span class="sec-num">05</span><h2>Offline verification, until the system is built</h2></div>
+  <p class="col">A daily routine that verifies early closes by hand. It fixes customers now and collects the numbers the build needs, such as how often a “down” reading is wrong. It follows the same guardrails as above.</p>
+
+  <h3>The daily routine</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Step</th><th>When</th><th>What happens</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Build the list</td><td>10:30</td><td>The call sheet refreshes with yesterday’s and this morning’s tickets marked resolved while the router was offline, and still offline. Tickets resolved less than 2 hours ago are left out, because ping data runs about 2 hours behind. Your earlier Status and Remarks are kept</td></tr>
+        <tr><td>2 · Hold back a control group</td><td>10:30</td><td>A random quarter of the list is marked “do not call”. Comparing it with the called tickets shows whether calling changes repeat contacts</td></tr>
+        <tr><td>3 · Re-check the line</td><td>Before each call</td><td>If the router has come back online since the list was built, record the time it came back and skip the call. Most early closes resolve themselves within the day</td></tr>
+        <tr><td>4 · Call the CSP</td><td>11:00–21:00</td><td>Ask what was done and why it was closed. No blame. If they say their portal shows it up, ask for a screenshot and a photo of the MAC on the Netbox label</td></tr>
+        <tr><td>5 · Call the customer</td><td>11:00–21:00, 2 tries</td><td>Ask one question: “Kya aapka internet abhi chal raha hai?” (Is your internet working now?) Record yes, no, or not reached. Never tell the customer it is fixed unless they say so</td></tr>
+        <tr><td>6 · Act on the answer</td><td>Same day</td><td>See the table below</td></tr>
+        <tr><td>7 · Record</td><td>After each call</td><td>Set one outcome code in Status and add notes in Remarks</td></tr>
+        <tr><td>8 · Review</td><td>Weekly</td><td>Counts by outcome code, the share that were really not fixed, the share of wrong “down” readings, and customer reach</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>What to do with the customer’s answer</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Customer says</th><th>Router now</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>Working</td><td>Online</td><td>Done. No action</td></tr>
+        <tr><td>Working</td><td>Still offline</td><td>Possible wrong “down” reading. Collect the Netbox MAC (label photo or tech’s device records) and compare it with the CSP’s portal</td></tr>
+        <tr><td>Not working</td><td>Any</td><td>Have the call centre reopen the Kapture ticket, then call the CSP: it is the same ticket and the same issue, not a new one</td></tr>
+        <tr><td>Not reached</td><td>Still offline</td><td>Silence is not a yes. Re-check the next day; if still offline after 24 hours, call the CSP again</td></tr>
+        <tr><td>Not reached</td><td>Online</td><td>Done</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Outcome codes for the Status column</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>BACK-BEFORE-CALL</code></td><td>Router came back online before we called</td></tr>
+        <tr><td><code>C-YES</code></td><td>Customer confirms the internet works</td></tr>
+        <tr><td><code>C-NO</code></td><td>Customer says it does not work; ticket reopened</td></tr>
+        <tr><td><code>C-DNP</code></td><td>Customer not reached</td></tr>
+        <tr><td><code>CSP-DNP</code></td><td>CSP not reached</td></tr>
+        <tr><td><code>EARLY-CLOSE</code></td><td>CSP closed before the fix and fixed it later</td></tr>
+        <tr><td><code>BLOCKER</code></td><td>Outside cause: road works, area outage, home switched off</td></tr>
+        <tr><td><code>PORTAL-UP</code></td><td>CSP relied on their portal or OLT</td></tr>
+        <tr><td><code>WRONG-DOWN</code></td><td>Internet works but Wiom reads the line as down (MAC checked)</td></tr>
+        <tr><td><code>ISP-PLAN</code></td><td>ISP plan or recharge problem, not a field fault</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Effort and limits</h3>
+  <ul class="plain col">
+    <li><strong>Effort.</strong> The list has run at 75–100 tickets a day. After the control group and the re-check, that is about 50–70 calls a day: two callers. One person should take a fixed random 25–30 a day and keep the method the same.</li>
+    <li><strong>The ticket is already closed.</strong> Offline work can only correct afterwards. It cannot hold the ticket open or change the CSP’s TAT and score.</li>
+    <li><strong>Ping data runs about 2 hours behind.</strong> Always re-check before calling.</li>
+    <li><strong>Netbox MACs are not in the data warehouse.</strong> Confirming a wrong “down” reading needs tech’s device records or a label photo.</li>
+    <li><strong>The call sheet holds customer contact details.</strong> Keep it internal.</li>
+  </ul>
+</section>
+
+<footer>
+  <p>Changes: 12 Oct 2026: added §04, the calling findings, and §05, the offline verification routine. The page as it stood before is kept at <code>archive/verification-flow-v33-2026-10-12.html</code>.</p>
+  <p>Changes: 1 Oct 2026 (v11): reshaped into guardrails for the solution team. The earlier version, with the detailed flow, OS-fit tables and open questions, is kept at <code>archive/verification-flow-v10-2026-10-01.html</code> in the project folder.</p>
+  <p>Sources: Customer OS lean register v9 · Recovery OS v3.0 · SQ Driver v2.0 · Continuity OS v2.0 · the closure and verification loop study (21 Sep 2026). The diagnosis behind this page: <a href="https://claude.ai/artifact/HrL374wt9cvNWQ46sa6oXJ">Service Tasks Closed While Down</a>.</p>
+</footer>
+
+</div>
+
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+const dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+mermaid.initialize({ startOnLoad: true, securityLevel: "strict", theme: dark ? "dark" : "neutral", flowchart: { useMaxWidth: true, htmlLabels: true }, fontFamily: "Public Sans, Segoe UI, sans-serif" });
+</script>
+</body>
+</html>

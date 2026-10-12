@@ -176,7 +176,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   <div class="sec-head"><span class="sec-num">01</span><h2>Why we are calling</h2></div>
   <div class="col stack">
     <p>When a CSP or technician marks a ticket resolved, Wiom closes it and tells the customer it is fixed. In about one in three closures, Wiom’s data shows the customer’s router still offline at that moment, and those customers come back 3.4 times as often as the rest.</p>
-    <p><strong>The goal of these calls is to understand why the CSP closes the ticket while the router is still offline.</strong> Every call ends with one of three answers: the customer actually has internet (a problem in Wiom’s data), the CSP told the customer when it would be fixed, or the CSP closed it without telling the customer, in which case we ask the CSP why.</p>
+    <p><strong>The goal of these calls is to understand why the CSP closes the ticket while the router is still offline.</strong> Every call ends with one of four answers: the customer actually has internet (a problem in Wiom’s data); the CSP told the customer when it would be fixed; the CSP closed it without telling the customer, and we ask the CSP why; or the customer did not answer, and we ask the CSP what the issue is.</p>
   </div>
 </section>
 
@@ -224,23 +224,24 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 <section id="process">
   <div class="sec-head"><span class="sec-num">03</span><h2>The calling process</h2></div>
-  <p class="col">Each call answers one question: why did the CSP close this ticket while the customer’s router was offline? Start with the customer, and call the CSP only when the customer’s answer calls for it.</p>
+  <p class="col">Each call answers one question: why did the CSP close this ticket while the customer’s router was offline? Start with the customer, and call the CSP when the customer’s answer calls for it.</p>
   <div class="chart">
 <pre class="mermaid">
 flowchart TD
   A["Ticket on the call sheet:&lt;br/&gt;closed while the router was offline"] --> B{"Call the customer:&lt;br/&gt;is your internet working?"}
   B -- "Yes, working" --> C(["Data issue on Wiom's side&lt;br/&gt;Report to the IX team"])
   B -- "No, not working" --> D{"Did the CSP call you&lt;br/&gt;and say when it will be fixed?"}
-  B -- "Not reached" --> R(["Try again later the same day&lt;br/&gt;then the next day"])
+  B -- "No answer" --> U["Call the CSP:&lt;br/&gt;what is the issue?"]
   D -- "Yes" --> E(["Record what was promised&lt;br/&gt;and by when"])
-  D -- "No" --> F["Call the CSP:&lt;br/&gt;why was it closed before the fix?"]
-  F --> G(["Record the CSP's reason&lt;br/&gt;in their own words"])
+  D -- "No" --> F{"Call the CSP:&lt;br/&gt;why was it closed before the fix?"}
+  F -- "Shows green on my portal" --> P(["Ask for a portal screenshot&lt;br/&gt;Report to the IX team"])
+  F -- "I am fixing it" --> Q(["Ask why it was resolved&lt;br/&gt;before the fix. Record the reason"])
+  F -- "Other answer" --> O(["Record the reason&lt;br/&gt;in their own words"])
+  U --> UO(["Record what the CSP says&lt;br/&gt;the issue is"])
   classDef good stroke:#1d7648,stroke-width:2px
   classDef ask stroke:#0e5c6b,stroke-width:2px
-  classDef wait stroke:#9a5b00,stroke-width:2px
-  class C,E,G good
-  class F ask
-  class R wait
+  class C,E,P,Q,O,UO good
+  class F,U ask
 </pre>
   </div>
 
@@ -251,17 +252,20 @@ flowchart TD
       <tbody>
         <tr><td>1 · Pick the ticket</td><td>Take the next row on the call sheet. Every row is a ticket marked resolved while the customer’s router was offline, and still offline when the sheet was made. If the sheet now shows the router back online, record <code>BACK-BEFORE-CALL</code> and move on</td></tr>
         <tr><td>2 · Call the customer</td><td>Ask whether their internet is working now. Two tries, between 11:00 and 21:00</td></tr>
-        <tr><td>3a · Internet working</td><td>The customer has internet but Wiom shows the router offline, so the problem is in Wiom’s data. Record <code>NET-WORKING</code> and report the ticket to the IX team (see below). No call to the CSP</td></tr>
+        <tr><td>3a · Internet working</td><td>The customer has internet but Wiom shows the router offline, so the problem is in Wiom’s data. Record <code>NET-WORKING</code> and report the ticket to the IX team. No call to the CSP</td></tr>
         <tr><td>3b · Internet not working</td><td>Ask whether the CSP called them and said when it would be fixed</td></tr>
         <tr><td>4a · CSP gave a time</td><td>Record what was promised and by when. Record <code>COMMITTED</code></td></tr>
-        <tr><td>4b · CSP did not call</td><td>Call the CSP and ask why the ticket was closed before it was fixed. Write their answer in Remarks in their own words, and pick the closest reason code. Record <code>NO-CALL</code></td></tr>
-        <tr><td>3c · Customer not reached</td><td>Silence is not an answer. Try again later the same day, then the next day. Record <code>C-DNP</code></td></tr>
+        <tr><td>4b · CSP did not call</td><td>Record <code>NO-CALL</code>. Call the CSP and ask why the ticket was closed before it was fixed. Then follow the CSP’s answer below</td></tr>
+        <tr><td>5a · “It shows green on my portal”</td><td>Ask for a screenshot of their portal. Report the ticket to the IX team with the screenshot. Reason code <code>R-PORTAL</code></td></tr>
+        <tr><td>5b · “I am fixing it”</td><td>Ask why they marked it resolved before it was fixed. Record their answer in their own words and pick the closest reason code</td></tr>
+        <tr><td>5c · Any other answer</td><td>Record it in their own words and pick the closest reason code</td></tr>
+        <tr><td>3c · Customer did not answer</td><td>Record <code>C-DNP</code>. Call the CSP and ask what the issue is. Record what they say and pick the closest reason code. Try the customer again later</td></tr>
       </tbody>
     </table>
   </div>
 
   <h3>Reporting to the IX team</h3>
-  <p class="col">For every <code>NET-WORKING</code> ticket, send the IX team the Kapture ticket ID, the time you called, and what the customer said. The customer has internet while Wiom’s data shows their router offline, so they need to find out why.</p>
+  <p class="col">Send the IX team the Kapture ticket ID, the time you called, what the customer or CSP said, and the CSP’s portal screenshot if you have one. These are cases where Wiom’s data and what people see on the ground disagree, and the IX team needs to find out why.</p>
 </section>
 
 <section id="script">
@@ -272,7 +276,10 @@ flowchart TD
       <tbody>
         <tr><td>Customer</td><td>“Kya aapka internet abhi chal raha hai?” (Is your internet working now?)</td><td>A clear yes or no. If they are unsure, ask them to open any website or video and tell you</td></tr>
         <tr><td>Customer, if not working</td><td>“Kya aapke CSP ne aapko call karke bataya ki internet kab tak theek ho jayega?” (Did your CSP call you and say when the internet would be fixed?) If yes: “Kab tak ka bola tha?” (By when did they say?)</td><td>Yes or no, and the time they were given</td></tr>
-        <tr><td>CSP, if the customer was not told</td><td>“Ticket [number] customer ka net abhi bhi band hai. Ticket theek hone se pehle close kyun hua? Kya hua tha?” (The customer’s internet on ticket [number] is still off. Why was the ticket closed before it was fixed? What happened?)</td><td>The reason in their own words: time pressure, their portal showed it up, someone else closed it, a blocker such as road works or an area outage, or something else</td></tr>
+        <tr><td>CSP, if the customer was not told</td><td>“Ticket [number] customer ka net abhi bhi band hai. Ticket theek hone se pehle close kyun hua?” (The customer’s internet on ticket [number] is still off. Why was the ticket closed before it was fixed?)</td><td>Their reason in their own words</td></tr>
+        <tr><td>CSP, if they say “I am fixing it”</td><td>“Theek ho raha hai toh resolve pehle kyun kiya?” (If it is still being fixed, why was it resolved already?)</td><td>Why they closed early: time, rating, someone else closed it, or something else</td></tr>
+        <tr><td>CSP, if the portal shows green</td><td>“Kya aap apne portal ka screenshot bhej sakte hain?” (Can you send a screenshot of your portal?)</td><td>The screenshot, for the IX team</td></tr>
+        <tr><td>CSP, if the customer did not answer</td><td>“Ticket [number] customer se baat nahi ho payi, aur router abhi bhi offline dikh raha hai. Kya issue hai?” (We couldn’t reach the customer on ticket [number], and the router still shows offline. What is the issue?)</td><td>What the fault is, and whether it is fixed</td></tr>
       </tbody>
     </table>
   </div>
@@ -301,8 +308,8 @@ flowchart TD
     <table>
       <thead><tr><th>Code</th><th>The CSP says</th></tr></thead>
       <tbody>
+        <tr><td><code>R-PORTAL</code></td><td>Their own portal or OLT shows the customer online (green); reported to the IX team</td></tr>
         <tr><td><code>R-TIME</code></td><td>They closed to stay within time, or to protect their rating</td></tr>
-        <tr><td><code>R-PORTAL</code></td><td>Their own portal or OLT showed the customer online</td></tr>
         <tr><td><code>R-SOMEONE-ELSE</code></td><td>Someone else closed it: the owner, a technician, or they don’t know who</td></tr>
         <tr><td><code>R-BLOCKER</code></td><td>Something outside their control: road works, area outage, power, home locked</td></tr>
         <tr><td><code>R-OTHER</code></td><td>Any other reason; write it in Remarks</td></tr>

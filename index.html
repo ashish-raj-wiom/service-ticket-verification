@@ -189,6 +189,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   <div class="sec-head"><span class="sec-num">02</span><h2>Guardrails</h2></div>
   <div class="col stack">
     <p>What the solution must respect, whatever its design. Set by the PM and checked against the Customer OS lean register in the <a href="https://github.com/shailpatel-wiom/customer-os-prd-kit">Customer OS PRD kit</a>. “Recovery” is the Recovery OS v3.0, “SQ” is SQ Driver v2.0, and C2 and C4 are rules of the Customer OS constitution. Every time limit is a parameter, listed below the table.</p>
+    <p><strong>Words used here.</strong> <em>Resolved</em>: the CSP marks the ticket resolved. <em>Verification</em>: the state a ticket is in after Resolved, until Closure. <em>Verdict</em>: Wiom’s check of the customer’s internet after Resolved, passed (up) or failed (down or no data). <em>Reopened</em>: during Verification, the ticket goes back to the CSP. <em>Closure</em>: the ticket is closed, for good.</p>
   </div>
   <div class="tablewrap">
     <table>
@@ -198,31 +199,42 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <tr><td>G1</td><td>Version 1 covers only no-internet tickets: internet supply down (ISD) and recharge done but no internet (RDNI).</td><td>SQ V1 limit: a ping can’t see speed</td></tr>
 
         <tr><td colspan="3"><strong>Checking the fix</strong></td></tr>
-        <tr><td>G2</td><td>The CSP must mark the ticket resolved before it can close. That tap is a claim, never proof that the internet works.</td><td>REC-01; SQ-16; Recovery §10.1</td></tr>
-        <tr><td>G3</td><td>The internet counts as up only if it stays up steadily through the check window after the CSP marks the ticket resolved. A single ping is not enough.</td><td>SQ-09; SQ-16</td></tr>
+        <tr><td>G2</td><td>The CSP must mark the ticket Resolved before it can reach Closure. Resolved is a claim, never proof that the internet works.</td><td>REC-01; SQ-16; Recovery §10.1</td></tr>
+        <tr><td>G3</td><td>The verdict is passed only if the internet stays up steadily through the check window after Resolved. A single ping is not enough.</td><td>SQ-09; SQ-16</td></tr>
         <tr><td>G4</td><td>Every decision follows fixed rules. No scoring models or predictions.</td><td>REC-08</td></tr>
         <tr><td>G5</td><td>The customer’s answer counts only as a plain yes or no: a button, a key press, or an agent recording it. Tone and free text are not answers.</td><td>REC-10</td></tr>
 
         <tr><td colspan="3"><strong>Closing a ticket</strong></td></tr>
-        <tr><td>G6</td><td>A ticket closes only when at least three of these four are true: the CSP marked it resolved, the internet is up, the customer has been told, and the customer said yes or stayed silent while the internet stayed up.</td><td>Recovery §5.3; <code>rec:closed</code></td></tr>
-        <tr><td>G7</td><td>A customer’s yes closes the ticket.</td><td>Recovery §5.3; SQ-03</td></tr>
-        <tr><td>G8</td><td>If the internet is up and the customer doesn’t answer, the ticket closes when the silence wait ends. Silence on its own is neither a yes nor a no.</td><td>REC-11; <code>CP-REC-12</code></td></tr>
-        <tr><td>G9</td><td>A ticket still in pending verification when the final closure limit is reached closes without the internet check or the customer’s yes.</td><td>Conflicts with REC-01, the <code>rec:closed</code> gate, SQ-11, C2</td></tr>
-        <tr><td>G10</td><td>Every closure records why it closed: the internet was up, the customer said yes, the customer was silent while the internet stayed up, or the final closure limit was reached.</td><td>Product decision</td></tr>
-        <tr><td>G11</td><td>The resolution signal goes to Quality only when the ticket moves to the Closed state.</td><td>Support Resolution OS (signal on CLOSED)</td></tr>
+        <tr><td>G6</td><td>A ticket reaches Closure only when at least three of these four are true: the CSP marked it Resolved, the internet is up, the customer has been told, and the customer said yes or stayed silent while the internet stayed up. G9 is the one exception, pending the governors’ ruling.</td><td>Recovery §5.3; <code>rec:closed</code></td></tr>
+        <tr><td>G7</td><td>If the customer says yes during Verification, the ticket reaches Closure immediately, whatever the verdict.</td><td>Recovery §5.3; SQ-03</td></tr>
+        <tr><td>G8</td><td>If the verdict is passed and the customer doesn’t answer, the ticket reaches Closure 48 hours after Resolved. Silence on its own is neither a yes nor a no.</td><td>REC-11; <code>CP-REC-12</code></td></tr>
+        <tr><td>G9</td><td>If the verdict is failed (internet down or no data) and the customer doesn’t answer, the ticket reaches Closure 7 days after Resolved.</td><td>Conflicts with REC-01, the <code>rec:closed</code> gate, SQ-11, C2</td></tr>
+        <tr><td>G10</td><td>Every Closure records why it happened: the customer said yes; the customer didn’t answer for 48 hours with the verdict passed; or the customer didn’t answer for 7 days with the verdict failed.</td><td>Product decision</td></tr>
+        <tr><td>G11</td><td>The resolution signal goes to Quality only at Closure.</td><td>Support Resolution OS (signal on CLOSED)</td></tr>
 
         <tr><td colspan="3"><strong>When the customer says it isn’t working</strong></td></tr>
-        <tr><td>G12</td><td>A closed ticket stays closed, except within the repeat window (G14).</td><td>Lean register: nothing leaves <code>rec:closed</code> (conflict)</td></tr>
-        <tr><td>G13</td><td>If the customer says it isn’t working while the ticket is in pending verification, even with the internet up, the same ticket goes back to the CSP. The CSP is told it is the same issue, not a new one.</td><td>REC-11; Recovery §10.2</td></tr>
-        <tr><td>G14</td><td>If the customer says it isn’t working within the repeat window after closure, the same ticket reopens and goes back to the CSP, who is told it is the same issue coming back. After the repeat window, a new ticket opens.</td><td>REC-12 treats a repeat as a new case (conflict); C2</td></tr>
+        <tr><td>G12</td><td>A ticket that has reached Closure is never Reopened.</td><td>Nothing leaves <code>rec:closed</code></td></tr>
+        <tr><td>G13</td><td>If the customer says it isn’t working during Verification, the ticket is Reopened immediately, whatever the verdict. It goes back to the same CSP, who is told it is the same issue, not a new one. When the CSP marks it Resolved again, a new Verification starts.</td><td>REC-11; Recovery §10.2</td></tr>
+        <tr><td>G14</td><td>If the customer says it isn’t working after Closure, a new ticket opens.</td><td>REC-12 (a repeat within 30 days is a failed fix); C2</td></tr>
 
         <tr><td colspan="3"><strong>Telling the customer</strong></td></tr>
-        <tr><td>G15</td><td>Wiom contacts the customer about the fix only once the CSP has marked the ticket resolved and Wiom has a verification verdict. If the verdict is passed (internet up), the customer is told the issue is fixed and can say if it still isn’t working; their reply shows whether the underlying issue is really resolved. If the verdict is failed (internet not up), the customer is asked whether the issue is resolved, because the router may simply be off while nobody is home, or Wiom’s data may be wrong.</td><td>REC-09; REC-15; C4</td></tr>
+        <tr><td>G15</td><td>Wiom contacts the customer about the fix only once the CSP has marked the ticket Resolved and Wiom has a verdict. If the verdict is passed, the customer is told the issue is fixed and can say if it still isn’t working; their reply shows whether the underlying issue is really resolved. If the verdict is failed, the customer is asked whether the issue is resolved, because the router may simply be off while nobody is home, or Wiom’s data may be wrong.</td><td>REC-09; REC-15; C4</td></tr>
         <tr><td>G16</td><td>A message counts as told only once it is delivered, not when it is sent. If delivery fails, Wiom tries another channel.</td><td>REC-18; REC-23</td></tr>
 
         <tr><td colspan="3"><strong>The CSP’s TAT</strong></td></tr>
         <tr><td>G17</td><td>The CSP’s TAT counts only the time the CSP spends on the ticket, inside the CSP’s working hours. Time spent verifying, by Wiom or the customer, never counts.</td><td>CSP-side TAT, outside the Customer OS</td></tr>
-        <tr><td>G18</td><td>When a ticket goes back to the CSP, the clock resumes where it stopped, and the final TAT adds up every round. Example: raised 11:00, resolved 15:00 (4 hours), in verification until 17:00 (not counted), back with the CSP 17:00–20:00 (3 hours). TAT: 7 hours.</td><td>CSP-side TAT, outside the Customer OS</td></tr>
+        <tr><td>G18</td><td>When a ticket is Reopened, the CSP’s clock resumes where it stopped, and the final TAT adds up every round. Example: raised 11:00, Resolved 15:00 (4 hours), in Verification until 17:00 (not counted), Reopened 17:00, Resolved again 20:00 (3 hours). TAT: 7 hours.</td><td>CSP-side TAT, outside the Customer OS</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>How Verification ends</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Verdict</th><th>Customer says yes</th><th>Customer says no</th><th>Customer doesn’t answer</th></tr></thead>
+      <tbody>
+        <tr><td>Passed (internet up)</td><td>Closure, immediately</td><td>Reopened, immediately</td><td>Closure after 48 hours</td></tr>
+        <tr><td>Failed (internet down or no data)</td><td>Closure, immediately</td><td>Reopened, immediately</td><td>Closure after 7 days</td></tr>
       </tbody>
     </table>
   </div>
@@ -233,9 +245,8 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
       <thead><tr><th>Parameter</th><th>Value</th><th>Used in</th><th>OS reference</th></tr></thead>
       <tbody>
         <tr><td>Check window</td><td>30 minutes</td><td>G3</td><td>SQ Driver restoration window <code>CP-SQ-33</code> is 2–24 hours, so 30 minutes needs the governors</td></tr>
-        <tr><td>Silence wait</td><td>48 hours</td><td>G8</td><td><code>CP-REC-12</code>: 24 hours default, 12–48 hours allowed</td></tr>
-        <tr><td>Final closure limit</td><td>7 days</td><td>G9, G10</td><td>No OS equivalent</td></tr>
-        <tr><td>Repeat window</td><td>48 hours</td><td>G14</td><td>Matches the Support Resolution OS reopen window (<code>P_SR_REOPEN_WINDOW</code>, 48 hours). The Customer OS uses <code>CP-REC-03</code>: 30 days, 14–60 days allowed</td></tr>
+        <tr><td>Verification window, verdict passed</td><td>48 hours</td><td>G8</td><td><code>CP-REC-12</code>: 24 hours default, 12–48 hours allowed</td></tr>
+        <tr><td>Verification window, verdict failed</td><td>7 days</td><td>G9</td><td>No OS equivalent</td></tr>
         <tr><td>CSP working hours</td><td>11:00–21:00 IST, every day</td><td>G17</td><td>Support Resolution OS working window, which already governs the 4-hour resolution TAT (P91)</td></tr>
       </tbody>
     </table>
@@ -244,31 +255,30 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 <section id="flow">
   <div class="sec-head"><span class="sec-num">03</span><h2>Backend flow</h2></div>
-  <p class="col">The flow at its simplest. The guardrails above set what must hold at every step, including any situation this chart leaves out.</p>
+  <p class="col">The flow at its simplest, drawn from the table above. The guardrails set what must hold at every step. A complaint after Closure is a new ticket.</p>
   <div class="chart">
 <pre class="mermaid">
 flowchart TD
-  A["CSP claims the job is done"] --> B["System verification starts at once"]
-  B --> C{"System verification: is the customer's internet up?"}
-  C -- "Up" --> D(["Ticket closed"])
-  D --> E["Quality gets the resolution signal"]
-  C -- "Down" --> F["Customer verification"]
-  F --> G{"What does the customer say?"}
-  G -- "Issue resolved" --> H(["Ticket closed"])
-  H --> E2["Quality gets the resolution signal"]
-  G -- "Not resolved" --> I["Ticket reopens"]
-  G -- "No response" --> NR{"System verification: is the internet up?"}
-  NR -- "Up" --> N(["Ticket closed"])
-  N --> E3["Quality gets the resolution signal"]
-  NR -- "Down" --> O(["Ticket remains open"])
-  I --> J["CSP is told: the same issue, on the same ticket"]
-  J --> K(["CSP TAT resumes"])
+  A["CSP marks the ticket Resolved"] --> B{"Verdict: is the customer's internet up?"}
+  B -- "Passed" --> P["Customer told it is fixed"]
+  B -- "Failed or no data" --> F["Customer asked if it is fixed"]
+  P --> PA{"Customer"}
+  F --> FA{"Customer"}
+  PA -- "Yes" --> C1(["Closure"])
+  PA -- "No" --> R(["Reopened: back to the same CSP, same issue"])
+  PA -- "No answer for 48 hours" --> C2(["Closure"])
+  FA -- "Yes" --> C3(["Closure"])
+  FA -- "No" --> R
+  FA -- "No answer for 7 days" --> C4(["Closure"])
+  R --> A
+  C1 --> Q["Quality gets the resolution signal"]
+  C2 --> Q
+  C3 --> Q
+  C4 --> Q
   classDef closed stroke:#1d7648,stroke-width:2px
   classDef back stroke:#b2291f,stroke-width:2px
-  class D,H,N closed
-  class K back
-  classDef open stroke:#9a5b00,stroke-width:2px
-  class O open
+  class C1,C2,C3,C4 closed
+  class R back
 </pre>
   </div>
 </section>
@@ -277,6 +287,7 @@ flowchart TD
 
 <footer>
   <p>For the customer care team: the calling findings and the daily offline routine are in the <a href="https://ashish-raj-wiom.github.io/service-ticket-verification/cc-calling-guide.html">Early Close Calling Guide</a>.</p>
+  <p>Changes: 13 Oct 2026 (later): agreed words added; a ticket that reaches Closure is never Reopened; Verification ends as in the new table; the repeat window removed; the backend flow redrawn.</p>
   <p>Changes: 13 Oct 2026: guardrails merged into one set of 18 with no repeats, reworded, and every time limit made a parameter. The 25-guardrail version is kept at <code>archive/verification-flow-v40-2026-10-13.html</code>.</p>
   <p>Changes: 12 Oct 2026: the calling findings and the offline routine moved to a separate page for the customer care team.</p>
   <p>Changes: 1 Oct 2026 (v11): reshaped into guardrails for the solution team. The earlier version, with the detailed flow, OS-fit tables and open questions, is kept at <code>archive/verification-flow-v10-2026-10-01.html</code> in the project folder.</p>

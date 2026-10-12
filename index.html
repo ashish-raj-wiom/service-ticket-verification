@@ -200,7 +200,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
         <tr><td colspan="3"><strong>Checking the fix</strong></td></tr>
         <tr><td>G2</td><td>The CSP must mark the ticket Resolved before it can reach Closure. This step is mandatory. Resolved is a claim, never proof that the internet works.</td><td>REC-01; SQ-16; Recovery §10.1</td></tr>
-        <tr><td>G3</td><td>The verdict is passed only if the internet stays up steadily through the check window after Resolved. A single ping is not enough.</td><td>SQ-09; SQ-16. Conflicts with <code>CP-SQ-33</code>: the 30-minute check window is below its 2–24 hours</td></tr>
+        <tr><td>G3</td><td>The verdict is passed if the internet is seen up within the check window after Resolved. In version 1, one ping is enough. For recharge done but no internet, the verdict is passed only if the customer’s plan is also active, because the router can be up while the plan blocks the internet.</td><td>SQ-16. Conflicts with SQ-09 (no state change on a single data point) and with <code>CP-SQ-33</code>: the 30-minute check window is below its 2–24 hours</td></tr>
         <tr><td>G4</td><td>Every decision follows fixed rules. No scoring models or predictions.</td><td>REC-08</td></tr>
         <tr><td>G5</td><td>The customer’s answer counts only as a plain yes or no: a button, a key press, or an agent recording it. Tone and free text are not answers. The customer “doesn’t answer” only when no yes or no comes back on any channel Wiom used to reach them.</td><td>REC-10</td></tr>
 
@@ -214,18 +214,19 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
         <tr><td colspan="3"><strong>When the customer says it isn’t working</strong></td></tr>
         <tr><td>G12</td><td>A ticket that has reached Closure is never Reopened.</td><td>Nothing leaves <code>rec:closed</code></td></tr>
-        <tr><td>G13</td><td>If the customer says it isn’t working during Verification, the ticket is Reopened immediately, whatever the verdict. It goes back to the same CSP, who is told it is the same issue, not a new one. When the CSP marks it Resolved again, a new Verification starts. Version 1 sets no limit on the number of rounds; we will learn whether one is needed.</td><td>REC-11; Recovery §10.2</td></tr>
-        <tr><td>G14</td><td>If the customer says it isn’t working after Closure, a new ticket opens.</td><td>REC-12 (a repeat within 30 days is a failed fix); C2</td></tr>
+        <tr><td>G13</td><td>If the customer says it isn’t working during Verification, the ticket is Reopened immediately, whatever the verdict. It goes back to the same CSP, who is told it is the same issue, not a new one. Internet up is only a proxy for the fix, so the CSP diagnoses the issue again. When the CSP marks it Resolved again, a new Verification starts. Version 1 sets no limit on the number of rounds; we will learn whether one is needed.</td><td>REC-11; Recovery §10.2</td></tr>
+        <tr><td>G14</td><td>If the customer gets in touch about the same issue during Verification, it is neither a new ticket nor a no. The customer is told the CSP is still working on it.</td><td>C2; C4</td></tr>
+        <tr><td>G15</td><td>If the customer says it isn’t working after Closure, a new ticket opens.</td><td>REC-12 (a repeat within 30 days is a failed fix); C2</td></tr>
 
         <tr><td colspan="3"><strong>Telling the customer</strong></td></tr>
-        <tr><td>G15</td><td>Wiom contacts the customer about the fix only once the CSP has marked the ticket Resolved and Wiom has a verdict. If the verdict is passed, the customer is told the issue is fixed and can say if it still isn’t working; their reply shows whether the underlying issue is really resolved. If the verdict is failed, the customer is asked whether the issue is resolved, because the router may simply be off while nobody is home, or Wiom’s data may be wrong.</td><td>REC-09; REC-15; C4</td></tr>
-        <tr><td>G16</td><td>A message counts as told only once it is delivered, not when it is sent. If delivery fails, Wiom tries another channel.</td><td>REC-18; REC-23</td></tr>
+        <tr><td>G16</td><td>Wiom contacts the customer about the fix only once the CSP has marked the ticket Resolved and Wiom has a verdict. If the verdict is passed, the customer is told the issue is fixed and can say if it still isn’t working; their reply shows whether the underlying issue is really resolved. If the verdict is failed, the customer is asked whether the issue is resolved, because the router may simply be off while nobody is home, or Wiom’s data may be wrong. Wiom reaches the customer by app notification, SMS and an IVR call.</td><td>REC-09; REC-15; C4</td></tr>
+        <tr><td>G17</td><td>In version 1, a message counts as told once it is sent. Wiom does not check delivery. The Verification windows run from Resolved, not from when the customer is told.</td><td>Conflicts with REC-18 (delivery tracked separately from sending) and REC-23 (told means delivered)</td></tr>
 
         <tr><td colspan="3"><strong>Telling the CSP</strong></td></tr>
-        <tr><td>G17</td><td>Once the CSP marks the ticket Resolved, the CSP sees that Wiom is verifying the fix, and sees the verdict. If the ticket is Reopened, the CSP is told the customer said it isn’t working. When the ticket reaches Closure, the CSP sees why (G10).</td><td>CSP-side, outside the Customer OS</td></tr>
+        <tr><td>G18</td><td>Once the CSP marks the ticket Resolved, the CSP sees that Wiom is verifying the fix, and sees the verdict. If the ticket is Reopened, the CSP is told the customer said it isn’t working. When the ticket reaches Closure, the CSP sees why (G10).</td><td>CSP-side, outside the Customer OS</td></tr>
         <tr><td colspan="3"><strong>The CSP’s TAT</strong></td></tr>
-        <tr><td>G18</td><td>The CSP’s TAT counts only the time the CSP spends on the ticket, inside the CSP’s working hours. Time spent verifying, by Wiom or the customer, never counts.</td><td>CSP-side TAT, outside the Customer OS. Conflicts with the Support Resolution OS: its resolution clock runs from intake to Closure without pausing</td></tr>
-        <tr><td>G19</td><td>When a ticket is Reopened, the CSP’s clock resumes where it stopped, and the final TAT adds up every round. Example: raised 11:00, Resolved 15:00 (4 hours), in Verification until 17:00 (not counted), Reopened 17:00, Resolved again 20:00 (3 hours). TAT: 7 hours.</td><td>CSP-side TAT, outside the Customer OS. Conflicts with the Support Resolution OS: on a repeat, its clock resumes from the original intake, Verification included</td></tr>
+        <tr><td>G19</td><td>The CSP’s TAT counts only the time the CSP spends on the ticket, inside the CSP’s working hours. Time spent verifying, by Wiom or the customer, never counts.</td><td>CSP-side TAT, outside the Customer OS. Conflicts with the Support Resolution OS: its resolution clock runs from intake to Closure without pausing</td></tr>
+        <tr><td>G20</td><td>When a ticket is Reopened, the CSP’s clock resumes where it stopped, and the final TAT adds up every round. Example: raised 11:00, Resolved 15:00 (4 hours), in Verification until 17:00 (not counted), Reopened 17:00, Resolved again 20:00 (3 hours). TAT: 7 hours.</td><td>CSP-side TAT, outside the Customer OS. Conflicts with the Support Resolution OS: on a repeat, its clock resumes from the original intake, Verification included</td></tr>
       </tbody>
     </table>
   </div>
@@ -249,7 +250,20 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <tr><td>Check window</td><td>30 minutes</td><td>G3</td><td>SQ Driver restoration window <code>CP-SQ-33</code> is 2–24 hours, so 30 minutes needs the governors</td></tr>
         <tr><td>Verification window, verdict passed</td><td>48 hours</td><td>G8</td><td><code>CP-REC-12</code>: 24 hours default, 12–48 hours allowed</td></tr>
         <tr><td>Verification window, verdict failed</td><td>7 days</td><td>G9</td><td>No OS equivalent</td></tr>
-        <tr><td>CSP working hours</td><td>11:00–21:00 IST, every day</td><td>G18</td><td>Support Resolution OS working window, which already governs the 4-hour resolution TAT (P91)</td></tr>
+        <tr><td>CSP working hours</td><td>11:00–21:00 IST, every day</td><td>G19</td><td>Support Resolution OS working window, which already governs the 4-hour resolution TAT (P91)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Open in version 1</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Case</th><th>Where it stands</th></tr></thead>
+      <tbody>
+        <tr><td>The internet comes up after the check window, while the customer is silent</td><td>Open. Today the ticket waits for the customer’s answer, up to 7 days. The CSP knows the ticket was marked Resolved while the internet was down. Whether a later recovery should change the outcome is still to be checked.</td></tr>
+        <tr><td>The customer’s plan expires during Verification</td><td>Open. A real case; how to resolve it is still to be worked out.</td></tr>
+        <tr><td>The same CSP can’t take a Reopened ticket back (inactive, suspended, left, territory lost)</td><td>Known and rare. No fallback in version 1.</td></tr>
+        <tr><td>In the passed lane, the internet drops after the verdict, and the customer stays silent</td><td>Accepted for version 1: the ticket reaches Closure at 48 hours (G8).</td></tr>
       </tbody>
     </table>
   </div>
@@ -289,7 +303,8 @@ flowchart TD
 
 <footer>
   <p>For the customer care team: the calling findings and the daily offline routine are in the <a href="https://ashish-raj-wiom.github.io/service-ticket-verification/cc-calling-guide.html">Early Close Calling Guide</a>.</p>
-  <p>Changes, latest: G2 back to the CSP’s Resolved mark being mandatory before Closure.</p>
+  <p>Changes, latest: G3 one ping is enough in version 1, and recharge done but no internet needs an active plan; new G14, contact during Verification is neither a new ticket nor a no (later guardrails renumbered); G13 internet up is only a proxy; G16 adds the IVR call; G17 sent counts as told in version 1; open items table added.</p>
+  <p>Changes, earlier: G2 back to the CSP’s Resolved mark being mandatory before Closure.</p>
   <p>Changes, earlier: new G17, the CSP sees Verification, the verdict, a Reopen and the Closure reason (TAT rules are now G18 and G19); “doesn’t answer” defined in G5; no limit on rounds in version 1 (G13); every OS conflict marked in its own row; “ticket” used throughout.</p>
   <p>Changes, earlier the same day: G2 no longer needs the CSP’s Resolved tap for Closure; G6 names G8 and G9 as exceptions; the problem figure says “came back with the same issue” instead of “reopen”.</p>
   <p>Changes: 13 Oct 2026 (later): agreed words added; a ticket that reaches Closure is never Reopened; Verification ends as in the new table; the repeat window removed; the backend flow redrawn.</p>

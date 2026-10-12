@@ -199,7 +199,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <tr><td>G1</td><td>Version 1 covers only no-internet tickets: internet supply down (ISD) and recharge done but no internet (RDNI).</td><td>SQ V1 limit: a ping can’t see speed</td></tr>
 
         <tr><td colspan="3"><strong>Checking the fix</strong></td></tr>
-        <tr><td>G2</td><td>A ticket does not need the CSP to mark it Resolved to reach Closure. When Wiom already knows the issue is fixed (the internet is steadily up and the customer says yes), Wiom closes the ticket itself, never penalises the CSP for the missing tap, and shows the CSP that it did. When the CSP does mark it Resolved, that is a claim, never proof that the internet works.</td><td>REC-01; SQ-16; Recovery §5.3</td></tr>
+        <tr><td>G2</td><td>The CSP must mark the ticket Resolved before it can reach Closure. This step is mandatory. Resolved is a claim, never proof that the internet works.</td><td>REC-01; SQ-16; Recovery §10.1</td></tr>
         <tr><td>G3</td><td>The verdict is passed only if the internet stays up steadily through the check window after Resolved. A single ping is not enough.</td><td>SQ-09; SQ-16. Conflicts with <code>CP-SQ-33</code>: the 30-minute check window is below its 2–24 hours</td></tr>
         <tr><td>G4</td><td>Every decision follows fixed rules. No scoring models or predictions.</td><td>REC-08</td></tr>
         <tr><td>G5</td><td>The customer’s answer counts only as a plain yes or no: a button, a key press, or an agent recording it. Tone and free text are not answers. The customer “doesn’t answer” only when no yes or no comes back on any channel Wiom used to reach them.</td><td>REC-10</td></tr>
@@ -257,7 +257,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 <section id="flow">
   <div class="sec-head"><span class="sec-num">03</span><h2>Backend flow</h2></div>
-  <p class="col">The flow at its simplest, drawn from the table above. The guardrails set what must hold at every step. If the customer says it isn’t working after Closure, a new ticket opens. Wiom can also close a ticket the CSP never marked Resolved (G2); the chart leaves that path out.</p>
+  <p class="col">The flow at its simplest, drawn from the table above. The guardrails set what must hold at every step. If the customer says it isn’t working after Closure, a new ticket opens.</p>
   <div class="chart">
 <pre class="mermaid">
 flowchart TD
@@ -289,7 +289,8 @@ flowchart TD
 
 <footer>
   <p>For the customer care team: the calling findings and the daily offline routine are in the <a href="https://ashish-raj-wiom.github.io/service-ticket-verification/cc-calling-guide.html">Early Close Calling Guide</a>.</p>
-  <p>Changes, latest: new G17, the CSP sees Verification, the verdict, a Reopen and the Closure reason (TAT rules are now G18 and G19); “doesn’t answer” defined in G5; no limit on rounds in version 1 (G13); every OS conflict marked in its own row; “ticket” used throughout.</p>
+  <p>Changes, latest: G2 back to the CSP’s Resolved mark being mandatory before Closure.</p>
+  <p>Changes, earlier: new G17, the CSP sees Verification, the verdict, a Reopen and the Closure reason (TAT rules are now G18 and G19); “doesn’t answer” defined in G5; no limit on rounds in version 1 (G13); every OS conflict marked in its own row; “ticket” used throughout.</p>
   <p>Changes, earlier the same day: G2 no longer needs the CSP’s Resolved tap for Closure; G6 names G8 and G9 as exceptions; the problem figure says “came back with the same issue” instead of “reopen”.</p>
   <p>Changes: 13 Oct 2026 (later): agreed words added; a ticket that reaches Closure is never Reopened; Verification ends as in the new table; the repeat window removed; the backend flow redrawn.</p>
   <p>Changes: 13 Oct 2026: guardrails merged into one set of 18 with no repeats, reworded, and every time limit made a parameter. The 25-guardrail version is kept at <code>archive/verification-flow-v40-2026-10-13.html</code>.</p>

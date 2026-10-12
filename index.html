@@ -161,7 +161,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </header>
 <nav class="toc" aria-label="Contents">
   <span class="eyebrow">Contents</span>
-  <ol><li><a href="#problem">The problem</a></li><li><a href="#guardrails">Guardrails</a></li><li><a href="#flow">Backend flow</a></li><li><a href="#findings">What the calls found</a></li><li><a href="#offline">Offline verification, until the system is built</a></li></ol>
+  <ol><li><a href="#problem">The problem</a></li><li><a href="#guardrails">Guardrails</a></li><li><a href="#flow">Backend flow</a></li></ol>
 </nav>
 
 <section id="problem">
@@ -252,131 +252,8 @@ flowchart TD
 
 
 
-<section id="findings">
-  <div class="sec-head"><span class="sec-num">04</span><h2>What the calls found</h2></div>
-  <p class="col">Calls made 8–12 Oct 2026 on 20 tickets a CSP or technician marked resolved while the customer’s router was offline (no ping in the 15 minutes before the resolve and none in the 30 minutes after). The CSP was called first, and the customer in three cases. CSP and customer names are left out.</p>
-  <div class="problem">
-    <p class="statement">These were early closes, not fake fixes. In all 20 cases the router came back online after the close, a median of about 6 hours later. The CSP marked the ticket resolved first and fixed it afterwards.</p>
-    <div class="figs">
-      <div class="fig neutral"><span class="n num">14 of 20</span><span class="l">CSPs reached. 6 did not pick up</span></div>
-      <div class="fig"><span class="n num">20 of 20</span><span class="l">routers came back online after the ticket was closed</span></div>
-      <div class="fig"><span class="n num">~6 h</span><span class="l">median from “resolved” to the router’s first ping (range 1 to 25 hours). The customer had no internet for that time after being told it was fixed</span></div>
-      <div class="fig neutral"><span class="n num">0</span><span class="l">confirmed cases of the internet working while Wiom read it as down. One is still open</span></div>
-    </div>
-  </div>
-
-  <h3>Why the CSPs closed early, in their own words</h3>
-  <p class="col">Grouped by the reason each CSP gave on the call, one group per CSP. Only what was said on the calls is counted.</p>
-  <div class="tablewrap">
-    <table>
-      <thead><tr><th>Reason the CSP gave</th><th>CSPs</th><th>What they said</th></tr></thead>
-      <tbody>
-        <tr><td>Believed it was fixed: their own portal or OLT showed the customer up, or the repair was done but did not hold</td><td class="num">5</td><td>“Mere OLT me online show ho rha hai” (my OLT shows it online) · “mere portal pe green show ho rha hai” (it shows green on my portal) · “wire jod diya tha… phir net nhi chala” (I joined the wire… then the net still didn’t work)</td></tr>
-        <tr><td>Nobody could say who closed it or why: the owner and the technician gave different accounts</td><td class="num">4</td><td>“Maine Owner ko bol diya close karne ko” (I told the owner to close it) · the owner “had no clue why it was resolved before” · “owner might have done it”</td></tr>
-        <tr><td>Time or rating pressure</td><td class="num">2</td><td>“time over ho rha tha isliye maine app me resolve kar diya tha” (time was running out, so I marked it resolved in the app) · “main agar nhi karunga resolve toh aap rating gira doge… aapne koi option bhi nhi diya” (if I don’t resolve it you will lower my rating… you gave me no other option)</td></tr>
-        <tr><td>Closes on purpose when a whole area is down</td><td class="num">1</td><td>“jab bada issue hota hai toh mai aisa karta hu” (when it’s a big issue, this is what I do) · “pehle option aata tha comment add karne ka, ab bus resolve ka option aata hai” (there used to be an option to add a comment, now there is only resolve)</td></tr>
-        <tr><td>Fixed the Netbox at the office and closed before reinstalling it</td><td class="num">1</td><td>“mai router office me le aaya… maine close kar diya office me hi” (I brought the router to the office… and closed it there)</td></tr>
-        <tr><td>Not a field fault: the customer’s ISP plan had not been renewed</td><td class="num">1</td><td>The ISP plan had expired, and no ISP renewal task was raised for it</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="note"><strong>Is it about TAT?</strong> On these calls, only 2 of the 14 CSPs reached named time or rating as the reason. The two most common answers were that they believed it was fixed (5) and that nobody at the CSP could say who closed it or why (4). Twenty calls cannot settle the question. The calls point to more than one cause, and TAT pressure is one of them.</div>
-
-  <h3>What it means for the solution</h3>
-  <div class="tablewrap">
-    <table>
-      <thead><tr><th>#</th><th>Finding</th><th>What the solution should take from it</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>The harm is the hours between “resolved” and the real fix, about 6 at the median, while the customer has been told it is fixed</td><td>Keep the ticket open until the line is up. Most of these would then close by themselves within the day, and the customer would hear only the truth meanwhile</td></tr>
-        <tr><td>2</td><td>In every case the fix came hours after the CSP’s mark</td><td><strong>Decision needed.</strong> If the CSP’s time counts from the mark whenever the line comes up later, an early close still costs nothing. Count it to when the line actually came up, unless the line is up within the check window</td></tr>
-        <tr><td>3</td><td>CSPs closed because they had no other way to report a blocker</td><td>Give the CSP a way to say why it can’t be fixed now (road works, area outage, home switched off) that holds the ticket instead of closing it</td></tr>
-        <tr><td>4</td><td>CSPs trust their own portal or OLT, which is not the customer’s Netbox</td><td>Show the CSP what Wiom sees on the customer’s line, on the same ticket</td></tr>
-        <tr><td>5</td><td>Owners and technicians give different accounts of who closed the ticket and why</td><td>The check applies whoever taps Resolved</td></tr>
-        <tr><td>6</td><td>A “recharge done, no internet” case was an unrenewed ISP plan</td><td>Check the ISP plan before sending anyone to the customer</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <h3>Did the customers come back?</h3>
-  <p class="col"><strong>9 of the 20 did</strong>, up to 12 Oct 2026. Some came back on the same ticket; others raised a new ticket on the same router.</p>
-  <div class="tablewrap">
-    <table>
-      <thead><tr><th>How they came back</th><th>Customers</th><th>Note</th></tr></thead>
-      <tbody>
-        <tr><td>Reopened the same ticket</td><td class="num">5</td><td>One customer reopened it twice</td></tr>
-        <tr><td>Raised a new ticket while the router was still offline</td><td class="num">4</td><td>1.7 to 5 hours after the close, before the line came back. Two of these customers also reopened the old ticket, so they are counted once in the total</td></tr>
-        <tr><td>Raised a new ticket after the router was back online</td><td class="num">2</td><td>2 to 3 days later. Probably a new fault</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <p class="meta">Total: 9 different customers, because two appear in two rows. A new ticket on the same router is not linked to the old one today, so the CSP sees it as new work. CSPs also asked for fewer duplicate tickets for the same customer.</p>
-</section>
-
-<section id="offline">
-  <div class="sec-head"><span class="sec-num">05</span><h2>Offline verification, until the system is built</h2></div>
-  <p class="col">A daily routine that verifies early closes by hand. It fixes customers now and collects the numbers the build needs, such as how often a “down” reading is wrong. It follows the same guardrails as above.</p>
-
-  <h3>The daily routine</h3>
-  <div class="tablewrap">
-    <table>
-      <thead><tr><th>Step</th><th>When</th><th>What happens</th></tr></thead>
-      <tbody>
-        <tr><td>1 · Build the list</td><td>10:30</td><td>The call sheet refreshes with yesterday’s and this morning’s tickets marked resolved while the router was offline, and still offline. Tickets resolved less than 2 hours ago are left out, because ping data runs about 2 hours behind. Your earlier Status and Remarks are kept</td></tr>
-        <tr><td>2 · Hold back a control group</td><td>10:30</td><td>A random quarter of the list is marked “do not call”. Comparing it with the called tickets shows whether calling changes repeat contacts</td></tr>
-        <tr><td>3 · Re-check the line</td><td>Before each call</td><td>If the router has come back online since the list was built, record the time it came back and skip the call. Most early closes resolve themselves within the day</td></tr>
-        <tr><td>4 · Call the CSP</td><td>11:00–21:00</td><td>Ask what was done and why it was closed. No blame. If they say their portal shows it up, ask for a screenshot and a photo of the MAC on the Netbox label</td></tr>
-        <tr><td>5 · Call the customer</td><td>11:00–21:00, 2 tries</td><td>Ask one question: “Kya aapka internet abhi chal raha hai?” (Is your internet working now?) Record yes, no, or not reached. Never tell the customer it is fixed unless they say so</td></tr>
-        <tr><td>6 · Act on the answer</td><td>Same day</td><td>See the table below</td></tr>
-        <tr><td>7 · Record</td><td>After each call</td><td>Set one outcome code in Status and add notes in Remarks</td></tr>
-        <tr><td>8 · Review</td><td>Weekly</td><td>Counts by outcome code, the share that were really not fixed, the share of wrong “down” readings, and customer reach</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h3>What to do with the customer’s answer</h3>
-  <div class="tablewrap">
-    <table>
-      <thead><tr><th>Customer says</th><th>Router now</th><th>Action</th></tr></thead>
-      <tbody>
-        <tr><td>Working</td><td>Online</td><td>Done. No action</td></tr>
-        <tr><td>Working</td><td>Still offline</td><td>Possible wrong “down” reading. Collect the Netbox MAC (label photo or tech’s device records) and compare it with the CSP’s portal</td></tr>
-        <tr><td>Not working</td><td>Any</td><td>Have the call centre reopen the Kapture ticket, then call the CSP: it is the same ticket and the same issue, not a new one</td></tr>
-        <tr><td>Not reached</td><td>Still offline</td><td>Silence is not a yes. Re-check the next day; if still offline after 24 hours, call the CSP again</td></tr>
-        <tr><td>Not reached</td><td>Online</td><td>Done</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h3>Outcome codes for the Status column</h3>
-  <div class="tablewrap">
-    <table>
-      <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
-      <tbody>
-        <tr><td><code>BACK-BEFORE-CALL</code></td><td>Router came back online before we called</td></tr>
-        <tr><td><code>C-YES</code></td><td>Customer confirms the internet works</td></tr>
-        <tr><td><code>C-NO</code></td><td>Customer says it does not work; ticket reopened</td></tr>
-        <tr><td><code>C-DNP</code></td><td>Customer not reached</td></tr>
-        <tr><td><code>CSP-DNP</code></td><td>CSP not reached</td></tr>
-        <tr><td><code>EARLY-CLOSE</code></td><td>CSP closed before the fix and fixed it later</td></tr>
-        <tr><td><code>BLOCKER</code></td><td>Outside cause: road works, area outage, home switched off</td></tr>
-        <tr><td><code>PORTAL-UP</code></td><td>CSP relied on their portal or OLT</td></tr>
-        <tr><td><code>WRONG-DOWN</code></td><td>Internet works but Wiom reads the line as down (MAC checked)</td></tr>
-        <tr><td><code>ISP-PLAN</code></td><td>ISP plan or recharge problem, not a field fault</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <h3>Effort and limits</h3>
-  <ul class="plain col">
-    <li><strong>Effort.</strong> The list has run at 75–100 tickets a day. After the control group and the re-check, that is about 50–70 calls a day: two callers. One person should take a fixed random 25–30 a day and keep the method the same.</li>
-    <li><strong>The ticket is already closed.</strong> Offline work can only correct afterwards. It cannot hold the ticket open or change the CSP’s TAT and score.</li>
-    <li><strong>Ping data runs about 2 hours behind.</strong> Always re-check before calling.</li>
-    <li><strong>Netbox MACs are not in the data warehouse.</strong> Confirming a wrong “down” reading needs tech’s device records or a label photo.</li>
-    <li><strong>The call sheet holds customer contact details.</strong> Keep it internal.</li>
-  </ul>
-</section>
-
 <footer>
-  <p>Changes: 12 Oct 2026: added §04, the calling findings, and §05, the offline verification routine. The page as it stood before is kept at <code>archive/verification-flow-v33-2026-10-12.html</code>.</p>
+  <p>Changes: 12 Oct 2026: the calling findings and the offline routine moved to a separate page for the customer care team.</p>
   <p>Changes: 1 Oct 2026 (v11): reshaped into guardrails for the solution team. The earlier version, with the detailed flow, OS-fit tables and open questions, is kept at <code>archive/verification-flow-v10-2026-10-01.html</code> in the project folder.</p>
   <p>Sources: Customer OS lean register v9 · Recovery OS v3.0 · SQ Driver v2.0 · Continuity OS v2.0 · the closure and verification loop study (21 Sep 2026). The diagnosis behind this page: <a href="https://claude.ai/artifact/HrL374wt9cvNWQ46sa6oXJ">Service Tasks Closed While Down</a>.</p>
 </footer>

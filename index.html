@@ -202,7 +202,7 @@ a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <tr><td>G5</td><td>If the customer says no after closure, a new ticket opens.</td><td>REC-12; <code>CP-REC-03</code> (30 days); C2</td></tr>
         <tr><td>G6</td><td>A ticket can only be reopened while it is in pending verification.</td><td>Recovery: <code>rec:verification_pending</code></td></tr>
         <tr><td>G7</td><td>A ticket in pending verification closes after 7 days (final closure), without the ping or the customer’s yes.</td><td>REC-01; <code>rec:closed</code> gate; SQ-11; C2</td></tr>
-        <tr><td>G8</td><td>If the ping is up but the customer says no, the ticket reopens.</td><td>REC-11; Recovery §10.2; SQ-03</td></tr>
+        <tr><td>G8</td><td>If the internet is up but the customer says it still isn’t working: while the 48-hour wait in G4 is still running, the same ticket goes back to the CSP. Once the wait is over and the ticket has closed, a new ticket opens instead.</td><td>REC-11; Recovery §10.2; SQ-03</td></tr>
         <tr><td>G9</td><td>The resolution signal to Quality goes only when the ticket is closed.</td><td>Support Resolution OS (signal on CLOSED); Recovery emits case-state changes separately</td></tr>
         <tr><td>G10</td><td>TAT doesn’t include the time the customer or Wiom takes to verify. It counts only the time the CSP actually spent on the ticket.</td><td>CSP-side TAT, outside the Customer OS; C2 (the customer’s waiting time is a separate clock)</td></tr>
         <tr><td>G11</td><td>Internet up means steadily up across the 30 minutes after the CSP marks the ticket resolved, not a single ping. The 30 minutes is a parameter.</td><td>SQ-09; SQ-16; <code>CP-SQ-33</code>, <code>CP-SQ-34</code>; principle P2</td></tr>

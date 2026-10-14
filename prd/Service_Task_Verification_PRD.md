@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — [TBD — not asked] | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.1 · 14 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
+| **Version** — v0.2 · 14 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
 | **Terminology source** — Wiom Operational Terminology · 14 Oct 2026 · Wiom System Terminology · 14 Oct 2026 | | | |
 
 ---
@@ -24,6 +24,9 @@
 | ISD | Internet supply down: a service task subtype for a customer with no internet. | Support Resolution OS |
 | RDNI | Recharge done but no internet: a service task subtype for a customer who has recharged and still has no internet. | Support Resolution OS |
 | Resolution signal | What Support Resolution OS sends Quality OS, and under this spec Compensation OS, when a service task finishes: its outcome and its closure reason. | Support Resolution OS |
+| M3 | The Quality OS metric for long-open service tasks: how many of a CSP's service tasks stayed open past the long-open limit (C-08) in a cycle. | Quality OS |
+| M3 timer | The clock M3 runs on each service task. It starts when the service task is raised, counts every hour of the day, pauses while the service task is in Pending Verification, and resumes where it stopped on a Reopen. | Quality OS |
+| M3 cycle | The fixed half-month period M3 counts in (C-09). Each service task counts in at most one. | Quality OS |
 | Kapture | The tool the Wiom CX team uses to see and work on service tasks. | Wiom CX team |
 | CSP TAT | The turnaround time from the service task reaching the CSP to the CSP's Resolved mark, counted only inside CSP working hours, summed over every round. | Support Resolution OS |
 
@@ -38,6 +41,8 @@
 - every other service task subtype, which keeps closing at the Resolved mark as today (AC-REG-2);
 - the lifecycle of any new service task opened after a Closure. This spec sets only its repeat link (R9).
 
+This spec also sets how M3 counts long-open service tasks (R10). The move to fixed M3 cycles applies to every service task M3 counts ⚠️ *AI GENERATED — review*; the pause applies only where Pending Verification exists, that is ISD and RDNI.
+
 Version 1 sets no limit on reopen rounds. A Reopened service task always goes back to the same CSP, with no fallback when that CSP cannot take it.
 
 ### Guardrails — promises that hold on every path
@@ -48,7 +53,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | G2 | **No Closure without the CSP's mark** (zero tolerance) | A service task in scope never reaches Closed unless a CSP or Technician first marked it Resolved. | R1 · R4 · AC-R1-1 · AC-GRD-2 |
 | G3 | **Never "fixed" on a failed verdict** (zero tolerance) | The customer is never told the issue is fixed when the verdict failed. | R3 · AC-R3-2 · AC-GRD-3 |
 | G4 | **Signals only at Closed** | Quality OS and Compensation OS hear about a service task's resolution only when it is Closed, never at the Resolved mark. | R6 · AC-R6-1 · AC-GRD-4 |
-| G5 | **Verification never counts against the CSP** | Time in Pending Verification never counts in the CSP TAT. | R1 · R7 · AC-R7-1 · AC-GRD-5 |
+| G5 | **Verification never counts against the CSP** | Time in Pending Verification never counts in the CSP TAT or on the M3 timer. | R1 · R7 · R10 · AC-R7-1 · AC-R10-2 · AC-GRD-5 · AC-GRD-7 |
 | G6 | **Rules and timers decide** | Every exit from Pending Verification comes from the customer's answer, a window expiring, or the connection ending — never from a person judging the case. | R4 · R5 · AC-GRD-6 |
 
 ---
@@ -175,6 +180,22 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R9-2 | **Given** the service task from AC-R4-2, **When** Rekha Verma replies yes at 10:00 on 17 Oct, **Then** it is still Closed with reason PING_UP_NO_RESPONSE, and no signal is sent. | R9b | Settled |
 | AC-R9-3 | **Given** a Closed service task, **When** any actor tries to move it to In Progress or Pending Verification, **Then** it stays Closed. | R9 MUST NOT · G1 | Settled |
 
+### R10 — M3 counts only time waiting on the CSP
+
+| ID | Story | MUST | MUST NOT |
+|---|---|---|---|
+| R10 | As a CSP, I want M3 to count only the time a service task waits on me, so that Wiom checking a fix never makes a service task look long-open. | **(a)** Start the M3 timer when the service task is raised, and run it on the wall clock, every hour of the day. **(b)** On T1, pause the M3 timer at the Resolved mark. **(c)** On T6, resume the M3 timer from where it stopped. **(d)** On T12, when the M3 timer reaches C-08, count the service task once toward M3, in the M3 cycle (C-09) in which that happens. **(e)** On T5, T7, T8 and T9, stop the M3 timer; a service task whose timer never reached C-08 is never counted. **(f)** Give a CSP a PASS on M3 for a cycle when C-10 or fewer of its service tasks were counted in it, and a FAIL otherwise. | Count time in Pending Verification on the M3 timer. Count the same service task in more than one M3 cycle, even if it stays open or is Reopened. Pause the M3 timer for any reason other than Pending Verification. |
+
+| AC | Given / When / Then | Verifies | Status |
+|---|---|---|---|
+| AC-R10-1 | **Given** an ISD service task raised at 20:10 on 9 Oct and never marked Resolved, **When** its M3 timer reaches C-08 (48 h) at 20:10 on 11 Oct, **Then** it is counted once toward M3 in the 1–15 Oct cycle, although its CSP TAT, counted in working hours only, is 20 h. | R10a · R10d · T12 | Settled |
+| AC-R10-2 | **Given** a service task raised at 10:20 on 14 Oct and marked Resolved at 06:20 on 15 Oct (M3 timer 20 h), **When** the customer replies yes at 08:05 on 17 Oct and it is Closed, **Then** its M3 timer reads 20 h and it is never counted toward M3. | R10b · R10e · T1 · T5 · G5 | Settled |
+| AC-R10-3 | **Given** a service task raised at 09:20 on 14 Oct, marked Resolved at 15:20 on 15 Oct (M3 timer 30 h) and Reopened at 09:05 on 16 Oct, **When** it is still not marked Resolved again at 03:05 on 17 Oct, **Then** its M3 timer reaches 48 h at 03:05 on 17 Oct and it is counted once in the 16–31 Oct cycle. | R10c · R10d · T6 · T12 | Settled |
+| AC-R10-4 | **Given** a service task counted toward M3 at 22:40 on 14 Oct in the 1–15 Oct cycle, **When** it is still open on 16 Oct, is marked Resolved at 09:00 on 17 Oct and is Reopened at 11:30 on 18 Oct, **Then** it is not counted in the 16–31 Oct cycle. | R10 MUST NOT | Settled |
+| AC-R10-5 | **Given** a CSP with 2 service tasks counted toward M3 in the 1–15 Oct cycle, **When** Quality OS evaluates that cycle, **Then** the CSP's M3 result is PASS. | R10f | Settled |
+| AC-R10-6 | **Given** a CSP with 3 service tasks counted toward M3 in the 1–15 Oct cycle, **When** Quality OS evaluates that cycle, **Then** the CSP's M3 result is FAIL. | R10f | Settled |
+| AC-R10-7 | **Given** a service task raised at 08:00 on 14 Oct and In Progress, **When** 21:00 on 14 Oct passes and the CSP's working hours end, **Then** its M3 timer keeps running through the night and reads 25 h at 09:00 on 15 Oct. | R10a · R10 MUST NOT | Settled |
+
 ---
 
 ## 4. Cross-cutting Acceptance Criteria
@@ -195,14 +216,19 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-GRD-4 | **Given** every service task Resolved in a day, **When** a Wiom Product user compares the Quality OS and Compensation OS signals with the Closures, **Then** every signal falls at a Closure and none at a Resolved mark. | G4 | Settled |
 | AC-GRD-5 | **Given** a service task with three rounds of 2 h 10 min, 1 h 05 min and 40 min In Progress, and 30 h in Pending Verification, **When** it is Closed, **Then** its CSP TAT is 3 h 55 min. | G5 | Settled |
 | AC-GRD-6 | **Given** every service task that left Pending Verification in a day, **When** a Wiom Product user reads the recorded cause of each exit, **Then** each was a customer answer, a window expiry, or a connection deactivation or cancellation. | G6 | Settled |
+| AC-GRD-7 | **Given** a service task with 2 h 10 min on the M3 timer before its Resolved mark and 6 days 4 h in Pending Verification, **When** it is Closed with FINAL_CLOSURE_UNVERIFIED, **Then** its M3 timer reads 2 h 10 min and it is not counted toward M3. | G5 · R10b · R10e | Settled |
 | AC-BV-1 | **Given** a service task Resolved at 13:47:00, **When** its only ping arrives at 14:16:59, **Then** the verdict is passed. | C-01 · C-02 · R2a | Settled |
 | AC-BV-2 | **Given** a service task Resolved at 13:47:00, **When** its only ping arrives at 14:17:01, **Then** the verdict is failed. | C-01 · R2b | Settled |
 | AC-BV-3 | **Given** a service task Resolved at 13:47:00, **When** its only ping arrives at 13:46:30, before the mark, **Then** the verdict is failed. | C-02 · R2 MUST NOT | Settled |
 | AC-BV-4 | **Given** a passed verdict, Resolved at 13:47 on 14 Oct, **When** the customer replies yes at 13:46 on 16 Oct, **Then** it is Closed with CUSTOMER_CONFIRMED, not PING_UP_NO_RESPONSE. | C-04 · R4a | Settled |
 | AC-BV-5 | **Given** a service task Closed at 13:47 on 16 Oct, **When** the customer reports "not working" at 13:46 on 15 Nov, **Then** the new service task is linked as a repeat. | C-07 · R9a | Settled |
 | AC-BV-6 | **Given** a service task Closed at 13:47 on 16 Oct, **When** the customer reports "not working" at 13:48 on 15 Nov, **Then** the new service task is not linked as a repeat. | C-07 · R9a | Settled |
+| AC-BV-7 | **Given** a service task whose M3 timer reads 47 h 59 min when the CSP marks it Resolved, **When** it is later Closed with CUSTOMER_CONFIRMED, **Then** it is not counted toward M3. | C-08 · R10e | Settled |
+| AC-BV-8 | **Given** a service task In Progress, **When** its M3 timer reaches 48 h 00 min at 23:59 on 15 Oct, **Then** it is counted in the 1–15 Oct cycle, not the 16–31 Oct cycle. | C-09 · R10d | Settled |
+| AC-BV-9 | **Given** a service task In Progress, **When** its M3 timer reaches 48 h 00 min at 00:00 on 16 Oct, **Then** it is counted in the 16–31 Oct cycle. | C-09 · R10d | Settled |
 | AC-RACE-1 | **Given** a passed verdict and no answer, **When** the customer replies "not working" at the same instant C-04 expires, **Then** the service task is Reopened, not Closed ⚠️ *AI GENERATED — review*. | Precedence · T6 · T7 | Settled |
 | AC-RACE-2 | **Given** a failed verdict and no answer, **When** the customer replies yes at the same instant C-05 expires, **Then** it is Closed with CUSTOMER_CONFIRMED ⚠️ *AI GENERATED — review*. | Precedence · T5 · T8 | Settled |
+| AC-RACE-3 | **Given** a service task In Progress whose M3 timer reaches 48 h at 13:47:00, **When** the CSP marks it Resolved at 13:47:00, **Then** it is counted toward M3 ⚠️ *AI GENERATED — review*. | Precedence · T1 · T12 | Settled |
 | AC-DUP-1 | **Given** a service task in Pending Verification, **When** the customer replies yes twice, at 15:02 and 15:03, **Then** it is Closed once at 15:02, and Quality OS and Compensation OS each receive one signal. | T5 · R6a | Settled |
 | AC-DUP-2 | **Given** a service task in Pending Verification, **When** the customer replies "not working" twice, at 16:05 and 16:06, **Then** it is Reopened once, at 16:05. | T6 · R5a | Settled |
 | AC-DUP-3 | **Given** a service task In Progress, **When** the Technician taps Resolved twice, at 13:47:00 and 13:47:02, **Then** one Pending Verification starts, with one check window ending at 14:17:00. | T1 · R1a | Settled |
@@ -217,15 +243,16 @@ Lifecycle of an **ISD or RDNI service task** from the CSP's Resolved mark to Clo
 
 ```mermaid
 stateDiagram-v2
-    InProgress --> PendingVerification : T1 · CSP or Technician marks Resolved / R1a, R1b, R1c, R1d, R8a
+    InProgress --> PendingVerification : T1 · CSP or Technician marks Resolved / R1a, R1b, R1c, R1d, R8a, R10b
+    InProgress --> InProgress : T12 · M3 timer reaches C-08 [not yet counted toward M3] / R10d
     PendingVerification --> PendingVerification : T2 · check window C-01 ends [at least C-02 ping after the mark, and for RDNI the plan is active] / R2a, R3a, R3c, R3d
     PendingVerification --> PendingVerification : T3 · check window C-01 ends [no ping after the mark, no data, or RDNI plan not active] / R2b, R2c, R3b, R3c, R3d
     PendingVerification --> PendingVerification : T4 · C-03 after the mark [no answer yet] / R3e
-    PendingVerification --> Closed : T5 · customer says yes / R4a, R4f, R6a, R8b
-    PendingVerification --> InProgress : T6 · customer says no, or a Wiom CX user records a plain no / R5a, R5b, R5c, R5d
-    PendingVerification --> Closed : T7 · C-04 after the mark [verdict passed, no answer] / R4b, R4e, R4f, R6a, R8b
-    PendingVerification --> Closed : T8 · C-05 after the mark [verdict failed, no answer] / R4c, R4e, R4f, R6a, R6b, R8b
-    PendingVerification --> Closed : T9 · connection deactivated or service task cancelled / R4d, R4f, R6a, R6b, R8b
+    PendingVerification --> Closed : T5 · customer says yes / R4a, R4f, R6a, R8b, R10e
+    PendingVerification --> InProgress : T6 · customer says no, or a Wiom CX user records a plain no / R5a, R5b, R5c, R5d, R10c
+    PendingVerification --> Closed : T7 · C-04 after the mark [verdict passed, no answer] / R4b, R4e, R4f, R6a, R8b, R10e
+    PendingVerification --> Closed : T8 · C-05 after the mark [verdict failed, no answer] / R4c, R4e, R4f, R6a, R6b, R8b, R10e
+    PendingVerification --> Closed : T9 · connection deactivated or service task cancelled / R4d, R4f, R6a, R6b, R8b, R10e
     PendingVerification --> PendingVerification : T10 · customer's plan expires [CLARIFY — outcome undecided] / R4g
     InProgress --> [*] : existing In Progress handling, escalation included — §2 Boundary
     Closed --> [*] : T11 · customer says not working after Closure — a new service task, §2 Boundary / R9a
@@ -238,9 +265,11 @@ stateDiagram-v2
 - Pending Verification × CSP or Technician marks Resolved — the mark is not offered while Pending Verification (R1 MUST NOT).
 - Pending Verification × customer contact that is not a plain no — no state change and no new service task (R5 MUST NOT).
 - Pending Verification × C-04 when the verdict failed, and × C-05 when it passed — only the window matching the verdict applies (R4b, R4c).
-- Closed × every trigger except T11 — Closed is final (G1); a yes after Closure changes nothing (R9b).
+- In Progress × M3 timer reaches C-08 when the service task was already counted — counted once only (R10 MUST NOT).
+- Pending Verification × M3 timer reaches C-08 — the timer is paused there (R10b).
+- Closed × every trigger except T11 — Closed is final (G1); a yes after Closure changes nothing (R9b), and the M3 timer has stopped (R10e).
 
-**Precedence:** a customer answer arriving at the same instant as C-04 or C-05 expiry is applied before the expiry (AC-RACE-1, AC-RACE-2) ⚠️ *AI GENERATED — review*.
+**Precedence:** a customer answer arriving at the same instant as C-04 or C-05 expiry is applied before the expiry (AC-RACE-1, AC-RACE-2) ⚠️ *AI GENERATED — review*. The M3 timer reaching C-08 at the same instant as a Resolved mark is applied before the mark (AC-RACE-3) ⚠️ *AI GENERATED — review*.
 
 ---
 
@@ -255,8 +284,13 @@ stateDiagram-v2
 | C-05 | Verification window when the verdict failed: from the Resolved mark to Closure with no answer | 7 days | Fixed | — |
 | C-06 | CSP working hours, inside which the CSP TAT runs | 11:00–21:00 IST, every day | Fixed | — |
 | C-07 | Repeat window: from Closure to a new service task, inside which it is linked as a repeat | 30 days | Fixed | — |
+| C-08 | M3 long-open limit: M3 timer time, wall clock, after which a service task counts toward M3 | 48 hours | Fixed | — |
+| C-09 | M3 cycles | 1st–15th, and 16th–last day of each month (IST) | Fixed | — |
+| C-10 | M3 pass mark: most service tasks counted in one cycle for a PASS | 2 | Fixed | — |
 
 **Interaction note (C-01 × C-03 × C-04 / C-05):** for the first 30 minutes after the Resolved mark the customer hears nothing and the CSP sees that Wiom is verifying. After the verdict, the customer has one message and, at 24 hours, one reminder; the service task then waits silently until the customer answers or the matching window ends.
+
+**Interaction note (C-08 × C-04 / C-05):** the M3 timer runs only outside Pending Verification and the verification windows run only inside it, so the two never overlap. A service task can wait the full 7 days of C-05 without moving closer to C-08.
 
 ---
 
@@ -269,6 +303,7 @@ stateDiagram-v2
 | TAS (CSP app and the app the Technician uses) | Shows Wiom is verifying, "not confirmed yet", the Reopen, and the closure reason | CSP app, 12 Oct 2026 | Today, after the mark, the CSP app says the connection is back online whatever the ping check showed · AC-R1-3 · AC-R2-5 · AC-R4-6 · AC-R5-2 |
 | Kapture, through `ticket-service-java` | Shows `IP` during Pending Verification and a completed sub-status at Closure | `ticket-service-java` main, 29 Sep 2026 | Kapture sub-status codes include `IP` (In progress), `RS` (Resolved), `CO` (Completed). Today the mark sends `RS` or `CO`, and an `IP` coming from Kapture is not accepted · AC-R8-1 · AC-R8-2 |
 | Quality OS | Receives the resolution signal only at Closure | `csp-os-yaml` main, 12 Oct 2026 | Today it receives the signal at the mark · AC-R6-1 to AC-R6-3 · AC-GRD-4 |
+| Quality OS, M3 | M3 timer pauses in Pending Verification and resumes on a Reopen; counting moves to fixed M3 cycles, once per service task | `csp-quality-service` main, 14 Oct 2026: `DailyMetricSnapshotServiceImpl` (M3 pass/fail), `ComplaintResolutionLedgerRepository.countBreachedNotExcluded` (breach count), `application.yml` (`QU_M3_BREACH_HOURS` 48, `QU_M3_BREACH_THRESHOLD` 2); M3 decision page (claude.ai artifact 8QRrrRYtSmayVyxdC9VZhL) | Today M3 counts a service task unresolved 48 wall-clock hours after filing, never pauses, and uses a rolling 15-day window; a repeat is a new record with its own 48 hours. Minimum service tasks for an M3 verdict in a cycle: [TBD — not asked] · AC-R10-1 to AC-R10-7 · AC-GRD-7 · AC-BV-7 to AC-BV-9 |
 | Compensation OS | Receives the resolution signal only at Closure | Solution flow v3 | No receiver of the resolution signal found in code today · AC-R6-1 to AC-R6-3 |
 | IVR service, Message orchestrator | Send the customer's message, the IVR call and the reminder | — | Today the customer gets a "resolved" app notification, or SMS if it fails, at the mark, with no way to answer · AC-R3-1 to AC-R3-5 |
 | Customer backend | Says whether an RDNI customer's plan is active at the verdict | — | Not checked [TBD — not asked] · AC-R2-2 |
@@ -287,6 +322,7 @@ stateDiagram-v2
 | Send Quality OS and Compensation OS the resolution signal, with the closure reason, only at Closure. | R6 · G4 |
 | Show the Wiom CX team `IP` in Kapture during Pending Verification. | R8 |
 | Link a new service task to a Closed one as a repeat within C-07. | T11 · R9 · C-07 |
+| Run a wall-clock M3 timer per service task from when it is raised, paused in Pending Verification and resumed on a Reopen, and count it once, in the M3 cycle in which it reaches C-08. | T1 · T6 · T12 · R10 · C-08 · C-09 · C-10 · G5 |
 
 ---
 
@@ -300,6 +336,8 @@ stateDiagram-v2
 | §3 · R8b · AC-R8-2 | Kapture shows `CO` (Completed) at Closure, not `RS` or `CL` | Inference — `CO` is what a normal-priority service task gets today |
 | §3 · R1 MUST NOT | The CSP cannot mark the service task Resolved again while it is in Pending Verification (v3 says only that it cannot be pulled back) | Inference — a second mark would restart the check window |
 | §4 · AC-RACE-1, AC-RACE-2 · §5 Precedence | A customer answer at the same instant as a window expiry is applied first | Inference — the customer's word outranks a timer |
+| §2 Boundary | The move to fixed M3 cycles applies to every service task M3 counts, not only ISD and RDNI | Inference — M3 is one count per CSP, so its cycles cannot differ by subtype |
+| §4 · AC-RACE-3 · §5 Precedence | When the M3 timer reaches 48 h at the same instant as a Resolved mark, the service task is counted | Inference — the timer had already run its full 48 hours |
 
 ## Not asked *(working drafts only — deleted at finalise)*
 
@@ -314,3 +352,4 @@ stateDiagram-v2
 | §2 Boundary | Whether a Wiom CX user closing the service task in Kapture during Pending Verification counts as the customer's yes, or is blocked |
 | §3 · R5 | Whether a customer raising the same issue again in the app during Pending Verification counts as a no |
 | §3 · R8 | What Kapture shows after a Reopen, while the service task is back In Progress |
+| §7 · Quality OS, M3 | The minimum number of service tasks a CSP needs in an M3 cycle for a PASS or FAIL (today 10 in the rolling window), and from which date the fixed M3 cycles start |

@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — [TBD — not asked] | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.2 · 14 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
+| **Version** — v0.3 · 14 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
 | **Terminology source** — Wiom Operational Terminology · 14 Oct 2026 · Wiom System Terminology · 14 Oct 2026 | | | |
 
 ---
@@ -15,6 +15,9 @@
 | Resolved | The mark a CSP or Technician puts on a service task to say the fault is fixed. It is a claim, not proof that the customer's internet works. | Support Resolution OS |
 | In Progress | The state of a service task while a CSP or Technician is working on it. The CSP's TAT runs only in this state. | Support Resolution OS |
 | Pending Verification | The state a service task enters at the Resolved mark and holds until it is Closed or goes back to In Progress. The CSP's TAT does not run here. | Support Resolution OS |
+| Checking | The first stage of Pending Verification: from the Resolved mark to the end of the check window, before the verdict is known. | Support Resolution OS |
+| Waiting, verdict passed | The stage of Pending Verification after a passed verdict, while the service task waits for the customer's answer or C-04. | Support Resolution OS |
+| Waiting, verdict failed | The stage of Pending Verification after a failed verdict, while the service task waits for the customer's answer or C-05. | Support Resolution OS |
 | Check window | The period right after the Resolved mark in which Wiom reads the customer's pings to reach the verdict. | Support Resolution OS |
 | Verdict | Wiom's one-time judgement, at the end of the check window, of whether the customer's internet is up: **passed** or **failed**. Failed covers both "no ping" and "no data". Once set, it does not change. | Support Resolution OS |
 | Reopen | The move of a service task from Pending Verification back to In Progress, caused only by the customer saying the internet is not working. The service task, the CSP and the issue stay the same. | Support Resolution OS |
@@ -239,21 +242,25 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 **Lifecycle test:** persists yes · two or more named statuses yes (In Progress, Pending Verification, Closed) · moved later yes (the customer's answer, window expiry) → state diagram.
 
-Lifecycle of an **ISD or RDNI service task** from the CSP's Resolved mark to Closed. It enters In Progress from the existing service task lifecycle; creation, assignment and escalation while In Progress are out of scope; so is the lifecycle of a new service task opened after Closure.
+Lifecycle of an **ISD or RDNI service task** from the CSP's Resolved mark to Closed. Pending Verification is drawn with its three stages (Checking, Waiting, verdict passed, Waiting, verdict failed); an edge leaving the Pending Verification box applies from any of them. It enters In Progress from the existing service task lifecycle; creation, assignment and escalation while In Progress are out of scope; so is the lifecycle of a new service task opened after Closure.
 
 ```mermaid
 stateDiagram-v2
     InProgress --> PendingVerification : T1 · CSP or Technician marks Resolved / R1a, R1b, R1c, R1d, R8a, R10b
     InProgress --> InProgress : T12 · M3 timer reaches C-08 [not yet counted toward M3] / R10d
-    PendingVerification --> PendingVerification : T2 · check window C-01 ends [at least C-02 ping after the mark, and for RDNI the plan is active] / R2a, R3a, R3c, R3d
-    PendingVerification --> PendingVerification : T3 · check window C-01 ends [no ping after the mark, no data, or RDNI plan not active] / R2b, R2c, R3b, R3c, R3d
-    PendingVerification --> PendingVerification : T4 · C-03 after the mark [no answer yet] / R3e
+    state PendingVerification {
+        [*] --> Checking
+        Checking --> WaitingPassed : T2 · check window C-01 ends [at least C-02 ping after the mark, and for RDNI the plan is active] / R2a, R3a, R3c, R3d
+        Checking --> WaitingFailed : T3 · check window C-01 ends [no ping after the mark, no data, or RDNI plan not active] / R2b, R2c, R3b, R3c, R3d
+        WaitingPassed --> WaitingPassed : T4 · C-03 after the mark [no answer yet] / R3e
+        WaitingFailed --> WaitingFailed : T4 · C-03 after the mark [no answer yet] / R3e
+    }
     PendingVerification --> Closed : T5 · customer says yes / R4a, R4f, R6a, R8b, R10e
     PendingVerification --> InProgress : T6 · customer says no, or a Wiom CX user records a plain no / R5a, R5b, R5c, R5d, R10c
-    PendingVerification --> Closed : T7 · C-04 after the mark [verdict passed, no answer] / R4b, R4e, R4f, R6a, R8b, R10e
-    PendingVerification --> Closed : T8 · C-05 after the mark [verdict failed, no answer] / R4c, R4e, R4f, R6a, R6b, R8b, R10e
-    PendingVerification --> Closed : T9 · connection deactivated or service task cancelled / R4d, R4f, R6a, R6b, R8b, R10e
+    WaitingPassed --> Closed : T7 · C-04 after the mark [no answer] / R4b, R4e, R4f, R6a, R8b, R10e
+    WaitingFailed --> Closed : T8 · C-05 after the mark [no answer] / R4c, R4e, R4f, R6a, R6b, R8b, R10e
     PendingVerification --> PendingVerification : T10 · customer's plan expires [CLARIFY — outcome undecided] / R4g
+    PendingVerification --> Closed : T9 · connection deactivated or service task cancelled / R4d, R4f, R6a, R6b, R8b, R10e
     InProgress --> [*] : existing In Progress handling, escalation included — §2 Boundary
     Closed --> [*] : T11 · customer says not working after Closure — a new service task, §2 Boundary / R9a
 ```
@@ -264,7 +271,9 @@ stateDiagram-v2
 - In Progress × plan expiry — existing handling (§2 Boundary).
 - Pending Verification × CSP or Technician marks Resolved — the mark is not offered while Pending Verification (R1 MUST NOT).
 - Pending Verification × customer contact that is not a plain no — no state change and no new service task (R5 MUST NOT).
-- Pending Verification × C-04 when the verdict failed, and × C-05 when it passed — only the window matching the verdict applies (R4b, R4c).
+- Waiting, verdict failed × C-04, and Waiting, verdict passed × C-05 — only the window matching the verdict applies (R4b, R4c).
+- Checking × C-03, C-04 or C-05 — all three run longer than the check window (C-01), so none can expire while Checking.
+- Waiting, verdict passed or failed × check window end — the verdict is set once and does not change (R2 MUST NOT).
 - In Progress × M3 timer reaches C-08 when the service task was already counted — counted once only (R10 MUST NOT).
 - Pending Verification × M3 timer reaches C-08 — the timer is paused there (R10b).
 - Closed × every trigger except T11 — Closed is final (G1); a yes after Closure changes nothing (R9b), and the M3 timer has stopped (R10e).

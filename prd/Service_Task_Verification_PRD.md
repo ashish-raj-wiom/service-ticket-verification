@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — [TBD — not asked] | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.24 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
+| **Version** — v0.25 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
 ---
@@ -89,7 +89,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R2 | As a customer, I want Wiom to check whether my internet is actually working, so that what I am told matches what is true. | **(a)** On T2, when C-02 positive Internet Verdicts (1 by default) have been received during the Initial Check — at the Resolved mark itself or after it, before C-01 runs out — move to Positive verdict at once. **(b)** On T3, when C-01 runs out without that, including when Connection Validation Service gives no answer, move to No positive verdict. **(c)** On T13, when a positive Internet Verdict is received after the Initial Check and before C-04 runs out from the mark, move to Positive verdict; one is enough here, whatever C-02 is. **(d)** On T1, ask Connection Validation Service for the Internet Verdict at the Resolved mark, and keep asking every C-13 until the customer answers, the service task closes, or C-04 runs out. | Judge the Internet Verdict, or handle the service task in any way, differently for RDNI than for ISD. Move from Positive verdict back to No positive verdict. Count a positive Internet Verdict received after C-04 has run out. |
+| R2 | As a customer, I want Wiom to check whether my internet is actually working, so that what I am told matches what is true. | **(a)** On T2, when a positive Internet Verdict is received during the Initial Check — at the Resolved mark itself or after it, before C-01 runs out — move to Positive verdict at once. **(b)** On T3, when C-01 runs out without that, including when Connection Validation Service gives no answer, move to No positive verdict. **(c)** On T13, when a positive Internet Verdict is received after the Initial Check and before C-04 runs out from the mark, move to Positive verdict. **(d)** On T1, ask Connection Validation Service for the Internet Verdict at the Resolved mark, and keep asking every C-13 until the customer answers, the service task closes, or C-04 runs out. | Judge the Internet Verdict, or handle the service task in any way, differently for RDNI than for ISD. Move from Positive verdict back to No positive verdict. Count a positive Internet Verdict received after C-04 has run out. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -301,7 +301,7 @@ Each comment is added by Wiom in Kapture at the moment of the action, and only f
 | AC-GRD-7 | **Given** a service task with 2 h 10 min on the M3 timer before its Resolved mark and 72 h in Pending Verification, **When** it is Closed with FINAL_CLOSURE_UNVERIFIED, **Then** its M3 timer reads 2 h 10 min and it is not counted toward M3. | G5 · R10b · R10e | Settled |
 | AC-GRD-8 | **Given** three service tasks for the same customer area — one In Progress, one in Pending Verification, one Closed at 10:00 that day — **When** each customer reports "not working" at 15:00, **Then** only the one in Pending Verification goes back to In Progress; the In Progress one is unchanged, and for the Closed one a new service task opens while it stays Closed. | G7 | Settled |
 | AC-GRD-9 | **Given** every service task Resolved in a day by CSPs not on the rollout list, **When** a Wiom Product user compares them with the same day a week earlier, before the feature, **Then** none entered Pending Verification, every one closed at its Resolved mark, and none received a verification message. | G8 | Settled |
-| AC-BV-1 | **Given** a service task Resolved at 13:47:00, **When** its only positive Internet Verdict comes at 14:16:59, **Then** it moves to Positive verdict and the customer is told the issue is fixed at 14:16:59. | C-01 · C-02 · R2a | Settled |
+| AC-BV-1 | **Given** a service task Resolved at 13:47:00, **When** its only positive Internet Verdict comes at 14:16:59, **Then** it moves to Positive verdict and the customer is told the issue is fixed at 14:16:59. | C-01 · R2a | Settled |
 | AC-BV-2 | **Given** a service task Resolved at 13:47:00, **When** its only positive Internet Verdict comes at 14:17:01, **Then** the customer was asked "is it working?" at 14:17:00, it moves to Positive verdict at 14:17:01, and no second message is sent. | C-01 · R2b · R2c · R3e | Settled |
 | AC-BV-4 | **Given** a positive Internet Verdict at the Resolved mark, 13:47 on 14 Oct, **When** the customer replies yes at 13:46 on 16 Oct, **Then** it is Closed with CUSTOMER_CONFIRMED, not POSITIVE_VERDICT_NO_RESPONSE. | C-04 · R4a | Settled |
 | AC-BV-5 | **Given** a service task Closed at 13:47 on 16 Oct, **When** the customer reports "not working" at 13:46 on 15 Nov, **Then** the new service task is linked as a repeat. | C-07 · R9a | Settled |
@@ -317,8 +317,6 @@ Each comment is added by Wiom in Kapture at the moment of the action, and only f
 | AC-CFG-2 | **Given** a Wiom Product user has set C-04 to 36 h, **When** a service task Resolved at 13:47 on 14 Oct gets a positive Internet Verdict at 14:09 and the customer never answers, **Then** it is Closed with POSITIVE_VERDICT_NO_RESPONSE at 01:47 on 16 Oct. | C-04 · R4b | Settled |
 | AC-CFG-3 | **Given** a Wiom Product user has set C-05 to 96 h, **When** a service task Resolved at 13:47 on 14 Oct never gets a positive Internet Verdict and the customer never answers, **Then** it is Closed with FINAL_CLOSURE_UNVERIFIED at 13:47 on 18 Oct. | C-05 · R4c | Settled |
 | AC-CFG-5 | **Given** C-04 is 48 h, **When** a Wiom Product user tries to set C-05 to 48 h, **Then** the change is refused, because C-05 must be longer than C-04 ⚠️ *AI GENERATED — review*. | C-05 range | Settled |
-| AC-CFG-7 | **Given** a Wiom Product user has set C-02 to 2, **When** a service task Resolved at 13:47 gets positive Internet Verdicts at 13:55 and 14:05, **Then** it moves to Positive verdict and the customer is told the issue is fixed at 14:05, not at 13:55. | C-02 · R2a · R3a | Settled |
-| AC-CFG-8 | **Given** C-02 is 2, **When** a service task Resolved at 13:47 gets only one positive Internet Verdict, at 13:55, by 14:17, **Then** at 14:17 it is in No positive verdict and the customer is asked whether the internet is working. | C-02 · R2b · R3b | Settled |
 | AC-BV-11 | **Given** C-01 is 30 min, **When** a Wiom Product user tries to set it to 61 min, outside its range of 15–60 min, **Then** the change is refused and C-01 stays 30 min. | C-01 range | Settled |
 | AC-BV-12 | **Given** a service task Resolved at 13:47:00 on 14 Oct with no positive Internet Verdict since, **When** its only positive Internet Verdict comes at 13:46:59 on 16 Oct, 1 s before C-04 runs out, **Then** it auto closes at 13:47:00 on 16 Oct with POSITIVE_VERDICT_NO_RESPONSE. | C-04 · R4b · R2c | Settled |
 | AC-BV-13 | **Given** a service task Resolved at 13:47:00 on 14 Oct with no positive Internet Verdict since, **When** a positive Internet Verdict would come at 13:47:01 on 16 Oct, 1 s after C-04 runs out, **Then** it auto closes at 13:47:00 on 17 Oct with FINAL_CLOSURE_UNVERIFIED. | C-04 · C-05 · R4d | Settled |
@@ -382,7 +380,6 @@ stateDiagram-v2
 | ID | Parameter | Value / Default | Kind | Range · Owner · Why configurable |
 |---|---|---|---|---|
 | C-01 | Initial Check: its length from the Resolved mark, before the customer is asked whether the internet is working | 30 minutes | Configurable | 15–60 min · Wiom Product team · PM: these values must change without a release (15 Oct 2026) |
-| C-02 | Positive Internet Verdicts needed during the Initial Check to tell the customer the issue is fixed | 1 | Configurable | 1–6 ⚠️ *AI GENERATED — review* · Wiom Product team · PM: this is a configuration (15 Oct 2026) |
 | C-04 | Auto closure with a positive Internet Verdict: from the Resolved mark to Closure, when a positive Internet Verdict was received before it ran out and the customer has not answered | 48 hours | Configurable | 24–72 h · Wiom Product team · PM: these values must change without a release (15 Oct 2026) |
 | C-05 | Auto closure with no positive Internet Verdict: from the Resolved mark to Closure, when none was received before C-04 ran out and the customer has not answered. Must be longer than C-04 ⚠️ *AI GENERATED — review* | 72 hours | Configurable | 3–14 days · Wiom Product team · PM: these values must change without a release (15 Oct 2026) |
 | C-06 | CSP working hours, inside which the CSP TAT runs | 11:00–21:00 IST, every day | Fixed | — |
@@ -393,7 +390,7 @@ stateDiagram-v2
 | C-12 | Rollout list: the CSP IDs on which this feature is live | Empty at launch; CSPs added one by one ⚠️ *AI GENERATED — review* | Configurable | Any CSP ID · Wiom Product team ⚠️ *AI GENERATED — review* · PM: the feature is released in a phased, tightly controlled way (15 Oct 2026) |
 | C-13 | How often Wiom asks Connection Validation Service for the Internet Verdict, from the Resolved mark until the customer answers, the service task closes, or C-04 runs out | [TBD — not asked] | Configurable | [TBD — not asked] · Wiom Product team |
 
-**Interaction note (C-01 × C-02 × C-04 / C-05 × C-13):** everything turns on the customer's answer; the timers act only when there is none. A positive Internet Verdict at the Resolved mark sends the "fixed" message at once. Otherwise the customer hears nothing until a positive Internet Verdict or until C-01 runs out, whichever is first. The CSP sees only that Wiom will verify the fix, throughout. A positive Internet Verdict after C-01 sends nothing new. Wiom keeps asking every C-13 until C-04 runs out. Both auto closures count from the Resolved mark: a positive Internet Verdict before C-04 runs out closes the service task at C-04; otherwise it closes at C-05, and a positive Internet Verdict between C-04 and C-05 changes nothing.
+**Interaction note (C-01 × C-04 / C-05 × C-13):** everything turns on the customer's answer; the timers act only when there is none. A positive Internet Verdict at the Resolved mark sends the "fixed" message at once. Otherwise the customer hears nothing until a positive Internet Verdict or until C-01 runs out, whichever is first. The CSP sees only that Wiom will verify the fix, throughout. A positive Internet Verdict after C-01 sends nothing new. Wiom keeps asking every C-13 until C-04 runs out. Both auto closures count from the Resolved mark: a positive Internet Verdict before C-04 runs out closes the service task at C-04; otherwise it closes at C-05, and a positive Internet Verdict between C-04 and C-05 changes nothing.
 
 **Interaction note (C-08 × C-04 / C-05):** the M3 timer runs only outside Pending Verification and the verification windows run only inside it, so the two never overlap. A service task can wait the full 72 hours of C-05 without moving closer to C-08.
 
@@ -423,13 +420,13 @@ stateDiagram-v2
 | Capability | Needed by |
 |---|---|
 | Hold a service task in Pending Verification, with the CSP TAT stopped, from the Resolved mark until it is Closed or Reopened, showing the CSP only that Wiom will verify the fix. | T1 · R1 · R7 · G5 |
-| Ask Connection Validation Service for the Internet Verdict at the Resolved mark and every C-13 until the customer answers, the service task closes, or C-04 runs out, the same way for every subtype in scope. | T1 · T2 · T3 · T13 · R2 · C-01 · C-02 · C-13 |
+| Ask Connection Validation Service for the Internet Verdict at the Resolved mark and every C-13 until the customer answers, the service task closes, or C-04 runs out, the same way for every subtype in scope. | T1 · T2 · T3 · T13 · R2 · C-01 · C-13 |
 | Send the customer one first message, the moment a positive Internet Verdict is received or when C-01 runs out, by app notification only. | T2 · T3 · R3 · C-01 · G3 |
 | Record every push notification in Verification — sent, opened, answered from, or not sent — against its service task, without delaying it. | T2 · T3 · T7 · T8 · T14 · R11 |
 | Send the CSP a CSP app notification and the assigned Technician a Technician App notification at every Reopen and every Closure, with the reason, and record them and their opening. | T5 · T6 · T7 · T8 · R4f · R5f · R11e |
 | Take the customer's yes or no, and a plain no recorded by a Wiom CX user, against the service task. | T5 · T6 · R4a · R5c |
 | Auto close a service task at C-04 after the Resolved mark if a positive Internet Verdict was received before then, otherwise at C-05 after the mark, recording one of four closure reasons. | T7 · T8 · R4 · C-04 · C-05 |
-| Let a Wiom Product user change C-01, C-02, C-04 and C-05 within their ranges, and add or remove CSPs on the rollout list (C-12), without a release. | C-01 · C-02 · C-04 · C-05 · C-12 · R12 |
+| Let a Wiom Product user change C-01, C-04 and C-05 within their ranges, and add or remove CSPs on the rollout list (C-12), without a release. | C-01 · C-04 · C-05 · C-12 · R12 |
 | Send Quality OS and Compensation OS the resolution signal, with the closure reason, only at Closure. | R6 · G4 |
 | Show the Wiom CX team in Kapture Status Pending / Sub Status Resolved during Pending Verification, Pending / Open after a Reopen and Complete / Completed at Closure, with a comment for every action; never act on a status Wiom itself set; take a Wiom CX user's Kapture close as a Closure — in Pending Verification, or In Progress before any Resolved mark — and refuse a Kapture reopen of a Closed service task. | T1 · T5 · T6 · T14 · T15 · R8 · G2 · G6 |
 | Link a new service task to a Closed one as a repeat within C-07. | T11 · R9 · C-07 |
@@ -443,7 +440,6 @@ stateDiagram-v2
 |---|---|---|
 | §1 · Closure reason · §3 · R4h | The name CX_CLOSED_IN_KAPTURE for the fourth closure reason | Inference — you decided a Kapture close stays allowed; it needs its own reason so it is never read as the customer's yes |
 | §3 · R8d · K1–K11 · AC-R8-4 · AC-R8-16 | The text of every Kapture comment, which actions get one, and the readable reason names (Internet working, no response; Not verified; Closed by CX). The comments say "ticket", the word the Wiom CX team sees in Kapture, though the PRD's own prose says "service task" | You asked for the comment written per case so it is built that way; the wording is mine |
-| §6 · C-02 | C-02's range (1–6) | Inference — kept from the earlier range when C-02 counted signals in a 30-minute Initial Check |
 | §1 · Closure reason · §3 · R4b | The code POSITIVE_VERDICT_NO_RESPONSE, renamed from the solution flow's earlier code so no closure reason names how the verdict is reached | Follows your rule to say Internet Verdict |
 | §3 · R4e · AC-R4-12 | What the customer's message on a Kapture close during Pending Verification must convey (closed, and how to raise a new one); the wording comes from Design's Figma file | Inference, matching the auto-closure message |
 | §4 · AC-RACE-1, AC-RACE-2, AC-RACE-5 · §5 Precedence | A customer answer at the same instant as a window expiry or a Wiom CX user's Kapture close is applied first | Inference — the customer's word outranks a timer and an agent |
@@ -462,7 +458,7 @@ stateDiagram-v2
 | §7 · Figma file | The link to Design's Figma file with the push notification copy |
 | §6 · C-13 | How often Wiom asks Connection Validation Service for the Internet Verdict, and its range |
 | §4 · AC-REG-1, AC-REG-2 | What to observe to prove escalation and other subtypes are unchanged, and the reference for it |
-| §6 · C-06 to C-10 | Whether these numbers must change without a release (C-01, C-02, C-04, C-05 are Configurable by the PM's decision; the rest stay Fixed, the default) |
+| §6 · C-06 to C-10 | Whether these numbers must change without a release (C-01, C-04, C-05 are Configurable by the PM's decision; the rest stay Fixed, the default) |
 | §3 · R3 | What happens when the app notification cannot be sent: is the customer still counted as told |
 | §3 · R4 / R6 | When the customer's existing "resolved" message and apology coupon fire — at Closure, or on which closure reasons |
 | §3 · R5 | Whether a customer raising the same issue again in the app during Pending Verification counts as a no |

@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — [TBD — not asked] | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.18 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
+| **Version** — v0.19 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
 ---
@@ -51,6 +51,8 @@
 This spec also sets how M3 counts long-open service tasks (R10). Everything in this spec, M3 included, applies only to service tasks of CSPs on the rollout list (R12). For every other CSP, nothing changes: their service tasks close at the Resolved mark and M3 counts them as it does today.
 
 Version 1 sets no limit on reopen rounds. A Reopened service task always goes back to the same CSP, with no fallback when that CSP cannot take it.
+
+**Push notification copy.** The wording of every push notification in this spec — to the customer, the CSP and the Technician — is set by Design and shared in the Figma file (§7). This spec sets only when each one is sent and what it must convey.
 
 ### Guardrails — promises that hold on every path
 
@@ -390,6 +392,7 @@ stateDiagram-v2
 | Quality OS, M3 | M3 timer pauses in Pending Verification and resumes on a Reopen; counting moves to fixed M3 cycles, once per service task | `csp-quality-service` main, 14 Oct 2026: `DailyMetricSnapshotServiceImpl` (M3 pass/fail), `ComplaintResolutionLedgerRepository.countBreachedNotExcluded` (breach count), `application.yml` (`QU_M3_BREACH_HOURS` 48, `QU_M3_BREACH_THRESHOLD` 2); M3 decision page (claude.ai artifact 8QRrrRYtSmayVyxdC9VZhL) | Today M3 counts a service task unresolved 48 wall-clock hours after filing, never pauses, and uses a rolling 15-day window; a repeat is a new record with its own 48 hours. Minimum service tasks for an M3 verdict in a cycle: [TBD — not asked] · AC-R10-1 to AC-R10-7 · AC-GRD-7 · AC-BV-7 to AC-BV-9 |
 | Compensation OS | Receives the resolution signal only at Closure | Solution flow v3 | No receiver of the resolution signal found in code today · AC-R6-1 to AC-R6-3 |
 | Message orchestrator | Sends the customer's app notifications: the verdict message and the message at Closure | — | Today the customer gets a "resolved" app notification, or SMS if it fails, at the mark, with no way to answer · AC-R3-1 to AC-R3-5 |
+| Figma file, Design | Holds the copy of every push notification in this spec: the customer's "fixed", "is it working?" and Closure messages, and the CSP and Technician Reopen and Closure notifications | Link [TBD — not asked] | Copy to be shared by Design · AC-R3-1 · AC-R3-2 · AC-R4-5 · AC-R4-12 · AC-R4-10 · AC-R5-8 |
 | CleverTap, Customer app project (R95-6RK-5K6Z, prod) | Holds the push notification records R11 needs | — | Not checked which push notification events exist today [TBD — not asked] · AC-R11-1 to AC-R11-6 |
 | CleverTap, CSP app project (44Z-644-777Z, prod; shared with the Technician App) | Holds the CSP app notification records R11e needs | — | Not checked which CSP app notification events exist today [TBD — not asked] · AC-R11-7 · AC-R11-8 |
 | Notification service (CSP side) | Sends the CSP the Reopen and Closure notifications | `csp-notification-service` main, 15 Oct 2026 | Today it notifies the owner, managers and Technician when a restore task is completed, which happens at the Resolved tap; there is no notification on a Reopen · AC-R4-10 · AC-R5-8 |
@@ -421,7 +424,7 @@ stateDiagram-v2
 |---|---|---|
 | §1 · Closure reason · §3 · R4h | The name CX_CLOSED_IN_KAPTURE for the fourth closure reason | Inference — you decided a Kapture close stays allowed; it needs its own reason so it is never read as the customer's yes |
 | §3 · R8d · AC-R8-4 · AC-R8-5 · AC-R8-11 · AC-R8-12 | The list of actions that get a Kapture comment (including the verdict, push notifications that could not be sent, and the CSP and Technician notifications), what each says, and that it is added at the moment of the action — you asked for a comment for every action | Inference from the actions this spec defines |
-| §3 · R4e · AC-R4-12 | What the customer is told on a Kapture close during Pending Verification (closed, and how to raise a new one) — you said only that the customer gets a message | Inference, matching the auto-closure message |
+| §3 · R4e · AC-R4-12 | What the customer's message on a Kapture close during Pending Verification must convey (closed, and how to raise a new one); the wording comes from Design's Figma file | Inference, matching the auto-closure message |
 | §4 · AC-RACE-1, AC-RACE-2, AC-RACE-5 · §5 Precedence | A customer answer at the same instant as a window expiry or a Wiom CX user's Kapture close is applied first | Inference — the customer's word outranks a timer and an agent |
 | §6 · C-05 · §4 · AC-CFG-5 | C-05 must stay longer than C-04, so a Product user cannot set them in the wrong order | Inference — a no-ping closure earlier than a ping-up closure would invert the rule |
 | §3 · R11a–d · R11 MUST NOT | What is recorded for each push notification (sent with type and time, opened, answered from, not sent) and that recording never delays a message — you asked only that push notifications be instrumented | Inference from what the flow needs to show whether silent customers saw the message |
@@ -435,6 +438,7 @@ stateDiagram-v2
 | Location (section · ID) | What was never asked |
 |---|---|
 | Header · Reviewer | Which engineering lead reviews this PRD |
+| §7 · Figma file | The link to Design's Figma file with the push notification copy |
 | §4 · AC-REG-1, AC-REG-2 | What to observe to prove escalation and other subtypes are unchanged, and the reference for it |
 | §6 · C-02, C-06 to C-11 | Whether these numbers must change without a release (C-01, C-04, C-05 are Configurable by the PM's decision; the rest stay Fixed, the default) |
 | §3 · R3 | What happens when the app notification cannot be sent: is the customer still counted as told |

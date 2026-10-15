@@ -2,7 +2,7 @@
 
 | | | | |
 |---|---|---|---|
-| **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) | **Status** — Signed off | **Sign-off** — Signed off · 15 Oct 2026 |
+| **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) · Dhruv (product) | **Status** — Signed off | **Sign-off** — Signed off · 15 Oct 2026 |
 | **Version** — v1.0 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 

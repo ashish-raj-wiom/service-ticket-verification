@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — [TBD — not asked] | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.9 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
+| **Version** — v0.10 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
 ---
@@ -23,9 +23,9 @@
 | First ping | The moment the verdict passes: the Resolved mark itself, when the Netbox pinged within C-11 before it; otherwise the first ping after the mark. | Support Resolution OS |
 | Reopen | The move of a service task from Pending Verification back to In Progress, caused only by the customer saying the internet is not working. The service task, the CSP and the issue stay the same. | Support Resolution OS |
 | Closed | The final state of a service task. Nothing leaves it. | Support Resolution OS |
-| Auto closure | Closure of a service task in Pending Verification when the customer has not answered: at C-04 after the Resolved mark if the Netbox pinged before then, otherwise at C-05 after the mark. One of only two ways into Closed; the other is the customer saying yes. | Support Resolution OS |
+| Auto closure | Closure of a service task in Pending Verification when the customer has not answered: at C-04 after the Resolved mark if the Netbox pinged before then, otherwise at C-05 after the mark. One of three ways into Closed; the others are the customer saying yes and a Wiom CX user closing the service task in Kapture. | Support Resolution OS |
 | Rollout list | The list of CSP IDs on which this feature is live (C-12). The feature is released CSP by CSP, under tight control; a CSP not on the list sees no change at all. | Wiom Product team |
-| Closure reason | The cause recorded on every Closed service task, one of three: **CUSTOMER_CONFIRMED** (the customer said yes), **PING_UP_NO_RESPONSE** (auto closure: the Netbox pinged before C-04 ran out, no answer), **FINAL_CLOSURE_UNVERIFIED** (auto closure: no ping before C-04 ran out, no answer by C-05). | Support Resolution OS |
+| Closure reason | The cause recorded on every Closed service task, one of four: **CUSTOMER_CONFIRMED** (the customer said yes), **CX_CLOSED_IN_KAPTURE** (a Wiom CX user closed it in Kapture during Pending Verification) ⚠️ *AI GENERATED — review*, **PING_UP_NO_RESPONSE** (auto closure: the Netbox pinged before C-04 ran out, no answer), **FINAL_CLOSURE_UNVERIFIED** (auto closure: no ping before C-04 ran out, no answer by C-05). | Support Resolution OS |
 | Repeat | A new service task opened after a Closure, for the same connection and the same issue, within the repeat window (C-07). It is linked to the Closed service task. | Support Resolution OS |
 | ISD | Internet supply down: a service task subtype for a customer with no internet. | Support Resolution OS |
 | RDNI | Recharge done but no internet: a service task subtype for a customer who has recharged and still has no internet. | Support Resolution OS |
@@ -60,7 +60,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | G3 | **Never "fixed" on a failed verdict** (zero tolerance) | The customer is never told the issue is fixed when the verdict failed. | R3 · AC-R3-2 · AC-GRD-3 |
 | G4 | **Signals only at Closed** | Quality OS and Compensation OS hear about a service task's resolution only when it is Closed, never at the Resolved mark. | R6 · AC-R6-1 · AC-GRD-4 |
 | G5 | **Verification never counts against the CSP** | Time in Pending Verification never counts in the CSP TAT or on the M3 timer. | R1 · R7 · R10 · AC-R7-1 · AC-R10-2 · AC-GRD-5 · AC-GRD-7 |
-| G6 | **Rules and timers decide** | Every exit from Pending Verification comes from the customer's answer or an auto closure — never from a person judging the case. | R4 · R5 · AC-GRD-6 |
+| G6 | **Every exit has a recorded cause** | Every exit from Pending Verification comes from the customer's answer, a Wiom CX user's action in Kapture, or an auto closure, and its cause is recorded — never a silent change. | R4 · R5 · R8 · AC-GRD-6 |
 | G7 | **The customer reopens only in Pending Verification** (zero tolerance) | A customer's "not working" sends a service task back to the CSP only while it is in Pending Verification; In Progress it changes nothing, and after Closure it opens a new service task. | R5 · R9 · AC-R5-1 · AC-R9-1 · AC-GRD-8 |
 | G8 | **No change for CSPs off the rollout list** (zero tolerance) | A service task whose CSP is not on the rollout list behaves exactly as it does today, in every system this spec touches. | R12 · AC-R12-2 · AC-R12-5 · AC-GRD-9 |
 
@@ -117,7 +117,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R4 | As a customer, I want my service task to close only when the fix is confirmed or I have had time to say otherwise, so that a closed service task means something. | **(a)** On T5, when the customer says yes, close the service task at once with reason CUSTOMER_CONFIRMED, whatever the verdict. **(b)** On T7, auto close at C-04 after the Resolved mark when the Netbox has pinged at least once since C-11 before the mark and the customer has not answered, with reason PING_UP_NO_RESPONSE. **(c)** On T8, auto close at C-05 after the Resolved mark when the Netbox did not ping before C-04 ran out and the customer has not answered, with reason FINAL_CLOSURE_UNVERIFIED. **(d)** Keep a service task on C-05 when its first ping arrives after C-04 has run out. **(e)** On T7 and T8, tell the customer how to raise a new service task. **(f)** On every Closure, show the CSP the closure reason, and send the CSP a CSP app notification, and the assigned Technician a Technician App notification, that the service task is Closed, with that reason, at the moment it closes ⚠️ *AI GENERATED — review*. **(g)** On T10, when the customer's plan expires during Pending Verification: [CLARIFY — what happens to the service task]. | Close a service task in Pending Verification any way other than the customer's yes or an auto closure. Close it before the customer's answer or the auto-closure time that applies. |
+| R4 | As a customer, I want my service task to close only when the fix is confirmed or I have had time to say otherwise, so that a closed service task means something. | **(a)** On T5, when the customer says yes, close the service task at once with reason CUSTOMER_CONFIRMED, whatever the verdict. **(b)** On T7, auto close at C-04 after the Resolved mark when the Netbox has pinged at least once since C-11 before the mark and the customer has not answered, with reason PING_UP_NO_RESPONSE. **(c)** On T8, auto close at C-05 after the Resolved mark when the Netbox did not ping before C-04 ran out and the customer has not answered, with reason FINAL_CLOSURE_UNVERIFIED. **(d)** Keep a service task on C-05 when its first ping arrives after C-04 has run out. **(e)** On T7 and T8, tell the customer how to raise a new service task. **(f)** On every Closure, show the CSP the closure reason, and send the CSP a CSP app notification, and the assigned Technician a Technician App notification, that the service task is Closed, with that reason, at the moment it closes ⚠️ *AI GENERATED — review*. **(h)** On T14, when a Wiom CX user closes the service task in Kapture during Pending Verification, close it at once with reason CX_CLOSED_IN_KAPTURE ⚠️ *AI GENERATED — review*, as a Kapture close works today. **(g)** On T10, when the customer's plan expires during Pending Verification: [CLARIFY — what happens to the service task]. | Close a service task in Pending Verification any way other than the customer's yes, a Wiom CX user's close in Kapture, or an auto closure. Close it before the customer's answer or the auto-closure time that applies. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -130,6 +130,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R4-6 | **Given** the service task from AC-R4-2, **When** it is Closed at 13:47 on 16 Oct, **Then** the CSP app shows it as Closed with reason PING_UP_NO_RESPONSE. | R4f · T7 | Settled |
 | AC-R4-10 | **Given** the service task from AC-R4-2, with CSP Shiv Net, **When** it auto closes at 13:47 on 16 Oct, **Then** Shiv Net receives a CSP app notification, and the assigned Technician a Technician App notification, at 13:47 that the service task is Closed with reason PING_UP_NO_RESPONSE. | R4f · T7 | Settled |
 | AC-R4-8 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox has not pinged, and no answer, **When** C-04 (48 h) after the mark passes at 13:47 on 16 Oct, **Then** it is still in Pending Verification, not Closed. | R4 MUST NOT | Settled |
+| AC-R4-11 | **Given** the service task from AC-R1-1, Resolved at 13:47 on 14 Oct, no answer, **When** a Wiom CX user closes it in Kapture at 17:20 on 14 Oct, **Then** it is Closed at 17:20 with reason CX_CLOSED_IN_KAPTURE, and CSP Shiv Net and the assigned Technician receive their Closure notifications at 17:20 with that reason. | R4h · R4f · T14 | Settled |
 | AC-R4-7 | **Given** a service task in Pending Verification since 13:47 on 14 Oct, **When** the customer's plan expires at 23:59 on 15 Oct, **Then** [CLARIFY — the service task's state and the customer's message]. | R4g · T10 | OPEN |
 
 ### R5 — Reopen on the customer's no
@@ -172,16 +173,21 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R7-1 | **Given** a service task In Progress from 11:20, Resolved at 13:47, Reopened at 16:05 and Resolved again at 19:12 on 14 Oct, **When** it is Closed at 08:40 on 15 Oct, **Then** its CSP TAT is 5 h 34 min (2 h 27 min plus 3 h 07 min). | R7a · R7b · G5 | Settled |
 | AC-R7-2 | **Given** a service task that reaches the CSP at 20:40 on 14 Oct, **When** the CSP marks it Resolved at 11:25 on 15 Oct, **Then** its CSP TAT is 45 min (20 min on 14 Oct and 25 min on 15 Oct). | R7a | Settled |
 
-### R8 — The Wiom CX team sees Verification
+### R8 — The Wiom CX team in Kapture
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R8 | As a Wiom CX user, I want to see that a service task is being verified, so that I can tell a customer where it stands. | **(a)** On T1, and while the service task is in Pending Verification, Kapture shows it as In progress. **(b)** At Closure, Kapture shows it as completed ⚠️ *AI GENERATED — review*. | Show a service task as resolved or completed in Kapture while it is in Pending Verification. |
+| R8 | As a Wiom CX user, I want Kapture to show where a service task stands in Verification and what Wiom has done, so that I can tell a customer the truth and act on their call. | **(a)** On T1, and while the service task is in Pending Verification, Kapture shows it as In progress. **(b)** At Closure, Kapture shows it as completed ⚠️ *AI GENERATED — review*. **(c)** On T6, Kapture shows it as Open while it is back In Progress. **(d)** Add a Kapture comment at each step, at the moment it happens: the Resolved mark (Wiom is verifying the CSP's fix), each message sent to the customer (which message, by which channel), the customer's answer, the Reopen, and the Closure with its reason ⚠️ *AI GENERATED — review*. **(e)** Let a Wiom CX user close the service task in Kapture during Pending Verification, as today (R4h, T14). **(f)** When a customer says it is not working after Closure, the Wiom CX user raises a new service task, linked to the Closed one as a repeat within C-07 (R9a). | Show a service task as resolved or completed in Kapture while it is in Pending Verification. Reopen a Closed service task from Kapture. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
 | AC-R8-1 | **Given** the service task from AC-R1-1, **When** a Wiom CX user opens it in Kapture at 14:30 on 14 Oct, **Then** its Kapture sub-status is `IP`, not `RS` or `CO`. | R8a · R8 MUST NOT | Settled |
 | AC-R8-2 | **Given** the service task from AC-R4-1, **When** a Wiom CX user opens it in Kapture at 18:40 on 14 Oct, **Then** its Kapture sub-status is `CO` ⚠️ *AI GENERATED — review*. | R8b · T5 | Settled |
+| AC-R8-3 | **Given** the service task from AC-R5-1, Reopened at 16:05 on 14 Oct, **When** a Wiom CX user opens it in Kapture at 16:30, **Then** its Kapture sub-status is `OP`, not `IP`. | R8c · T6 | Settled |
+| AC-R8-4 | **Given** the service task from AC-R2-1, Resolved at 13:47 on 14 Oct, "fixed" message sent at 14:09, customer's yes at 18:32, **When** a Wiom CX user opens it in Kapture at 18:40, **Then** it has three comments in order: at 13:47 that Wiom is verifying the CSP's fix, at 14:09 that the "fixed" message went to the customer and by which channel, and at 18:32 that the customer said it is working and the service task is Closed with reason CUSTOMER_CONFIRMED. | R8d · T1 · T2 · T5 | Settled |
+| AC-R8-5 | **Given** the service task from AC-R5-1, **When** Rekha Verma replies "not working" at 16:05 on 14 Oct, **Then** its Kapture record has a comment at 16:05 that the customer said it is not working and the service task is back with CSP Shiv Net. | R8d · T6 | Settled |
+| AC-R8-6 | **Given** the service task from AC-R4-11, **When** a Wiom CX user closes it in Kapture at 17:20 on 14 Oct, **Then** it is Closed with reason CX_CLOSED_IN_KAPTURE, and its Kapture record has a comment at 17:20 with that reason. | R8e · R8d · T14 | Settled |
+| AC-R8-7 | **Given** the service task from AC-R4-2, Closed at 13:47 on 16 Oct, **When** Rekha Verma calls at 09:15 on 2 Nov to say it is not working and a Wiom CX user tries to reopen it in Kapture, **Then** Kapture refuses the reopen and the Closed service task stays Closed; the Wiom CX user raises a new service task, linked to the Closed one as a repeat. | R8f · R8 MUST NOT · R9a · T11 · G1 | Settled |
 
 ### R9 — After Closure
 
@@ -199,7 +205,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R10 | As a CSP, I want M3 to count only the time a service task waits on me, so that Wiom checking a fix never makes a service task look long-open. | **(a)** Start the M3 timer when the service task is raised, and run it on the wall clock, every hour of the day. **(b)** On T1, pause the M3 timer at the Resolved mark. **(c)** On T6, resume the M3 timer from where it stopped. **(d)** On T12, when the M3 timer reaches C-08, count the service task once toward M3, in the M3 cycle (C-09) in which that happens. **(e)** On T5, T7 and T8, stop the M3 timer; a service task whose timer never reached C-08 is never counted. **(f)** Give a CSP a PASS on M3 for a cycle when C-10 or fewer of its service tasks were counted in it, and a FAIL otherwise. | Count time in Pending Verification on the M3 timer. Count the same service task in more than one M3 cycle, even if it stays open or is Reopened. Pause the M3 timer for any reason other than Pending Verification. |
+| R10 | As a CSP, I want M3 to count only the time a service task waits on me, so that Wiom checking a fix never makes a service task look long-open. | **(a)** Start the M3 timer when the service task is raised, and run it on the wall clock, every hour of the day. **(b)** On T1, pause the M3 timer at the Resolved mark. **(c)** On T6, resume the M3 timer from where it stopped. **(d)** On T12, when the M3 timer reaches C-08, count the service task once toward M3, in the M3 cycle (C-09) in which that happens. **(e)** On T5, T7, T8 and T14, stop the M3 timer; a service task whose timer never reached C-08 is never counted. **(f)** Give a CSP a PASS on M3 for a cycle when C-10 or fewer of its service tasks were counted in it, and a FAIL otherwise. | Count time in Pending Verification on the M3 timer. Count the same service task in more than one M3 cycle, even if it stays open or is Reopened. Pause the M3 timer for any reason other than Pending Verification. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -240,7 +246,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R12-1 | **Given** CSP Shiv Net is on the rollout list, **When** its Technician marks an ISD service task Resolved at 13:47, **Then** the service task is in Pending Verification at 13:47. | R12a · T1 | Settled |
 | AC-R12-2 | **Given** CSP Om Sai Cable is not on the rollout list, **When** it marks an ISD service task Resolved at 13:47, **Then** the service task closes at 13:47 as today, the customer gets today's "resolved" message, and Quality OS receives the resolution signal at 13:47. | R12b · G8 | Settled |
 | AC-R12-3 | **Given** CSP Om Sai Cable is added to the rollout list at 15:00, **When** one of its service tasks was marked Resolved at 14:40 and another is marked Resolved at 15:10, **Then** the 14:40 one closed as today and the 15:10 one is in Pending Verification. | R12a · R12c · R12 MUST NOT | Settled |
-| AC-R12-4 | **Given** a service task of CSP Shiv Net in Pending Verification since 13:47, **When** Shiv Net is removed from the rollout list at 16:00, **Then** the service task stays in Pending Verification and closes by the customer's yes or an auto closure as this spec sets out. | R12d | Settled |
+| AC-R12-4 | **Given** a service task of CSP Shiv Net in Pending Verification since 13:47, **When** Shiv Net is removed from the rollout list at 16:00, **Then** the service task stays in Pending Verification and closes by the customer's yes, a Wiom CX user's close in Kapture, or an auto closure, as this spec sets out. | R12d | Settled |
 | AC-R12-5 | **Given** CSP Om Sai Cable is not on the rollout list, **When** Quality OS counts M3 for it, **Then** it uses today's rolling window and today's clock, with no pause and no fixed M3 cycles. | R12b · R10 · G8 | Settled |
 
 ---
@@ -257,12 +263,12 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-FAIL-4 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox never pings, no answer, **When** C-05 (72 h) runs out at 13:47 on 17 Oct, **Then** the service task is Closed with FINAL_CLOSURE_UNVERIFIED and the customer has been told how to raise a new service task. | C-05 · R4c · R4e | Settled |
 | AC-REG-1 | **Given** a service task In Progress that has not been marked Resolved, **When** it reaches its escalation point, **Then** it escalates exactly as before this change [TBD — not asked]. | §2 Boundary | OPEN |
 | AC-REG-2 | **Given** a service task of a subtype other than ISD or RDNI, **When** the CSP marks it Resolved, **Then** it closes as before this change [TBD — not asked]. | §2 Boundary | OPEN |
-| AC-GRD-1 | **Given** service tasks Closed by each of the three closure reasons, **When** the customer replies yes, the CSP opens each one in the CSP app, and a Wiom CX user opens each one in Kapture, **Then** each stays Closed. | G1 | Settled |
+| AC-GRD-1 | **Given** service tasks Closed by each of the four closure reasons, **When** the customer replies yes, the CSP opens each one in the CSP app, and a Wiom CX user tries to reopen each one in Kapture, **Then** each stays Closed. | G1 | Settled |
 | AC-GRD-2 | **Given** an ISD service task never marked Resolved, **When** the customer replies yes to any message, or C-04 or C-05 passes from its creation, **Then** it is not Closed. | G2 | Settled |
 | AC-GRD-3 | **Given** every failed-verdict service task in a day, **When** a Wiom Product user reads every message and reminder sent to those customers, **Then** none says the issue is fixed. | G3 | Settled |
 | AC-GRD-4 | **Given** every service task Resolved in a day, **When** a Wiom Product user compares the Quality OS and Compensation OS signals with the Closures, **Then** every signal falls at a Closure and none at a Resolved mark. | G4 | Settled |
 | AC-GRD-5 | **Given** a service task with three rounds of 2 h 10 min, 1 h 05 min and 40 min In Progress, and 30 h in Pending Verification, **When** it is Closed, **Then** its CSP TAT is 3 h 55 min. | G5 | Settled |
-| AC-GRD-6 | **Given** every service task that left Pending Verification in a day, **When** a Wiom Product user reads the recorded cause of each exit, **Then** each was the customer's yes, the customer's no, or an auto closure. | G6 | Settled |
+| AC-GRD-6 | **Given** every service task that left Pending Verification in a day, **When** a Wiom Product user reads the recorded cause of each exit, **Then** each was the customer's yes, the customer's no, a Wiom CX user's plain no or close in Kapture, or an auto closure, and each has a matching Kapture comment. | G6 · R8d | Settled |
 | AC-GRD-7 | **Given** a service task with 2 h 10 min on the M3 timer before its Resolved mark and 6 days 4 h in Pending Verification, **When** it is Closed with FINAL_CLOSURE_UNVERIFIED, **Then** its M3 timer reads 2 h 10 min and it is not counted toward M3. | G5 · R10b · R10e | Settled |
 | AC-GRD-8 | **Given** three service tasks for the same customer area — one In Progress, one in Pending Verification, one Closed at 10:00 that day — **When** each customer reports "not working" at 15:00, **Then** only the one in Pending Verification goes back to In Progress; the In Progress one is unchanged, and for the Closed one a new service task opens while it stays Closed. | G7 | Settled |
 | AC-GRD-9 | **Given** every service task Resolved in a day by CSPs not on the rollout list, **When** a Wiom Product user compares them with the same day a week earlier, before the feature, **Then** none entered Pending Verification, every one closed at its Resolved mark, and none received a verification message. | G8 | Settled |
@@ -301,24 +307,25 @@ Lifecycle of an **ISD or RDNI service task** from the CSP's Resolved mark to Clo
 
 ```mermaid
 stateDiagram-v2
-    InProgress --> PendingVerification : T1 · CSP or Technician marks Resolved [CSP on the rollout list] / R1a, R1b, R1c, R1d, R8a, R10b, R12a
+    InProgress --> PendingVerification : T1 · CSP or Technician marks Resolved [CSP on the rollout list] / R1a, R1b, R1c, R1d, R8a, R8d, R10b, R12a
     InProgress --> InProgress : T12 · M3 timer reaches C-08 [not yet counted toward M3] / R10d
     state PendingVerification {
         [*] --> Checking
-        Checking --> WaitingPassed : T2 · Netbox seen up [pinged within C-11 before the mark, or a ping before C-01 runs out, and for RDNI the plan is active] / R2a, R3a, R3c, R3d, R11a
-        Checking --> WaitingFailed : T3 · check window C-01 runs out [no ping, no data, or RDNI plan not active] / R2b, R3b, R3c, R3d, R11a
+        Checking --> WaitingPassed : T2 · Netbox seen up [pinged within C-11 before the mark, or a ping before C-01 runs out, and for RDNI the plan is active] / R2a, R3a, R3c, R3d, R8d, R11a
+        Checking --> WaitingFailed : T3 · check window C-01 runs out [no ping, no data, or RDNI plan not active] / R2b, R3b, R3c, R3d, R8d, R11a
         WaitingFailed --> WaitingPassed : T13 · one ping after the check window [before C-04 runs out, and for RDNI the plan is active] / R2c, R3f
-        WaitingPassed --> WaitingPassed : T4 · C-03 after the mark [no answer yet] / R3e, R11a
-        WaitingFailed --> WaitingFailed : T4 · C-03 after the mark [no answer yet] / R3e, R11a
+        WaitingPassed --> WaitingPassed : T4 · C-03 after the mark [no answer yet] / R3e, R8d, R11a
+        WaitingFailed --> WaitingFailed : T4 · C-03 after the mark [no answer yet] / R3e, R8d, R11a
     }
-    PendingVerification --> Closed : T5 · customer says yes / R4a, R4f, R6a, R8b, R10e, R11e
-    PendingVerification --> InProgress : T6 · customer says no, or a Wiom CX user records a plain no / R5a, R5b, R5c, R5d, R5f, R10c, R11e
-    WaitingPassed --> Closed : T7 · auto closure at C-04 after the mark [no answer] / R4b, R4e, R4f, R6a, R8b, R10e, R11a, R11e
-    WaitingFailed --> Closed : T8 · auto closure at C-05 after the mark [no ping before C-04, no answer] / R4c, R4e, R4f, R6a, R6b, R8b, R10e, R11a, R11e
+    PendingVerification --> Closed : T5 · customer says yes / R4a, R4f, R6a, R8b, R8d, R10e, R11e
+    PendingVerification --> InProgress : T6 · customer says no, or a Wiom CX user records a plain no / R5a, R5b, R5c, R5d, R5f, R8c, R8d, R10c, R11e
+    WaitingPassed --> Closed : T7 · auto closure at C-04 after the mark [no answer] / R4b, R4e, R4f, R6a, R8b, R8d, R10e, R11a, R11e
+    WaitingFailed --> Closed : T8 · auto closure at C-05 after the mark [no ping before C-04, no answer] / R4c, R4e, R4f, R6a, R6b, R8b, R8d, R10e, R11a, R11e
+    PendingVerification --> Closed : T14 · Wiom CX user closes it in Kapture / R4h, R4f, R6a, R8b, R8d, R8e, R10e, R11e
     PendingVerification --> PendingVerification : T10 · customer's plan expires [CLARIFY — outcome undecided] / R4g
     InProgress --> [*] : existing In Progress handling, escalation included — §2 Boundary
     InProgress --> [*] : CSP not on the rollout list marks Resolved — closes as today, §2 Boundary / R12b
-    Closed --> [*] : T11 · customer says not working after Closure — a new service task, §2 Boundary / R9a
+    Closed --> [*] : T11 · customer says not working after Closure — the Wiom CX user raises a new service task, §2 Boundary / R8f, R9a
 ```
 
 **Not possible from here:**
@@ -335,7 +342,7 @@ stateDiagram-v2
 - Waiting, verdict passed or failed × check window end — the check window has already ended.
 - In Progress × M3 timer reaches C-08 when the service task was already counted — counted once only (R10 MUST NOT).
 - Pending Verification × M3 timer reaches C-08 — the timer is paused there (R10b).
-- Closed × every trigger except T11 — Closed is final (G1); a yes after Closure changes nothing (R9b), and the M3 timer has stopped (R10e).
+- Closed × every trigger except T11 — Closed is final (G1); a reopen from Kapture is refused (R8 MUST NOT); a yes after Closure changes nothing (R9b), and the M3 timer has stopped (R10e).
 
 **Precedence:** a customer answer arriving at the same instant as C-04 or C-05 running out is applied first (AC-RACE-1, AC-RACE-2) ⚠️ *AI GENERATED — review*.  The M3 timer reaching C-08 at the same instant as a Resolved mark is applied before the mark (AC-RACE-3) ⚠️ *AI GENERATED — review*.
 
@@ -368,10 +375,10 @@ stateDiagram-v2
 
 | System / Service | Impact | Reference material | What was checked · ACs grounded on it |
 |---|---|---|---|
-| Support Resolution OS (`csp-support-resolution-service`) | Owns the service task; gains Pending Verification, the verdict, Reopen and the three closure reasons | `csp-os-yaml` main, 12 Oct 2026 | Today the service task closes at the Resolved mark whatever the ping check shows, and repeats link only within the existing reopen window (`REOPEN_LINEAGE_WINDOW`), shorter than C-07 · AC-R1-1 · AC-R4-1 to AC-R4-4 · AC-R9-1 |
+| Support Resolution OS (`csp-support-resolution-service`) | Owns the service task; gains Pending Verification, the verdict, Reopen and the four closure reasons | `csp-os-yaml` main, 12 Oct 2026 | Today the service task closes at the Resolved mark whatever the ping check shows, and repeats link only within the existing reopen window (`REOPEN_LINEAGE_WINDOW`), shorter than C-07 · AC-R1-1 · AC-R4-1 to AC-R4-4 · AC-R9-1 |
 | Connection Validation Service (ping check, called by Support Resolution OS) | Its reading of the customer's Netbox pings sets the verdict and the first ping, from C-11 before the mark onwards | Same repository | Today it is read once, at the mark, and its result is not shown for the decision · AC-R2-1 to AC-R2-7 |
 | TAS (CSP app and Technician App) | Shows only that Wiom will verify the fix, then the Reopen and the closure reason; never the ping status or verdict | CSP app, 12 Oct 2026 | Today, after the mark, the CSP app says the connection is back online whatever the ping check showed · AC-R1-3 · AC-R1-6 · AC-R4-6 · AC-R5-2 |
-| Kapture, through `ticket-service-java` | Shows `IP` during Pending Verification and a completed sub-status at Closure | `ticket-service-java` main, 29 Sep 2026 | Kapture sub-status codes include `IP` (In progress), `RS` (Resolved), `CO` (Completed). Today the mark sends `RS` or `CO`, and an `IP` coming from Kapture is not accepted · AC-R8-1 · AC-R8-2 |
+| Kapture, through `ticket-service-java` | Shows `IP` during Pending Verification, `OP` after a Reopen and a completed sub-status at Closure; carries a comment at each step; a Wiom CX user's close during Pending Verification closes the service task; a reopen of a Closed one is refused | `ticket-service-java` main, 29 Sep 2026 | Kapture sub-status codes include `OP` (Open), `IP` (In progress), `RS` (Resolved), `CO` (Completed). Today the mark sends `RS` or `CO`, an `IP` coming from Kapture is not accepted, and a Wiom CX user's close in Kapture resolves the service task in Support Resolution OS · AC-R8-1 to AC-R8-7 · AC-R4-11 |
 | Quality OS | Receives the resolution signal only at Closure | `csp-os-yaml` main, 12 Oct 2026 | Today it receives the signal at the mark · AC-R6-1 · AC-R6-2 · AC-GRD-4 |
 | Quality OS, M3 | M3 timer pauses in Pending Verification and resumes on a Reopen; counting moves to fixed M3 cycles, once per service task | `csp-quality-service` main, 14 Oct 2026: `DailyMetricSnapshotServiceImpl` (M3 pass/fail), `ComplaintResolutionLedgerRepository.countBreachedNotExcluded` (breach count), `application.yml` (`QU_M3_BREACH_HOURS` 48, `QU_M3_BREACH_THRESHOLD` 2); M3 decision page (claude.ai artifact 8QRrrRYtSmayVyxdC9VZhL) | Today M3 counts a service task unresolved 48 wall-clock hours after filing, never pauses, and uses a rolling 15-day window; a repeat is a new record with its own 48 hours. Minimum service tasks for an M3 verdict in a cycle: [TBD — not asked] · AC-R10-1 to AC-R10-7 · AC-GRD-7 · AC-BV-7 to AC-BV-9 |
 | Compensation OS | Receives the resolution signal only at Closure | Solution flow v3 | No receiver of the resolution signal found in code today · AC-R6-1 · AC-R6-2 |
@@ -393,10 +400,10 @@ stateDiagram-v2
 | Record every push notification in Verification — sent, opened, answered from, or failed with an SMS sent instead — against its service task, without delaying it. | T2 · T3 · T4 · T7 · T8 · R11 |
 | Send the CSP a CSP app notification and the assigned Technician a Technician App notification at every Reopen and every Closure, with the reason, and record them and their opening. | T5 · T6 · T7 · T8 · R4f · R5f · R11e |
 | Take the customer's yes or no, and a plain no recorded by a Wiom CX user, against the service task. | T5 · T6 · R4a · R5c |
-| Auto close a service task at C-04 after the Resolved mark if it pinged before then, otherwise at C-05 after the mark, recording one of three closure reasons. | T7 · T8 · R4 · C-04 · C-05 |
+| Auto close a service task at C-04 after the Resolved mark if it pinged before then, otherwise at C-05 after the mark, recording one of four closure reasons. | T7 · T8 · R4 · C-04 · C-05 |
 | Let a Wiom Product user change C-01, C-03, C-04 and C-05 within their ranges, and add or remove CSPs on the rollout list (C-12), without a release. | C-01 · C-03 · C-04 · C-05 · C-12 · R12 |
 | Send Quality OS and Compensation OS the resolution signal, with the closure reason, only at Closure. | R6 · G4 |
-| Show the Wiom CX team `IP` in Kapture during Pending Verification. | R8 |
+| Show the Wiom CX team in Kapture `IP` during Pending Verification, `OP` after a Reopen and a completed sub-status at Closure, with a comment at each step; take a Wiom CX user's Kapture close during Pending Verification as a Closure, and refuse a Kapture reopen of a Closed service task. | T1 · T5 · T6 · T14 · R8 |
 | Link a new service task to a Closed one as a repeat within C-07. | T11 · R9 · C-07 |
 | Run a wall-clock M3 timer per service task from when it is raised, paused in Pending Verification and resumed on a Reopen, and count it once, in the M3 cycle in which it reaches C-08. | T1 · T6 · T12 · R10 · C-08 · C-09 · C-10 · G5 |
 
@@ -409,6 +416,8 @@ stateDiagram-v2
 | §3 · R3c | SMS as one of the channels (you named IVR; v3 names no channels) | Inference from today's "resolved" message, which uses push then SMS |
 | §6 · C-03 · §3 · R3e · §5 · T4 | The reminder is counted from the Resolved mark (v3 counts it from when the customer is told). The T4 diagram label cannot carry a marker | Follows your decision that the windows run from Resolved |
 | §3 · R8b · AC-R8-2 | Kapture shows `CO` (Completed) at Closure, not `RS` or `CL` | Inference — `CO` is what a normal-priority service task gets today |
+| §1 · Closure reason · §3 · R4h | The name CX_CLOSED_IN_KAPTURE for the fourth closure reason | Inference — you decided a Kapture close stays allowed; it needs its own reason so it is never read as the customer's yes |
+| §3 · R8d · AC-R8-4 · AC-R8-5 | What each Kapture comment says, and that it is added at the moment of the step | Inference from your list of steps (Resolved mark, message sent, answer, Reopen, Closure with reason) |
 | §3 · R1 MUST NOT | The CSP cannot mark the service task Resolved again while it is in Pending Verification (v3 says only that it cannot be pulled back) | Inference — a second mark would restart the check window |
 | §4 · AC-RACE-1, AC-RACE-2 · §5 Precedence | A customer answer at the same instant as a window expiry is applied first | Inference — the customer's word outranks a timer |
 | §6 · C-05 · §4 · AC-CFG-5 | C-05 must stay longer than C-04, so a Product user cannot set them in the wrong order | Inference — a no-ping closure earlier than a ping-up closure would invert the rule |
@@ -428,9 +437,9 @@ stateDiagram-v2
 | §6 · C-02, C-06 to C-11 | Whether these numbers must change without a release (C-01, C-03, C-04, C-05 are Configurable by the PM's decision; the rest stay Fixed, the default) |
 | §3 · R3 | What happens when the message cannot be sent on any channel |
 | §3 · R4 / R6 | When the customer's existing "resolved" message and apology coupon fire — at Closure, or on which closure reasons |
-| §2 Boundary | Whether a Wiom CX user closing the service task in Kapture during Pending Verification counts as the customer's yes, or is blocked |
+| §3 · R4h · R6 | For a CX_CLOSED_IN_KAPTURE Closure: whether Quality OS and Compensation OS read it as fixed, and whether the customer gets a message |
 | §3 · R5 | Whether a customer raising the same issue again in the app during Pending Verification counts as a no |
-| §3 · R8 | What Kapture shows after a Reopen, while the service task is back In Progress |
+| §2 Boundary · G2 | A Wiom CX user closing a service task in Kapture while it is In Progress, before any Resolved mark, closes it today; kept as today, that breaches G2 |
 | §7 · Quality OS, M3 | The minimum number of service tasks a CSP needs in an M3 cycle for a PASS or FAIL (today 10 in the rolling window), and from which date the fixed M3 cycles start |
 | §7 · CleverTap | Which push notification events the Customer app, and which notification events the CSP app, already send, and whether R11 reuses them |
 | §3 · R12 | What happens to a service task in Pending Verification when its connection is moved to a CSP not on the rollout list (CSP reassignment) |

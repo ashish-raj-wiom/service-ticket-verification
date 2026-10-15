@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.37 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
+| **Version** — v0.38 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
 ---
@@ -47,7 +47,8 @@
 **Boundary.** This spec governs service tasks of two subtypes, internet supply down (ISD) and recharge done but no internet (RDNI), from the CSP's Resolved mark until the service task is Closed. It leaves unchanged:
 - how a service task is created, assigned and worked on while In Progress. A Wiom CX user closing it in Kapture while In Progress closes it exactly as today — reason, signals, messages and Kapture status — and this spec adds only that its M3 timer stops (G2 exception, T15);
 - every other service task subtype, which keeps closing at the Resolved mark as today (AC-REG-2);
-- the lifecycle of any new service task opened after a Closure. This spec sets only its repeat link (R9).
+- the lifecycle of any new service task opened after a Closure. This spec sets only its repeat link (R9);
+- moving a service task to another CSP, including one not on the rollout list, during Pending Verification.
 
 This spec also sets how M3 counts long-open service tasks (R10). Everything in this spec, M3 included, applies only to service tasks of CSPs on the rollout list (R12). For every other CSP, nothing changes: their service tasks close at the Resolved mark and M3 counts them as it does today.
 
@@ -108,7 +109,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R3 | As a customer, I want one clear question after the CSP's fix, so that I can say whether my internet works. | **(a)** On T2, the moment a positive Internet Verdict is received, send the customer the first message (copy: Figma files, §7). **(b)** On T3, when C-01 runs out with no positive Internet Verdict, send the customer the same first message. **(c)** Reach the customer by app notification and in the customer chat. **(d)** Count the customer as told once the message is sent. **(e)** On T13, send the customer nothing new: they already have the first message. | Send a different first message depending on the Internet Verdict. Send more than one first message in a round. |
+| R3 | As a customer, I want one clear question after the CSP's fix, so that I can say whether my internet works. | **(a)** On T2, the moment a positive Internet Verdict is received, send the customer the first message (copy: Figma files, §7). **(b)** On T3, when C-01 runs out with no positive Internet Verdict, send the customer the same first message. **(c)** Reach the customer by app notification and in the customer chat. **(d)** Count the customer as told once the message is sent. **(e)** On T13, send the customer nothing new: they already have the first message. | Send a different first message depending on the Internet Verdict. Send more than one first message in a round. Send today's "resolved" message at the Resolved mark to a customer whose CSP is on the rollout list: the messages in this spec replace it (customers of other CSPs keep today's messages, R12b). |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -117,6 +118,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R3-2 | **Given** a service task Resolved at 13:47 with no positive Internet Verdict, **When** C-01 runs out at 14:17, **Then** the customer receives at 14:17 the same first message as in AC-R3-1, word for word, with yes and no replies. | R3b · T3 · G3 · R3 MUST NOT | Settled |
 | AC-R3-3 | **Given** a service task Resolved at 13:47 with no positive Internet Verdict, **When** C-01 runs out at 14:17, **Then** the first message goes to the customer as an app notification and appears in the customer chat at 14:17. | R3c | Settled |
 | AC-R3-4 | **Given** a first message sent at 14:17 that never reaches the customer's phone, **When** a Wiom CX user opens the service task at 14:18, **Then** it shows the customer as told at 14:17. | R3d | Settled |
+| AC-R3-7 | **Given** CSP Shiv Net is on the rollout list, **When** its Technician marks a service task Resolved at 13:47, **Then** the customer does not get today's "resolved" message at 13:47; the only message about the fix is the first message, at the first positive Internet Verdict or at 14:17. | R3 MUST NOT · R12b | Settled |
 
 ### R4 — Closure
 
@@ -299,7 +301,7 @@ Each comment is added by Wiom in Kapture at the moment of the action, and only f
 | AC-FAIL-1 | **Given** a service task Resolved at 13:47 with no positive Internet Verdict, **When** C-01 (30 min) runs out at 14:17, **Then** it is in No positive verdict and the customer has the first message. | C-01 · R2b · R3b | Settled |
 | AC-FAIL-3 | **Given** a service task Resolved at 13:47 on 14 Oct whose Internet Verdict was positive at the mark, no answer, **When** C-04 (48 h) after the mark runs out at 13:47 on 16 Oct, **Then** the service task is Closed with “Internet working, no response” and the customer received no message about it. | C-04 · R4b · R4e | Settled |
 | AC-FAIL-4 | **Given** a service task Resolved at 13:47 on 14 Oct that never gets a positive Internet Verdict, no answer, **When** C-05 (72 h) runs out at 13:47 on 17 Oct, **Then** the service task is Closed with “Not verified” and the customer received no message about it. | C-05 · R4c · R4e | Settled |
-| AC-REG-2 | **Given** a service task of a subtype other than ISD or RDNI, **When** the CSP marks it Resolved, **Then** it closes as before this change [TBD — not asked]. | §2 Boundary | OPEN |
+| AC-REG-2 | **Given** a slow-internet service task of CSP Shiv Net, which is on the rollout list, **When** the CSP marks it Resolved at 13:47, **Then** it is Closed at 13:47, immediately after the mark, as today; it never enters Pending Verification. | §2 Boundary | Settled |
 | AC-GRD-1 | **Given** service tasks Closed by each of the four closure reasons, **When** the customer replies yes, the CSP opens each one in the CSP app, and a Wiom CX user tries to reopen each one in Kapture, **Then** each stays Closed. | G1 | Settled |
 | AC-GRD-2 | **Given** an ISD service task never marked Resolved, **When** the customer replies yes to any message, or C-04 or C-05 passes from its creation, **Then** it is not Closed; the only way it closes is a Wiom CX user's close in Kapture (AC-R8-8). | G2 | Settled |
 | AC-GRD-3 | **Given** every service task that entered Pending Verification in a day, **When** a Wiom Product user reads the first messages sent, **Then** every customer got exactly one, with the same wording whether or not there was a positive Internet Verdict. | G3 | Settled |
@@ -325,7 +327,7 @@ Each comment is added by Wiom in Kapture at the moment of the action, and only f
 | AC-CFG-2 | **Given** a Wiom Product user has set C-04 to 36 h, **When** a service task Resolved at 13:47 on 14 Oct gets a positive Internet Verdict at 14:09 and the customer never answers, **Then** it is Closed with “Internet working, no response” at 01:47 on 16 Oct. | C-04 · R4b | Settled |
 | AC-CFG-3 | **Given** a Wiom Product user has set C-05 to 96 h, **When** a service task Resolved at 13:47 on 14 Oct never gets a positive Internet Verdict and the customer never answers, **Then** it is Closed with “Not verified” at 13:47 on 18 Oct. | C-05 · R4c | Settled |
 | AC-CFG-5 | **Given** C-04 is 48 h, **When** a Wiom Product user tries to set C-05 to 48 h, **Then** the change is refused, because C-05 must be longer than C-04. | C-05 range | Settled |
-| AC-CFG-6 | **Given** C-01 is 30 min, **When** a Wiom Product user tries to set C-13 to 45 min, **Then** the change is refused, because C-13 must not be longer than C-01. | C-13 range | Settled |
+| AC-CFG-6 | **Given** C-13 is 5 min and C-14 is 1 h, **When** a Wiom Product user tries to set C-13 to 6 min or C-14 to 5 min, **Then** each change is refused and the values stay 5 min and 1 h. | C-13 range · C-14 range | Settled |
 | AC-BV-11 | **Given** C-01 is 30 min, **When** a Wiom Product user tries to set it to 61 min, outside its range of 15–60 min, **Then** the change is refused and C-01 stays 30 min. | C-01 range | Settled |
 | AC-BV-12 | **Given** a service task Resolved at 13:47:00 on 14 Oct with no positive Internet Verdict since, **When** its only positive Internet Verdict comes at 13:46:59 on 16 Oct, 1 s before C-04 runs out, **Then** it auto closes at 13:47:00 on 16 Oct with “Internet working, no response”. | C-04 · R4b · R2c | Settled |
 | AC-BV-13 | **Given** a service task Resolved at 13:47:00 on 14 Oct with no positive Internet Verdict since, **When** C-04 runs out at 13:47:00 on 16 Oct, **Then** Wiom asks for no Internet Verdict after it, and with no answer it auto closes at 13:47:00 on 17 Oct with “Not verified”. | C-04 · C-05 · R4d · R2d | Settled |
@@ -400,8 +402,8 @@ stateDiagram-v2
 | C-09 | M3 cycles | 1st–15th, and 16th–last day of each month (IST) | Fixed | — |
 | C-10 | M3 pass mark: most service tasks counted in one cycle for a PASS | 2 | Fixed | — |
 | C-12 | Rollout list: the CSP IDs on which this feature is live | Empty at launch; CSPs added one by one | Configurable | Any CSP ID · Wiom Product team · PM: the feature is released in a phased, tightly controlled way (15 Oct 2026) |
-| C-13 | How often Wiom asks Connection Validation Service for the Internet Verdict during the Initial Check, after the ask at the Resolved mark. Must not be longer than C-01 | 5 minutes | Configurable | [TBD — not asked] · Wiom Product team · PM: every 5 min during the Initial Check (15 Oct 2026) |
-| C-14 | How often Wiom asks Connection Validation Service for the Internet Verdict after the Initial Check, until the customer answers, the service task closes, or C-04 runs out | 1 hour | Configurable | [TBD — not asked] · Wiom Product team · PM: every hour after the Initial Check (15 Oct 2026) |
+| C-13 | How often Wiom asks Connection Validation Service for the Internet Verdict during the Initial Check, after the ask at the Resolved mark. Must not be longer than C-01 | 5 minutes | Configurable | 1–5 min · Wiom Product team · PM: every 5 min during the Initial Check; range set 15 Oct 2026 |
+| C-14 | How often Wiom asks Connection Validation Service for the Internet Verdict after the Initial Check, until the customer answers, the service task closes, or C-04 runs out | 1 hour | Configurable | 10 min–1 h · Wiom Product team · PM: every hour after the Initial Check; range set 15 Oct 2026 |
 
 **Interaction note (C-01 × C-04 / C-05 × C-13 × C-14):** everything turns on the customer's answer; the timers act only when there is none. A positive Internet Verdict at the Resolved mark sends the first message at once. Otherwise the customer hears nothing until a positive Internet Verdict or until C-01 runs out, whichever is first. The CSP sees only that Wiom will verify the fix, throughout. A positive Internet Verdict after C-01 sends nothing new. Wiom asks every C-13 during the Initial Check and every C-14 after it, until C-04 runs out; a positive Internet Verdict after the Initial Check can therefore be seen up to C-14 late, which changes nothing for the customer (no new message) and only decides between closing at C-04 and C-05. Both auto closures count from the Resolved mark: a positive Internet Verdict before C-04 runs out closes the service task at C-04; otherwise Wiom stops asking at C-04 and it closes at C-05.
 
@@ -454,10 +456,7 @@ None left: every item was accepted or changed by the PM on 15 Oct 2026.
 
 | Location (section · ID) | What was never asked |
 |---|---|
-| §6 · C-13 · C-14 | The ranges a Wiom Product user may set them to, and whether the Connection Validation Service owners accept the load |
-| §4 · AC-REG-2 | What to observe to prove other subtypes still close at the Resolved mark as today, and the reference for it |
-| §6 · C-06 to C-10 | Whether these numbers must change without a release (C-01, C-04, C-05 are Configurable by the PM's decision; the rest stay Fixed, the default) |
-| §3 · R4 / R6 | When the customer's existing "resolved" message and apology coupon fire — at Closure, or on which closure reasons |
+| §6 · C-13 · C-14 | Whether the Connection Validation Service owners accept the load at the fastest settings (every 1 min in the Initial Check, every 10 min after) |
+| §6 · C-06 to C-10 | Whether these numbers must change without a release (C-01, C-04, C-05, C-12, C-13 and C-14 are Configurable by the PM's decision; these stay Fixed, the default) |
+| §3 · R4 / R6 | When the apology coupon fires for a customer whose CSP is on the rollout list — at Closure, and on which closure reasons (today it comes with the "resolved" message at the mark) |
 | §7 · CleverTap | Which push notification events the Customer app, and which notification events the CSP app, already send, and whether R11 reuses them |
-| §3 · R12 | What happens to a service task in Pending Verification when its connection is moved to a CSP not on the rollout list (CSP reassignment) |
-| §2 Boundary · G2 · AC-GRD-2 | Whether any existing In Progress handling other than a Wiom CX user's Kapture close can close a service task; if so, it breaches G2 outside its one exception |

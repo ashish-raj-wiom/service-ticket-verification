@@ -2,7 +2,7 @@
 
 | | | | |
 |---|---|---|---|
-| **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) · Dhruv (product) | **Status** — Signed off | **Sign-off** — Signed off · 15 Oct 2026 (v1.1: within-TAT rule made explicit; v1.2: a new service task after Closure is fresh, not linked — PM, 15 Oct 2026) |
+| **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) · Dhruv (product) | **Status** — Signed off | **Sign-off** — Signed off · 15 Oct 2026 |
 | **Version** — v1.2 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
@@ -45,8 +45,8 @@ Where a design and this spec differ, this spec decides. The designs were reviewe
 | M3 cycle | The fixed half-month period M3 counts in (C-09). Each service task counts in at most one. | Quality OS |
 | Kapture | The tool the Wiom CX team uses to see and work on service tasks. | Wiom CX team |
 | Status, Sub Status (Kapture) | The two fields a Wiom CX user sees on a service task in the Kapture portal: Status (for example Pending, Complete) and Current Sub Status (for example Open, Resolved, Completed). | Wiom CX team |
-| CSP TAT | The turnaround time from the service task reaching the CSP to the CSP's Resolved mark, counted only inside CSP working hours, summed over every round. | Support Resolution OS |
-| Within TAT | Whether a service task was fixed in time, judged when it is Closed: its CSP TAT — the time the CSP spent on it, In Progress rounds only, inside CSP working hours, with every hour in Pending Verification left out — compared with the TAT for its subtype (C-15). Within TAT when the CSP TAT is no longer than C-15; otherwise breached. It is the same time the SLA timer in the CSP app counts, and it is judged the same way however the service task closes — the customer's yes, a Wiom CX user's close, or an auto closure at C-04 or C-05. Sent to Quality OS in the resolution signal. | Support Resolution OS |
+| CSP TAT | The turnaround time from the service task reaching the CSP to the CSP's Resolved mark, counted only inside CSP working hours (11:00–21:00 IST, C-06), summed over every round. | Support Resolution OS |
+| Within TAT | Whether a service task was fixed in time, judged when it is Closed: its CSP TAT — the time the CSP spent on it, In Progress rounds only, inside CSP working hours (11:00–21:00 IST, C-06), with every hour in Pending Verification left out — compared with the TAT for its subtype (C-15). Within TAT when the CSP TAT is no longer than C-15; otherwise breached. It is the same time the SLA timer in the CSP app counts, and it is judged the same way however the service task closes — the customer's yes, a Wiom CX user's close, or an auto closure at C-04 or C-05. Sent to Quality OS in the resolution signal. | Support Resolution OS |
 
 ---
 

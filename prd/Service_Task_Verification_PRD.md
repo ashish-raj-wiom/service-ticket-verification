@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — [TBD — not asked] | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.14 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
+| **Version** — v0.15 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
 ---
@@ -19,7 +19,7 @@
 | Waiting, verdict passed | The stage of Pending Verification once the Netbox has pinged, while the service task waits for the customer's answer or for C-04 to run out from the Resolved mark. | Support Resolution OS |
 | Waiting, verdict failed | The stage of Pending Verification after the check window ended with no ping, while the service task waits for the customer's answer, a ping before C-04 runs out, or C-05. | Support Resolution OS |
 | Check window | The wait after the Resolved mark (C-01) for the customer's Netbox to ping before the customer is messaged. | Support Resolution OS |
-| Verdict | Whether Wiom has seen the customer's Netbox up in this round: **passed** once it pinged (one ping is enough, C-02) within C-11 before the Resolved mark or at any time after it until C-04 runs out (and, for RDNI, the customer's plan is active); **failed** until then. It sets the customer's message and how the service task closes, is never shown to the CSP, and moves from failed to passed at most once, never back. | Support Resolution OS |
+| Verdict | Whether Wiom has seen the customer's Netbox up in this round: **passed** once it pinged (one ping is enough, C-02) within C-11 before the Resolved mark or at any time after it until C-04 runs out; **failed** until then. It is judged the same way for ISD and RDNI. It sets the customer's message and how the service task closes, is never shown to the CSP, and moves from failed to passed at most once, never back. | Support Resolution OS |
 | First ping | The moment the verdict passes: the Resolved mark itself, when the Netbox pinged within C-11 before it; otherwise the first ping after the mark. | Support Resolution OS |
 | Reopen | The move of a service task from Pending Verification back to In Progress, caused only by the customer saying the internet is not working. The service task, the CSP and the issue stay the same. | Support Resolution OS |
 | Closed | The final state of a service task. Nothing leaves it. | Support Resolution OS |
@@ -88,13 +88,13 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R2 | As a customer, I want Wiom to judge from my own Netbox whether my internet is back, so that what I am told matches what is true. | **(a)** On T2, pass the verdict the moment the Netbox is seen up inside the check window: at the Resolved mark when it pinged within C-11 before the mark, or at the first ping after the mark before C-01 runs out — and, for RDNI, only when the customer's plan is active. **(b)** On T3, when C-01 runs out with no ping, no ping data, or an RDNI plan that is not active, record the verdict as failed. **(c)** On T13, pass the verdict at the first ping that arrives later, before C-04 runs out from the mark (for RDNI, with the plan active). | Move a passed verdict back to failed. Count a ping older than C-11 before the Resolved mark. Count a ping that arrives after C-04 has run out. |
+| R2 | As a customer, I want Wiom to judge from my own Netbox whether my internet is back, so that what I am told matches what is true. | **(a)** On T2, pass the verdict the moment the Netbox is seen up inside the check window: at the Resolved mark when it pinged within C-11 before the mark, or at the first ping after the mark before C-01 runs out. **(b)** On T3, when C-01 runs out with no ping or no ping data, record the verdict as failed. **(c)** On T13, pass the verdict at the first ping that arrives later, before C-04 runs out from the mark. | Judge the verdict, or handle the service task in any way, differently for RDNI than for ISD. Move a passed verdict back to failed. Count a ping older than C-11 before the Resolved mark. Count a ping that arrives after C-04 has run out. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
 | AC-R2-1 | **Given** the service task from AC-R1-1, whose Netbox last pinged at 11:02, Resolved at 13:47, **When** one ping from Rekha Verma's Netbox arrives at 14:09, **Then** the verdict passes at 14:09, inside C-01 (30 min), and 14:09 is its first ping. | R2a · T2 | Settled |
 | AC-R2-6 | **Given** an ISD service task whose Netbox pinged at 13:38, **When** the CSP marks it Resolved at 13:47, **Then** the verdict passes at 13:47 (the ping was within C-11, 15 min, before the mark) and 13:47 is its first ping. | R2a · T2 | Settled |
-| AC-R2-2 | **Given** an RDNI service task Resolved at 13:47 whose customer's plan expired at 09:00 the same day, **When** pings arrive at 13:52 and 14:05, **Then** the verdict at 14:17 is failed. | R2a · R2b · T3 | Settled |
+| AC-R2-2 | **Given** an RDNI service task and an ISD service task, both Resolved at 13:47, **When** each Netbox pings once at 13:52, **Then** both verdicts pass at 13:52, both customers get the "fixed" message at 13:52, and nothing else about either service task differs. | R2a · R2 MUST NOT · T2 | Settled |
 | AC-R2-3 | **Given** a service task Resolved at 13:47, **When** no ping data exists for the customer's Netbox between 13:47 and 14:17, **Then** the verdict at 14:17 is failed. | R2b · T3 | Settled |
 | AC-R2-4 | **Given** a service task Resolved at 13:47 on 14 Oct whose verdict was recorded failed at 14:17, **When** one ping arrives at 19:52, **Then** the verdict passes at 19:52 and the service task will auto close at 13:47 on 16 Oct, C-04 (48 h) after the mark. | R2c · T13 | Settled |
 | AC-R2-7 | **Given** a service task whose verdict passed at 14:09, **When** its Netbox stops pinging at 15:30, **Then** the verdict stays passed and it still auto closes C-04 after the mark. | R2 MUST NOT | Settled |
@@ -324,9 +324,9 @@ stateDiagram-v2
     InProgress --> InProgress : T12 · M3 timer reaches C-08 [not yet counted toward M3] / R10d
     state PendingVerification {
         [*] --> Checking
-        Checking --> WaitingPassed : T2 · Netbox seen up [pinged within C-11 before the mark, or a ping before C-01 runs out, and for RDNI the plan is active] / R2a, R3a, R3c, R3d, R8d, R11a
-        Checking --> WaitingFailed : T3 · check window C-01 runs out [no ping, no data, or RDNI plan not active] / R2b, R3b, R3c, R3d, R8d, R11a
-        WaitingFailed --> WaitingPassed : T13 · one ping after the check window [before C-04 runs out, and for RDNI the plan is active] / R2c, R3f, R8d
+        Checking --> WaitingPassed : T2 · Netbox seen up [pinged within C-11 before the mark, or a ping before C-01 runs out] / R2a, R3a, R3c, R3d, R8d, R11a
+        Checking --> WaitingFailed : T3 · check window C-01 runs out [no ping or no data] / R2b, R3b, R3c, R3d, R8d, R11a
+        WaitingFailed --> WaitingPassed : T13 · one ping after the check window [before C-04 runs out] / R2c, R3f, R8d
         WaitingPassed --> WaitingPassed : T4 · C-03 after the mark [no answer yet] / R3e, R8d, R11a
         WaitingFailed --> WaitingFailed : T4 · C-03 after the mark [no answer yet] / R3e, R8d, R11a
     }
@@ -401,7 +401,6 @@ stateDiagram-v2
 | CleverTap, Customer app project (R95-6RK-5K6Z, prod) | Holds the push notification records R11 needs | — | Not checked which push notification events exist today [TBD — not asked] · AC-R11-1 to AC-R11-6 |
 | CleverTap, CSP app project (44Z-644-777Z, prod; shared with the Technician App) | Holds the CSP app notification records R11e needs | — | Not checked which CSP app notification events exist today [TBD — not asked] · AC-R11-7 · AC-R11-8 |
 | Notification service (CSP side) | Sends the CSP the Reopen and Closure notifications | `csp-notification-service` main, 15 Oct 2026 | Today it notifies the owner, managers and Technician when a restore task is completed, which happens at the Resolved tap; there is no notification on a Reopen · AC-R4-10 · AC-R5-8 |
-| Customer backend | Says whether an RDNI customer's plan is active at the verdict | — | Not checked [TBD — not asked] · AC-R2-2 |
 
 ---
 
@@ -410,7 +409,7 @@ stateDiagram-v2
 | Capability | Needed by |
 |---|---|
 | Hold a service task in Pending Verification, with the CSP TAT stopped, from the Resolved mark until it is Closed or Reopened, showing the CSP only that Wiom will verify the fix. | T1 · R1 · R7 · G5 |
-| Read the customer's Netbox pings from C-11 before the Resolved mark onwards, pass the verdict at the first ping, and know whether an RDNI customer's plan is active. | T2 · T3 · T13 · R2 · C-01 · C-11 |
+| Read the customer's Netbox pings from C-11 before the Resolved mark onwards, and pass the verdict at the first ping, the same way for every subtype in scope. | T2 · T3 · T13 · R2 · C-01 · C-11 |
 | Send the customer one verdict-matched message, the moment the verdict passes or when C-01 runs out, by app notification, SMS and IVR call, and one reminder at C-03. | T2 · T3 · T4 · R3 · C-01 · C-03 · G3 |
 | Record every push notification in Verification — sent, opened, answered from, or failed with an SMS sent instead — against its service task, without delaying it. | T2 · T3 · T4 · T7 · T8 · R11 |
 | Send the CSP a CSP app notification and the assigned Technician a Technician App notification at every Reopen and every Closure, with the reason, and record them and their opening. | T5 · T6 · T7 · T8 · R4f · R5f · R11e |
@@ -448,7 +447,6 @@ stateDiagram-v2
 |---|---|
 | Header · Reviewer | Which engineering lead reviews this PRD |
 | §4 · AC-REG-1, AC-REG-2 | What to observe to prove escalation and other subtypes are unchanged, and the reference for it |
-| §7 · Customer backend | Which system answers "is the RDNI customer's plan active", and its reference |
 | §6 · C-02, C-06 to C-11 | Whether these numbers must change without a release (C-01, C-03, C-04, C-05 are Configurable by the PM's decision; the rest stay Fixed, the default) |
 | §3 · R3 | What happens when the message cannot be sent on any channel |
 | §3 · R4 / R6 | When the customer's existing "resolved" message and apology coupon fire — at Closure, or on which closure reasons |

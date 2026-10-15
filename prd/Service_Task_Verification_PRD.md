@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.35 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
+| **Version** — v0.36 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
 ---
@@ -209,7 +209,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R8-15 | **Given** the service task from AC-R1-1, Resolved at 13:47 on 14 Oct, **When** a Wiom CX user changes its priority from Low to High in Kapture at 17:50, **Then** it is still in Pending Verification, with Status Pending / Sub Status Resolved. | R8 MUST NOT | Settled |
 | AC-R8-16 | **Given** the service task from AC-R4-3, Resolved at 13:47 on 14 Oct, never a positive Internet Verdict, no answer, **When** it auto closes at 13:47 on 17 Oct, **Then** its Kapture record shows Status Complete, Sub Status Completed, and a comment at 13:47 with the K9 text, the durations filled as 72 h and 48 h. | R8b · R8d · T8 | Settled |
 
-#### Kapture status and comment per action ⚠️ *AI GENERATED — review*
+#### Kapture status and comment per action
 
 Each comment is added by Wiom in Kapture at the moment of the action, and only for the actions listed here (an app notification that could not be sent gets no comment), with the Status and Sub Status shown. `{…}` is filled with the actual value; times are IST; durations are the current values of C-01, C-04 and C-05. A Kapture close before any Resolved mark (T15) adds nothing new: it works as today.
 
@@ -451,7 +451,6 @@ stateDiagram-v2
 | Location (section · ID) | What was generated | Basis |
 |---|---|---|
 | §1 · Closure reason · §3 · R4h | The name CX_CLOSED_IN_KAPTURE for the fourth closure reason | Inference — you decided a Kapture close stays allowed; it needs its own reason so it is never read as the customer's yes |
-| §3 · R8d · K1–K11 · AC-R8-4 · AC-R8-16 | The text of every Kapture comment, which actions get one, and the readable reason names (Internet working, no response; Not verified; Closed by CX). The comments say "ticket", the word the Wiom CX team sees in Kapture, though the PRD's own prose says "service task" | You asked for the comment written per case so it is built that way; the wording is mine |
 | §1 · Closure reason · §3 · R4b | The code POSITIVE_VERDICT_NO_RESPONSE, renamed from the solution flow's earlier code so no closure reason names how the verdict is reached | Follows your rule to say Internet Verdict |
 | §4 · AC-RACE-1, AC-RACE-2, AC-RACE-5 · §5 Precedence | A customer answer at the same instant as a window expiry or a Wiom CX user's Kapture close is applied first | Inference — the customer's word outranks a timer and an agent |
 | §6 · C-05 · §4 · AC-CFG-5 | C-05 must stay longer than C-04, so a Product user cannot set them in the wrong order | Inference — a closure with no positive Internet Verdict earlier than one with a positive verdict would invert the rule |
@@ -469,7 +468,6 @@ stateDiagram-v2
 | §4 · AC-REG-2 | What to observe to prove other subtypes still close at the Resolved mark as today, and the reference for it |
 | §6 · C-06 to C-10 | Whether these numbers must change without a release (C-01, C-04, C-05 are Configurable by the PM's decision; the rest stay Fixed, the default) |
 | §3 · R4 / R6 | When the customer's existing "resolved" message and apology coupon fire — at Closure, or on which closure reasons |
-| §3 · R5 | Whether a customer raising the same issue again in the app during Pending Verification counts as a no |
 | §7 · CleverTap | Which push notification events the Customer app, and which notification events the CSP app, already send, and whether R11 reuses them |
 | §3 · R12 | What happens to a service task in Pending Verification when its connection is moved to a CSP not on the rollout list (CSP reassignment) |
 | §2 Boundary · G2 · AC-GRD-2 | Whether any existing In Progress handling other than a Wiom CX user's Kapture close can close a service task; if so, it breaches G2 outside its one exception |

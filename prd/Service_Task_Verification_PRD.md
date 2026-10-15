@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — [TBD — not asked] | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.4 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
+| **Version** — v0.5 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
 ---
@@ -16,14 +16,15 @@
 | In Progress | The state of a service task while a CSP or Technician is working on it. The CSP's TAT runs only in this state. | Support Resolution OS |
 | Pending Verification | The state a service task enters at the Resolved mark and holds until it is Closed or goes back to In Progress. The CSP's TAT does not run here. | Support Resolution OS |
 | Checking | The first stage of Pending Verification: from the Resolved mark until the verdict passes or the check window ends, whichever comes first. The customer has not been messaged yet. | Support Resolution OS |
-| Waiting, verdict passed | The stage of Pending Verification once the verdict has passed, while the service task waits for the customer's answer or for C-04 to run out from the first ping. | Support Resolution OS |
-| Waiting, verdict failed | The stage of Pending Verification after the check window ended with no ping, while the service task waits for the customer's answer, a first ping, or C-05. | Support Resolution OS |
+| Waiting, verdict passed | The stage of Pending Verification once the Netbox has pinged, while the service task waits for the customer's answer or for C-04 to run out from the Resolved mark. | Support Resolution OS |
+| Waiting, verdict failed | The stage of Pending Verification after the check window ended with no ping, while the service task waits for the customer's answer, a ping before C-04 runs out, or C-05. | Support Resolution OS |
 | Check window | The wait after the Resolved mark (C-01) for the customer's Netbox to ping before the customer is messaged. | Support Resolution OS |
-| Verdict | Whether Wiom has seen the customer's Netbox up in this round: **passed** once it pinged within C-11 before the Resolved mark or at any time after it (and, for RDNI, the customer's plan is active); **failed** until then. It sets the customer's message and the closing window, is never shown to the CSP, and moves from failed to passed at most once, never back. | Support Resolution OS |
-| First ping | The moment the verdict passes: the Resolved mark itself, when the Netbox pinged within C-11 before it; otherwise the first ping after the mark. C-04 runs from here. | Support Resolution OS |
+| Verdict | Whether Wiom has seen the customer's Netbox up in this round: **passed** once it pinged (one ping is enough, C-02) within C-11 before the Resolved mark or at any time after it until C-04 runs out (and, for RDNI, the customer's plan is active); **failed** until then. It sets the customer's message and how the service task closes, is never shown to the CSP, and moves from failed to passed at most once, never back. | Support Resolution OS |
+| First ping | The moment the verdict passes: the Resolved mark itself, when the Netbox pinged within C-11 before it; otherwise the first ping after the mark. | Support Resolution OS |
 | Reopen | The move of a service task from Pending Verification back to In Progress, caused only by the customer saying the internet is not working. The service task, the CSP and the issue stay the same. | Support Resolution OS |
 | Closed | The final state of a service task. Nothing leaves it. | Support Resolution OS |
-| Closure reason | The cause recorded on every Closed service task, one of four: **CUSTOMER_CONFIRMED** (the customer said yes), **PING_UP_NO_RESPONSE** (verdict passed, no answer in time), **FINAL_CLOSURE_UNVERIFIED** (verdict failed, no answer in time), **ENDED_NOT_VERIFIED** (the connection was deactivated or the service task cancelled during Pending Verification). | Support Resolution OS |
+| Auto closure | Closure of a service task in Pending Verification when the customer has not answered: at C-04 after the Resolved mark if the Netbox pinged before then, otherwise at C-05 after the mark. One of only two ways into Closed; the other is the customer saying yes. | Support Resolution OS |
+| Closure reason | The cause recorded on every Closed service task, one of three: **CUSTOMER_CONFIRMED** (the customer said yes), **PING_UP_NO_RESPONSE** (auto closure: the Netbox pinged before C-04 ran out, no answer), **FINAL_CLOSURE_UNVERIFIED** (auto closure: no ping before C-04 ran out, no answer by C-05). | Support Resolution OS |
 | Repeat | A new service task opened after a Closure, for the same connection and the same issue, within the repeat window (C-07). It is linked to the Closed service task. | Support Resolution OS |
 | ISD | Internet supply down: a service task subtype for a customer with no internet. | Support Resolution OS |
 | RDNI | Recharge done but no internet: a service task subtype for a customer who has recharged and still has no internet. | Support Resolution OS |
@@ -58,7 +59,8 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | G3 | **Never "fixed" on a failed verdict** (zero tolerance) | The customer is never told the issue is fixed when the verdict failed. | R3 · AC-R3-2 · AC-GRD-3 |
 | G4 | **Signals only at Closed** | Quality OS and Compensation OS hear about a service task's resolution only when it is Closed, never at the Resolved mark. | R6 · AC-R6-1 · AC-GRD-4 |
 | G5 | **Verification never counts against the CSP** | Time in Pending Verification never counts in the CSP TAT or on the M3 timer. | R1 · R7 · R10 · AC-R7-1 · AC-R10-2 · AC-GRD-5 · AC-GRD-7 |
-| G6 | **Rules and timers decide** | Every exit from Pending Verification comes from the customer's answer, a window expiring, or the connection ending — never from a person judging the case. | R4 · R5 · AC-GRD-6 |
+| G6 | **Rules and timers decide** | Every exit from Pending Verification comes from the customer's answer or an auto closure — never from a person judging the case. | R4 · R5 · AC-GRD-6 |
+| G7 | **The customer reopens only in Pending Verification** (zero tolerance) | A customer's "not working" sends a service task back to the CSP only while it is in Pending Verification; In Progress it changes nothing, and after Closure it opens a new service task. | R5 · R9 · AC-R5-1 · AC-R9-1 · AC-GRD-8 |
 
 ---
 
@@ -83,7 +85,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R2 | As a customer, I want Wiom to judge from my own Netbox whether my internet is back, so that what I am told matches what is true. | **(a)** On T2, pass the verdict the moment the Netbox is seen up inside the check window: at the Resolved mark when it pinged within C-11 before the mark, or at the first ping after the mark before C-01 runs out — and, for RDNI, only when the customer's plan is active. **(b)** On T3, when C-01 runs out with no ping, no ping data, or an RDNI plan that is not active, record the verdict as failed. **(c)** On T13, pass the verdict at the first ping that arrives later in Pending Verification (for RDNI, with the plan active). | Move a passed verdict back to failed. Count a ping older than C-11 before the Resolved mark. |
+| R2 | As a customer, I want Wiom to judge from my own Netbox whether my internet is back, so that what I am told matches what is true. | **(a)** On T2, pass the verdict the moment the Netbox is seen up inside the check window: at the Resolved mark when it pinged within C-11 before the mark, or at the first ping after the mark before C-01 runs out — and, for RDNI, only when the customer's plan is active. **(b)** On T3, when C-01 runs out with no ping, no ping data, or an RDNI plan that is not active, record the verdict as failed. **(c)** On T13, pass the verdict at the first ping that arrives later, before C-04 runs out from the mark (for RDNI, with the plan active). | Move a passed verdict back to failed. Count a ping older than C-11 before the Resolved mark. Count a ping that arrives after C-04 has run out. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -91,8 +93,8 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R2-6 | **Given** an ISD service task whose Netbox pinged at 13:38, **When** the CSP marks it Resolved at 13:47, **Then** the verdict passes at 13:47 (the ping was within C-11, 15 min, before the mark) and 13:47 is its first ping. | R2a · T2 | Settled |
 | AC-R2-2 | **Given** an RDNI service task Resolved at 13:47 whose customer's plan expired at 09:00 the same day, **When** pings arrive at 13:52 and 14:05, **Then** the verdict at 14:17 is failed. | R2a · R2b · T3 | Settled |
 | AC-R2-3 | **Given** a service task Resolved at 13:47, **When** no ping data exists for the customer's Netbox between 13:47 and 14:17, **Then** the verdict at 14:17 is failed. | R2b · T3 | Settled |
-| AC-R2-4 | **Given** a service task Resolved at 13:47 whose verdict was recorded failed at 14:17, **When** the first ping arrives at 19:52, **Then** the verdict passes at 19:52, 19:52 is its first ping, and the service task is now on C-04 counted from 19:52. | R2c · T13 | Settled |
-| AC-R2-7 | **Given** a service task whose verdict passed at 14:09, **When** its Netbox stops pinging at 15:30, **Then** the verdict stays passed and C-04 still runs from 14:09. | R2 MUST NOT | Settled |
+| AC-R2-4 | **Given** a service task Resolved at 13:47 on 14 Oct whose verdict was recorded failed at 14:17, **When** one ping arrives at 19:52, **Then** the verdict passes at 19:52 and the service task will auto close at 13:47 on 16 Oct, C-04 (48 h) after the mark. | R2c · T13 | Settled |
+| AC-R2-7 | **Given** a service task whose verdict passed at 14:09, **When** its Netbox stops pinging at 15:30, **Then** the verdict stays passed and it still auto closes C-04 after the mark. | R2 MUST NOT | Settled |
 
 ### R3 — Telling or asking the customer
 
@@ -113,18 +115,18 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R4 | As a customer, I want my service task to close only when the fix is confirmed or I have had time to say otherwise, so that a closed service task means something. | **(a)** On T5, when the customer says yes, close the service task at once with reason CUSTOMER_CONFIRMED, whatever the verdict. **(b)** On T7, when the verdict has passed and the customer has not answered C-04 after the first ping, close it with reason PING_UP_NO_RESPONSE. **(c)** On T8, when the Netbox has not pinged and the customer has not answered C-05 after the Resolved mark, close it with reason FINAL_CLOSURE_UNVERIFIED. **(d)** On T9, when the connection is deactivated or the service task is cancelled during Pending Verification, close it with reason ENDED_NOT_VERIFIED. **(e)** On T7 and T8, tell the customer how to raise a new service task. **(f)** On every Closure, show the CSP the closure reason. **(g)** On T10, when the customer's plan expires during Pending Verification: [CLARIFY — what happens to the service task]. | Close a service task in scope any other way. Close it before the customer's answer or the window that applies. |
+| R4 | As a customer, I want my service task to close only when the fix is confirmed or I have had time to say otherwise, so that a closed service task means something. | **(a)** On T5, when the customer says yes, close the service task at once with reason CUSTOMER_CONFIRMED, whatever the verdict. **(b)** On T7, auto close at C-04 after the Resolved mark when the Netbox has pinged at least once since C-11 before the mark and the customer has not answered, with reason PING_UP_NO_RESPONSE. **(c)** On T8, auto close at C-05 after the Resolved mark when the Netbox did not ping before C-04 ran out and the customer has not answered, with reason FINAL_CLOSURE_UNVERIFIED. **(d)** Keep a service task on C-05 when its first ping arrives after C-04 has run out. **(e)** On T7 and T8, tell the customer how to raise a new service task. **(f)** On every Closure, show the CSP the closure reason. **(g)** On T10, when the customer's plan expires during Pending Verification: [CLARIFY — what happens to the service task]. | Close a service task in Pending Verification any way other than the customer's yes or an auto closure. Close it before the customer's answer or the auto-closure time that applies. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
 | AC-R4-1 | **Given** a service task Resolved at 13:47 on 14 Oct with no ping yet, **When** the customer replies yes at 18:32, **Then** the service task is Closed at 18:32 with reason CUSTOMER_CONFIRMED. | R4a · T5 | Settled |
-| AC-R4-2 | **Given** the service task from AC-R2-1, first ping at 14:09 on 14 Oct, no answer, **When** C-04 (48 h) after the first ping passes at 14:09 on 16 Oct, **Then** it is Closed at 14:09 on 16 Oct with reason PING_UP_NO_RESPONSE. | R4b · T7 | Settled |
-| AC-R4-9 | **Given** the service task from AC-R2-4, Resolved at 13:47 on 14 Oct, first ping at 19:52 on 14 Oct, no answer, **When** C-04 (48 h) after the first ping passes at 19:52 on 16 Oct, **Then** it is Closed at 19:52 on 16 Oct with reason PING_UP_NO_RESPONSE, not at 13:47 on 21 Oct. | R4b · T13 · T7 | Settled |
-| AC-R4-3 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox never pings, and no answer, **When** C-05 (7 days) after the mark passes at 13:47 on 21 Oct, **Then** it is Closed at 13:47 on 21 Oct with reason FINAL_CLOSURE_UNVERIFIED. | R4c · T8 | Settled |
-| AC-R4-4 | **Given** a service task in Pending Verification since 13:47 on 14 Oct, **When** its connection is deactivated at 10:05 on 15 Oct, **Then** it is Closed at 10:05 on 15 Oct with reason ENDED_NOT_VERIFIED. | R4d · T9 | Settled |
-| AC-R4-5 | **Given** the service task from AC-R4-3, **When** it is Closed at 13:47 on 21 Oct, **Then** the customer receives a message telling them how to raise a new service task. | R4e · T8 | Settled |
-| AC-R4-6 | **Given** the service task from AC-R4-2, **When** it is Closed at 14:09 on 16 Oct, **Then** the CSP app shows it as Closed with reason PING_UP_NO_RESPONSE. | R4f · T7 | Settled |
-| AC-R4-8 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox has not pinged, and no answer, **When** 48 h after the mark pass at 13:47 on 16 Oct, **Then** it is still in Pending Verification, not Closed. | R4 MUST NOT | Settled |
+| AC-R4-2 | **Given** the service task from AC-R2-1, Resolved at 13:47 on 14 Oct, first ping at 14:09, no answer, **When** C-04 (48 h) after the mark passes at 13:47 on 16 Oct, **Then** it is Closed at 13:47 on 16 Oct with reason PING_UP_NO_RESPONSE. | R4b · T7 | Settled |
+| AC-R4-9 | **Given** the service task from AC-R2-4, Resolved at 13:47 on 14 Oct, one ping at 19:52 on 14 Oct, no answer, **When** C-04 (48 h) after the mark passes at 13:47 on 16 Oct, **Then** it is Closed at 13:47 on 16 Oct with reason PING_UP_NO_RESPONSE. | R4b · T13 · T7 | Settled |
+| AC-R4-3 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox never pings, and no answer, **When** C-05 (72 h) after the mark passes at 13:47 on 17 Oct, **Then** it is Closed at 13:47 on 17 Oct with reason FINAL_CLOSURE_UNVERIFIED. | R4c · T8 | Settled |
+| AC-R4-4 | **Given** a service task Resolved at 13:47 on 14 Oct with no ping by 13:47 on 16 Oct, **When** its first ping arrives at 09:30 on 17 Oct and the customer never answers, **Then** it is Closed at 13:47 on 17 Oct with reason FINAL_CLOSURE_UNVERIFIED. | R4d · R2 MUST NOT | Settled |
+| AC-R4-5 | **Given** the service task from AC-R4-3, **When** it is Closed at 13:47 on 17 Oct, **Then** the customer receives a message telling them how to raise a new service task. | R4e · T8 | Settled |
+| AC-R4-6 | **Given** the service task from AC-R4-2, **When** it is Closed at 13:47 on 16 Oct, **Then** the CSP app shows it as Closed with reason PING_UP_NO_RESPONSE. | R4f · T7 | Settled |
+| AC-R4-8 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox has not pinged, and no answer, **When** C-04 (48 h) after the mark passes at 13:47 on 16 Oct, **Then** it is still in Pending Verification, not Closed. | R4 MUST NOT | Settled |
 | AC-R4-7 | **Given** a service task in Pending Verification since 13:47 on 14 Oct, **When** the customer's plan expires at 23:59 on 15 Oct, **Then** [CLARIFY — the service task's state and the customer's message]. | R4g · T10 | OPEN |
 
 ### R5 — Reopen on the customer's no
@@ -135,10 +137,11 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
-| AC-R5-1 | **Given** the service task from AC-R2-1, verdict passed at 14:09, **When** Rekha Verma replies "not working" at 16:05 on 14 Oct, **Then** the service task is In Progress at 16:05, with CSP Shiv Net, under the same service task. | R5a · T6 | Settled |
+| AC-R5-1 | **Given** the service task from AC-R2-1, verdict passed at 14:09, **When** Rekha Verma replies "not working" at 16:05 on 14 Oct, **Then** the service task is In Progress at 16:05, with CSP Shiv Net, under the same service task. | R5a · T6 · G7 | Settled |
 | AC-R5-2 | **Given** the Reopen in AC-R5-1, **When** the CSP opens the service task at 16:10, **Then** the CSP app shows it as the same issue, Reopened, not as a new service task. | R5b · T6 | Settled |
 | AC-R5-3 | **Given** a service task in Pending Verification, **When** a Wiom CX user records a plain "not working" against it at 17:40 after the customer calls, **Then** the service task is In Progress at 17:40 with the same CSP, and no new service task exists for that connection. | R5c · T6 | Settled |
 | AC-R5-4 | **Given** a service task in Pending Verification, **When** the customer calls the Wiom CX team at 17:40 to ask when the CSP will visit and no plain no is recorded, **Then** the service task stays in Pending Verification and no new service task exists for that connection. | R5 MUST NOT | Settled |
+| AC-R5-7 | **Given** a service task In Progress since 11:20, not yet marked Resolved, **When** a Wiom CX user records a plain "not working" from the customer at 12:40, **Then** it stays In Progress, unchanged, and no new service task exists. | G7 · R5 | Settled |
 | AC-R5-5 | **Given** a service task in Pending Verification with CSP TAT 2 h 27 min, **When** the customer replies "not working" at 22:30 on 14 Oct, **Then** it is In Progress at 22:30, and its CSP TAT reads 2 h 27 min until 11:00 on 15 Oct, then grows. | R5d · T6 | Settled |
 | AC-R5-6 | **Given** the Reopened service task from AC-R5-1, **When** the CSP marks it Resolved again at 19:12, **Then** it is in Pending Verification with a new check window ending at 19:42 and a new verdict. | R5e · T1 | Settled |
 
@@ -146,13 +149,12 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R6 | As a CSP, I want my quality and earnings to rest on what happened to the customer, so that a confirmed fix counts and a claimed one does not. | **(a)** At every Closure, send Quality OS and Compensation OS the resolution signal with the closure reason. **(b)** For FINAL_CLOSURE_UNVERIFIED and ENDED_NOT_VERIFIED, never signal the service task as fixed. | Send any resolution signal at the Resolved mark or during Pending Verification. |
+| R6 | As a CSP, I want my quality and earnings to rest on what happened to the customer, so that a confirmed fix counts and a claimed one does not. | **(a)** At every Closure, send Quality OS and Compensation OS the resolution signal with the closure reason. **(b)** For FINAL_CLOSURE_UNVERIFIED, never signal the service task as fixed. | Send any resolution signal at the Resolved mark or during Pending Verification. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
 | AC-R6-1 | **Given** the service task from AC-R1-1, Resolved at 13:47 on 14 Oct, **When** it is Closed at 18:32 with reason CUSTOMER_CONFIRMED, **Then** Quality OS and Compensation OS each receive one resolution signal at 18:32 carrying CUSTOMER_CONFIRMED, and neither received one between 13:47 and 18:32. | R6a · T5 · G4 | Settled |
 | AC-R6-2 | **Given** the service task from AC-R4-3, **When** it is Closed with reason FINAL_CLOSURE_UNVERIFIED, **Then** the signal Quality OS and Compensation OS receive does not mark it as fixed. | R6b · T8 | Settled |
-| AC-R6-3 | **Given** the service task from AC-R4-4, **When** it is Closed with reason ENDED_NOT_VERIFIED, **Then** the signal Quality OS and Compensation OS receive does not mark it as fixed. | R6b · T9 | Settled |
 
 ### R7 — CSP TAT
 
@@ -184,7 +186,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
-| AC-R9-1 | **Given** the service task from AC-R4-2, Closed at 14:09 on 16 Oct, **When** Rekha Verma reports "not working" at 09:15 on 2 Nov, **Then** a new service task exists, linked to the Closed one as a repeat, and the Closed service task is still Closed. | R9a · T11 · G1 | Settled |
+| AC-R9-1 | **Given** the service task from AC-R4-2, Closed at 13:47 on 16 Oct, **When** Rekha Verma reports "not working" at 09:15 on 2 Nov, **Then** a new service task exists, linked to the Closed one as a repeat, and the Closed service task is still Closed. | R9a · T11 · G1 · G7 | Settled |
 | AC-R9-2 | **Given** the service task from AC-R4-2, **When** Rekha Verma replies yes at 10:00 on 17 Oct, **Then** it is still Closed with reason PING_UP_NO_RESPONSE, and no signal is sent. | R9b | Settled |
 | AC-R9-3 | **Given** a Closed service task, **When** any actor tries to move it to In Progress or Pending Verification, **Then** it stays Closed. | R9 MUST NOT · G1 | Settled |
 
@@ -192,7 +194,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R10 | As a CSP, I want M3 to count only the time a service task waits on me, so that Wiom checking a fix never makes a service task look long-open. | **(a)** Start the M3 timer when the service task is raised, and run it on the wall clock, every hour of the day. **(b)** On T1, pause the M3 timer at the Resolved mark. **(c)** On T6, resume the M3 timer from where it stopped. **(d)** On T12, when the M3 timer reaches C-08, count the service task once toward M3, in the M3 cycle (C-09) in which that happens. **(e)** On T5, T7, T8 and T9, stop the M3 timer; a service task whose timer never reached C-08 is never counted. **(f)** Give a CSP a PASS on M3 for a cycle when C-10 or fewer of its service tasks were counted in it, and a FAIL otherwise. | Count time in Pending Verification on the M3 timer. Count the same service task in more than one M3 cycle, even if it stays open or is Reopened. Pause the M3 timer for any reason other than Pending Verification. |
+| R10 | As a CSP, I want M3 to count only the time a service task waits on me, so that Wiom checking a fix never makes a service task look long-open. | **(a)** Start the M3 timer when the service task is raised, and run it on the wall clock, every hour of the day. **(b)** On T1, pause the M3 timer at the Resolved mark. **(c)** On T6, resume the M3 timer from where it stopped. **(d)** On T12, when the M3 timer reaches C-08, count the service task once toward M3, in the M3 cycle (C-09) in which that happens. **(e)** On T5, T7 and T8, stop the M3 timer; a service task whose timer never reached C-08 is never counted. **(f)** Give a CSP a PASS on M3 for a cycle when C-10 or fewer of its service tasks were counted in it, and a FAIL otherwise. | Count time in Pending Verification on the M3 timer. Count the same service task in more than one M3 cycle, even if it stays open or is Reopened. Pause the M3 timer for any reason other than Pending Verification. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -211,20 +213,21 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
 | AC-WF-1 | **Given** an ISD service task In Progress from 11:20 on 14 Oct, **When** the Technician marks it Resolved at 13:47, a ping arrives at 14:16, and Rekha Verma replies yes at 15:02, **Then** she received the "fixed" message at 14:16, the service task is Closed at 15:02 with reason CUSTOMER_CONFIRMED, and Quality OS received one signal at 15:02. | T1 · T2 · T5 · G4 | Settled |
-| AC-WF-2 | **Given** the same service task, **When** no ping arrives by 14:17, the customer replies "not working" at 16:05, the CSP marks it Resolved again at 19:12, a ping arrives at 19:20, and no answer comes, **Then** it is Closed at 19:20 on 16 Oct (C-04 from the first ping of the second round) with reason PING_UP_NO_RESPONSE and CSP TAT 5 h 34 min. | T1 · T3 · T6 · T2 · T7 · G5 | Settled |
+| AC-WF-2 | **Given** the same service task, **When** no ping arrives by 14:17, the customer replies "not working" at 16:05, the CSP marks it Resolved again at 19:12, a ping arrives at 19:20, and no answer comes, **Then** it is Closed at 19:12 on 16 Oct (C-04 after the second Resolved mark) with reason PING_UP_NO_RESPONSE and CSP TAT 5 h 34 min. | T1 · T3 · T6 · T2 · T7 · G5 | Settled |
 | AC-FAIL-1 | **Given** a service task Resolved at 13:47 with no ping, **When** C-01 (30 min) runs out at 14:17, **Then** the verdict is recorded failed and the customer has been asked whether the internet is working. | C-01 · R2b · R3b | Settled |
 | AC-FAIL-2 | **Given** a service task Resolved at 13:47 on 14 Oct with no answer, **When** C-03 (24 h) expires at 13:47 on 15 Oct, **Then** the customer has received exactly one reminder. | C-03 · R3e | Settled |
-| AC-FAIL-3 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox pinged at 13:41, no answer, **When** C-04 (48 h) from the first ping (13:47) runs out at 13:47 on 16 Oct, **Then** the service task is Closed with PING_UP_NO_RESPONSE and the customer has been told how to raise a new service task. | C-04 · R4b · R4e | Settled |
-| AC-FAIL-4 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox never pings, no answer, **When** C-05 (7 days) expires at 13:47 on 21 Oct, **Then** the service task is Closed with FINAL_CLOSURE_UNVERIFIED and the customer has been told how to raise a new service task. | C-05 · R4c · R4e | Settled |
+| AC-FAIL-3 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox pinged at 13:41, no answer, **When** C-04 (48 h) after the mark runs out at 13:47 on 16 Oct, **Then** the service task is Closed with PING_UP_NO_RESPONSE and the customer has been told how to raise a new service task. | C-04 · R4b · R4e | Settled |
+| AC-FAIL-4 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox never pings, no answer, **When** C-05 (72 h) runs out at 13:47 on 17 Oct, **Then** the service task is Closed with FINAL_CLOSURE_UNVERIFIED and the customer has been told how to raise a new service task. | C-05 · R4c · R4e | Settled |
 | AC-REG-1 | **Given** a service task In Progress that has not been marked Resolved, **When** it reaches its escalation point, **Then** it escalates exactly as before this change [TBD — not asked]. | §2 Boundary | OPEN |
 | AC-REG-2 | **Given** a service task of a subtype other than ISD or RDNI, **When** the CSP marks it Resolved, **Then** it closes as before this change [TBD — not asked]. | §2 Boundary | OPEN |
-| AC-GRD-1 | **Given** service tasks Closed by each of the four closure reasons, **When** the customer replies yes, the CSP opens each one in the CSP app, and a Wiom CX user opens each one in Kapture, **Then** each stays Closed. | G1 | Settled |
+| AC-GRD-1 | **Given** service tasks Closed by each of the three closure reasons, **When** the customer replies yes, the CSP opens each one in the CSP app, and a Wiom CX user opens each one in Kapture, **Then** each stays Closed. | G1 | Settled |
 | AC-GRD-2 | **Given** an ISD service task never marked Resolved, **When** the customer replies yes to any message, or C-04 or C-05 passes from its creation, **Then** it is not Closed. | G2 | Settled |
 | AC-GRD-3 | **Given** every failed-verdict service task in a day, **When** a Wiom Product user reads every message and reminder sent to those customers, **Then** none says the issue is fixed. | G3 | Settled |
 | AC-GRD-4 | **Given** every service task Resolved in a day, **When** a Wiom Product user compares the Quality OS and Compensation OS signals with the Closures, **Then** every signal falls at a Closure and none at a Resolved mark. | G4 | Settled |
 | AC-GRD-5 | **Given** a service task with three rounds of 2 h 10 min, 1 h 05 min and 40 min In Progress, and 30 h in Pending Verification, **When** it is Closed, **Then** its CSP TAT is 3 h 55 min. | G5 | Settled |
-| AC-GRD-6 | **Given** every service task that left Pending Verification in a day, **When** a Wiom Product user reads the recorded cause of each exit, **Then** each was a customer answer, a window expiry, or a connection deactivation or cancellation. | G6 | Settled |
+| AC-GRD-6 | **Given** every service task that left Pending Verification in a day, **When** a Wiom Product user reads the recorded cause of each exit, **Then** each was the customer's yes, the customer's no, or an auto closure. | G6 | Settled |
 | AC-GRD-7 | **Given** a service task with 2 h 10 min on the M3 timer before its Resolved mark and 6 days 4 h in Pending Verification, **When** it is Closed with FINAL_CLOSURE_UNVERIFIED, **Then** its M3 timer reads 2 h 10 min and it is not counted toward M3. | G5 · R10b · R10e | Settled |
+| AC-GRD-8 | **Given** three service tasks for the same customer area — one In Progress, one in Pending Verification, one Closed at 10:00 that day — **When** each customer reports "not working" at 15:00, **Then** only the one in Pending Verification goes back to In Progress; the In Progress one is unchanged, and for the Closed one a new service task opens while it stays Closed. | G7 | Settled |
 | AC-BV-1 | **Given** a service task Resolved at 13:47:00, **When** its only ping arrives at 14:16:59, **Then** the verdict is passed. | C-01 · C-02 · R2a | Settled |
 | AC-BV-2 | **Given** a service task Resolved at 13:47:00, **When** its only ping arrives at 14:17:01, **Then** the customer was asked "is it working?" at 14:17:00, the verdict passes at 14:17:01, and no second message is sent. | C-01 · R2b · R2c · R3f | Settled |
 | AC-BV-3 | **Given** a service task whose Netbox last pinged at 13:32:00, **When** the CSP marks it Resolved at 13:47:00, **Then** the verdict passes at 13:47:00 (exactly C-11, 15 min, before). | C-11 · R2a | Settled |
@@ -236,14 +239,16 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-BV-8 | **Given** a service task In Progress, **When** its M3 timer reaches 48 h 00 min at 23:59 on 15 Oct, **Then** it is counted in the 1–15 Oct cycle, not the 16–31 Oct cycle. | C-09 · R10d | Settled |
 | AC-BV-9 | **Given** a service task In Progress, **When** its M3 timer reaches 48 h 00 min at 00:00 on 16 Oct, **Then** it is counted in the 16–31 Oct cycle. | C-09 · R10d | Settled |
 | AC-RACE-1 | **Given** a passed verdict and no answer, **When** the customer replies "not working" at the same instant C-04 runs out, **Then** the service task is Reopened, not Closed ⚠️ *AI GENERATED — review*. | Precedence · T6 · T7 | Settled |
-| AC-RACE-2 | **Given** a failed verdict and no answer, **When** the customer replies yes at the same instant C-05 expires, **Then** it is Closed with CUSTOMER_CONFIRMED ⚠️ *AI GENERATED — review*. | Precedence · T5 · T8 | Settled |
+| AC-RACE-2 | **Given** no ping and no answer, **When** the customer replies yes at the same instant C-05 runs out, **Then** it is Closed with CUSTOMER_CONFIRMED ⚠️ *AI GENERATED — review*. | Precedence · T5 · T8 | Settled |
 | AC-RACE-3 | **Given** a service task In Progress whose M3 timer reaches 48 h at 13:47:00, **When** the CSP marks it Resolved at 13:47:00, **Then** it is counted toward M3 ⚠️ *AI GENERATED — review*. | Precedence · T1 · T12 | Settled |
-| AC-RACE-4 | **Given** a service task Resolved at 13:47 on 14 Oct with no ping and no answer, **When** its first ping arrives at 13:47 on 21 Oct, the same instant C-05 runs out, **Then** the verdict passes and it stays in Pending Verification, now closing 48 h later ⚠️ *AI GENERATED — review*. | Precedence · T8 · T13 | Settled |
 | AC-CFG-1 | **Given** a Wiom Product user has set C-01 to 45 min, **When** a service task is Resolved at 13:47 and no ping arrives, **Then** the customer is asked "is it working?" at 14:32, not 14:17. | C-01 · R3b | Settled |
-| AC-CFG-2 | **Given** a Wiom Product user has set C-04 to 72 h, **When** a service task's first ping is at 14:09 on 14 Oct and the customer never answers, **Then** it is Closed with PING_UP_NO_RESPONSE at 14:09 on 17 Oct. | C-04 · R4b | Settled |
-| AC-CFG-3 | **Given** a Wiom Product user has set C-05 to 10 days, **When** a service task Resolved at 13:47 on 14 Oct never pings and the customer never answers, **Then** it is Closed with FINAL_CLOSURE_UNVERIFIED at 13:47 on 24 Oct. | C-05 · R4c | Settled |
+| AC-CFG-2 | **Given** a Wiom Product user has set C-04 to 36 h, **When** a service task Resolved at 13:47 on 14 Oct pings at 14:09 and the customer never answers, **Then** it is Closed with PING_UP_NO_RESPONSE at 01:47 on 16 Oct. | C-04 · R4b | Settled |
+| AC-CFG-3 | **Given** a Wiom Product user has set C-05 to 96 h, **When** a service task Resolved at 13:47 on 14 Oct never pings and the customer never answers, **Then** it is Closed with FINAL_CLOSURE_UNVERIFIED at 13:47 on 18 Oct. | C-05 · R4c | Settled |
 | AC-CFG-4 | **Given** a Wiom Product user has set C-03 to 36 h, **When** a service task Resolved at 13:47 on 14 Oct gets no answer, **Then** the one reminder goes at 01:47 on 16 Oct. | C-03 · R3e | Settled |
+| AC-CFG-5 | **Given** C-04 is 48 h, **When** a Wiom Product user tries to set C-05 to 48 h, **Then** the change is refused, because C-05 must be longer than C-04 ⚠️ *AI GENERATED — review*. | C-05 range | Settled |
 | AC-BV-11 | **Given** C-01 is 30 min, **When** a Wiom Product user tries to set it to 61 min, outside its range of 15–60 min, **Then** the change is refused and C-01 stays 30 min. | C-01 range | Settled |
+| AC-BV-12 | **Given** a service task Resolved at 13:47:00 on 14 Oct with no ping since, **When** its only ping arrives at 13:46:59 on 16 Oct, 1 s before C-04 runs out, **Then** it auto closes at 13:47:00 on 16 Oct with PING_UP_NO_RESPONSE. | C-04 · R4b · R2c | Settled |
+| AC-BV-13 | **Given** a service task Resolved at 13:47:00 on 14 Oct with no ping since, **When** its only ping arrives at 13:47:01 on 16 Oct, 1 s after C-04 runs out, **Then** it auto closes at 13:47:00 on 17 Oct with FINAL_CLOSURE_UNVERIFIED. | C-04 · C-05 · R4d | Settled |
 | AC-DUP-1 | **Given** a service task in Pending Verification, **When** the customer replies yes twice, at 15:02 and 15:03, **Then** it is Closed once at 15:02, and Quality OS and Compensation OS each receive one signal. | T5 · R6a | Settled |
 | AC-DUP-2 | **Given** a service task in Pending Verification, **When** the customer replies "not working" twice, at 16:05 and 16:06, **Then** it is Reopened once, at 16:05. | T6 · R5a | Settled |
 | AC-DUP-3 | **Given** a service task In Progress, **When** the Technician taps Resolved twice, at 13:47:00 and 13:47:02, **Then** one Pending Verification starts, with one check window ending at 14:17:00. | T1 · R1a | Settled |
@@ -264,16 +269,15 @@ stateDiagram-v2
         [*] --> Checking
         Checking --> WaitingPassed : T2 · Netbox seen up [pinged within C-11 before the mark, or a ping before C-01 runs out, and for RDNI the plan is active] / R2a, R3a, R3c, R3d
         Checking --> WaitingFailed : T3 · check window C-01 runs out [no ping, no data, or RDNI plan not active] / R2b, R3b, R3c, R3d
-        WaitingFailed --> WaitingPassed : T13 · first ping after the check window [for RDNI the plan is active] / R2c, R3f
+        WaitingFailed --> WaitingPassed : T13 · one ping after the check window [before C-04 runs out, and for RDNI the plan is active] / R2c, R3f
         WaitingPassed --> WaitingPassed : T4 · C-03 after the mark [no answer yet] / R3e
         WaitingFailed --> WaitingFailed : T4 · C-03 after the mark [no answer yet] / R3e
     }
     PendingVerification --> Closed : T5 · customer says yes / R4a, R4f, R6a, R8b, R10e
     PendingVerification --> InProgress : T6 · customer says no, or a Wiom CX user records a plain no / R5a, R5b, R5c, R5d, R10c
-    WaitingPassed --> Closed : T7 · C-04 after the first ping [no answer] / R4b, R4e, R4f, R6a, R8b, R10e
-    WaitingFailed --> Closed : T8 · C-05 after the mark [no ping, no answer] / R4c, R4e, R4f, R6a, R6b, R8b, R10e
+    WaitingPassed --> Closed : T7 · auto closure at C-04 after the mark [no answer] / R4b, R4e, R4f, R6a, R8b, R10e
+    WaitingFailed --> Closed : T8 · auto closure at C-05 after the mark [no ping before C-04, no answer] / R4c, R4e, R4f, R6a, R6b, R8b, R10e
     PendingVerification --> PendingVerification : T10 · customer's plan expires [CLARIFY — outcome undecided] / R4g
-    PendingVerification --> Closed : T9 · connection deactivated or service task cancelled / R4d, R4f, R6a, R6b, R8b, R10e
     InProgress --> [*] : existing In Progress handling, escalation included — §2 Boundary
     Closed --> [*] : T11 · customer says not working after Closure — a new service task, §2 Boundary / R9a
 ```
@@ -286,13 +290,16 @@ stateDiagram-v2
 - Pending Verification × customer contact that is not a plain no — no state change and no new service task (R5 MUST NOT).
 - Waiting, verdict failed × C-04, and Waiting, verdict passed × C-05 — only the window matching the verdict applies (R4b, R4c).
 - Checking × C-03, C-04 or C-05 — all three run longer than the check window (C-01), so none can expire while Checking.
-- Waiting, verdict passed × a ping, or the Netbox going offline — the verdict never moves back and C-04 keeps running from the first ping (R2 MUST NOT).
+- Waiting, verdict passed × a ping, or the Netbox going offline — the verdict never moves back (R2 MUST NOT).
+- Waiting, verdict failed × a ping after C-04 has run out — it changes nothing; the service task stays on C-05 (R4d).
+- Pending Verification × connection deactivated or service task cancelled — no separate closure; with no ping it auto closes at C-05 (R4c).
+- In Progress × the customer's "not working" — nothing is Reopened (G7).
 - Waiting, verdict passed or failed × check window end — the check window has already ended.
 - In Progress × M3 timer reaches C-08 when the service task was already counted — counted once only (R10 MUST NOT).
 - Pending Verification × M3 timer reaches C-08 — the timer is paused there (R10b).
 - Closed × every trigger except T11 — Closed is final (G1); a yes after Closure changes nothing (R9b), and the M3 timer has stopped (R10e).
 
-**Precedence:** a customer answer arriving at the same instant as C-04 or C-05 running out is applied first (AC-RACE-1, AC-RACE-2) ⚠️ *AI GENERATED — review*. A first ping arriving at the same instant as C-05 running out is applied first (AC-RACE-4) ⚠️ *AI GENERATED — review*. The M3 timer reaching C-08 at the same instant as a Resolved mark is applied before the mark (AC-RACE-3) ⚠️ *AI GENERATED — review*.
+**Precedence:** a customer answer arriving at the same instant as C-04 or C-05 running out is applied first (AC-RACE-1, AC-RACE-2) ⚠️ *AI GENERATED — review*.  The M3 timer reaching C-08 at the same instant as a Resolved mark is applied before the mark (AC-RACE-3) ⚠️ *AI GENERATED — review*.
 
 ---
 
@@ -303,8 +310,8 @@ stateDiagram-v2
 | C-01 | Check window: the longest wait after the Resolved mark for a ping before the customer is messaged | 30 minutes | Configurable | 15–60 min · Wiom Product team · PM: these values must change without a release (15 Oct 2026) |
 | C-02 | Pings needed inside the check window for a passed verdict | 1 | Fixed | — |
 | C-03 | Reminder: from the Resolved mark to the one reminder, if no answer | 24 hours ⚠️ *AI GENERATED — review* | Configurable | 12–48 h · Wiom Product team · PM: these values must change without a release (15 Oct 2026) |
-| C-04 | Ping-up closing window: from the first ping to Closure with no answer | 48 hours | Configurable | 24–72 h · Wiom Product team · PM: these values must change without a release (15 Oct 2026) |
-| C-05 | No-ping closing window: from the Resolved mark to Closure with no ping and no answer | 7 days | Configurable | 3–14 days · Wiom Product team · PM: these values must change without a release (15 Oct 2026) |
+| C-04 | Ping-up auto closure: from the Resolved mark to Closure, when the Netbox pinged (once is enough) before it ran out and the customer has not answered | 48 hours | Configurable | 24–72 h · Wiom Product team · PM: these values must change without a release (15 Oct 2026) |
+| C-05 | No-ping auto closure: from the Resolved mark to Closure, when there was no ping before C-04 ran out and no answer. Must be longer than C-04 ⚠️ *AI GENERATED — review* | 72 hours | Configurable | 3–14 days · Wiom Product team · PM: these values must change without a release (15 Oct 2026) |
 | C-06 | CSP working hours, inside which the CSP TAT runs | 11:00–21:00 IST, every day | Fixed | — |
 | C-11 | How recent a ping before the Resolved mark counts as the Netbox being up at the mark | 15 minutes | Fixed | — |
 | C-07 | Repeat window: from Closure to a new service task, inside which it is linked as a repeat | 30 days | Fixed | — |
@@ -312,9 +319,9 @@ stateDiagram-v2
 | C-09 | M3 cycles | 1st–15th, and 16th–last day of each month (IST) | Fixed | — |
 | C-10 | M3 pass mark: most service tasks counted in one cycle for a PASS | 2 | Fixed | — |
 
-**Interaction note (C-11 × C-01 × C-03 × C-04 / C-05):** a Netbox that pinged within C-11 before the mark gets the "fixed" message at once. Otherwise the customer hears nothing until the first ping or until C-01 runs out, whichever is first. The CSP sees only that Wiom will verify the fix, throughout. One reminder follows at C-03. A first ping after C-01 sends nothing new; it moves the service task from the C-05 clock (from the mark) to the C-04 clock (from that ping), which can end later than C-05 would have.
+**Interaction note (C-11 × C-01 × C-03 × C-04 / C-05):** a Netbox that pinged within C-11 before the mark gets the "fixed" message at once. Otherwise the customer hears nothing until the first ping or until C-01 runs out, whichever is first. The CSP sees only that Wiom will verify the fix, throughout. One reminder follows at C-03. A first ping after C-01 sends nothing new. Both auto closures count from the Resolved mark: one ping before C-04 runs out closes the service task at C-04; otherwise it closes at C-05, and a ping between C-04 and C-05 changes nothing.
 
-**Interaction note (C-08 × C-04 / C-05):** the M3 timer runs only outside Pending Verification and the verification windows run only inside it, so the two never overlap. A service task can wait the full 7 days of C-05 without moving closer to C-08.
+**Interaction note (C-08 × C-04 / C-05):** the M3 timer runs only outside Pending Verification and the verification windows run only inside it, so the two never overlap. A service task can wait the full 72 hours of C-05 without moving closer to C-08.
 
 ---
 
@@ -322,13 +329,13 @@ stateDiagram-v2
 
 | System / Service | Impact | Reference material | What was checked · ACs grounded on it |
 |---|---|---|---|
-| Support Resolution OS (`csp-support-resolution-service`) | Owns the service task; gains Pending Verification, the verdict, Reopen and the four closure reasons | `csp-os-yaml` main, 12 Oct 2026 | Today the service task closes at the Resolved mark whatever the ping check shows, and repeats link only within the existing reopen window (`REOPEN_LINEAGE_WINDOW`), shorter than C-07 · AC-R1-1 · AC-R4-1 to AC-R4-4 · AC-R9-1 |
+| Support Resolution OS (`csp-support-resolution-service`) | Owns the service task; gains Pending Verification, the verdict, Reopen and the three closure reasons | `csp-os-yaml` main, 12 Oct 2026 | Today the service task closes at the Resolved mark whatever the ping check shows, and repeats link only within the existing reopen window (`REOPEN_LINEAGE_WINDOW`), shorter than C-07 · AC-R1-1 · AC-R4-1 to AC-R4-4 · AC-R9-1 |
 | Connection Validation Service (ping check, called by Support Resolution OS) | Its reading of the customer's Netbox pings sets the verdict and the first ping, from C-11 before the mark onwards | Same repository | Today it is read once, at the mark, and its result is not shown for the decision · AC-R2-1 to AC-R2-7 |
 | TAS (CSP app and Technician App) | Shows only that Wiom will verify the fix, then the Reopen and the closure reason; never the ping status or verdict | CSP app, 12 Oct 2026 | Today, after the mark, the CSP app says the connection is back online whatever the ping check showed · AC-R1-3 · AC-R1-6 · AC-R4-6 · AC-R5-2 |
 | Kapture, through `ticket-service-java` | Shows `IP` during Pending Verification and a completed sub-status at Closure | `ticket-service-java` main, 29 Sep 2026 | Kapture sub-status codes include `IP` (In progress), `RS` (Resolved), `CO` (Completed). Today the mark sends `RS` or `CO`, and an `IP` coming from Kapture is not accepted · AC-R8-1 · AC-R8-2 |
-| Quality OS | Receives the resolution signal only at Closure | `csp-os-yaml` main, 12 Oct 2026 | Today it receives the signal at the mark · AC-R6-1 to AC-R6-3 · AC-GRD-4 |
+| Quality OS | Receives the resolution signal only at Closure | `csp-os-yaml` main, 12 Oct 2026 | Today it receives the signal at the mark · AC-R6-1 · AC-R6-2 · AC-GRD-4 |
 | Quality OS, M3 | M3 timer pauses in Pending Verification and resumes on a Reopen; counting moves to fixed M3 cycles, once per service task | `csp-quality-service` main, 14 Oct 2026: `DailyMetricSnapshotServiceImpl` (M3 pass/fail), `ComplaintResolutionLedgerRepository.countBreachedNotExcluded` (breach count), `application.yml` (`QU_M3_BREACH_HOURS` 48, `QU_M3_BREACH_THRESHOLD` 2); M3 decision page (claude.ai artifact 8QRrrRYtSmayVyxdC9VZhL) | Today M3 counts a service task unresolved 48 wall-clock hours after filing, never pauses, and uses a rolling 15-day window; a repeat is a new record with its own 48 hours. Minimum service tasks for an M3 verdict in a cycle: [TBD — not asked] · AC-R10-1 to AC-R10-7 · AC-GRD-7 · AC-BV-7 to AC-BV-9 |
-| Compensation OS | Receives the resolution signal only at Closure | Solution flow v3 | No receiver of the resolution signal found in code today · AC-R6-1 to AC-R6-3 |
+| Compensation OS | Receives the resolution signal only at Closure | Solution flow v3 | No receiver of the resolution signal found in code today · AC-R6-1 · AC-R6-2 |
 | IVR service, Message orchestrator | Send the customer's message, the IVR call and the reminder | — | Today the customer gets a "resolved" app notification, or SMS if it fails, at the mark, with no way to answer · AC-R3-1 to AC-R3-5 |
 | Customer backend | Says whether an RDNI customer's plan is active at the verdict | — | Not checked [TBD — not asked] · AC-R2-2 |
 
@@ -342,7 +349,7 @@ stateDiagram-v2
 | Read the customer's Netbox pings from C-11 before the Resolved mark onwards, pass the verdict at the first ping, and know whether an RDNI customer's plan is active. | T2 · T3 · T13 · R2 · C-01 · C-11 |
 | Send the customer one verdict-matched message, the moment the verdict passes or when C-01 runs out, by app notification, SMS and IVR call, and one reminder at C-03. | T2 · T3 · T4 · R3 · C-01 · C-03 · G3 |
 | Take the customer's yes or no, and a plain no recorded by a Wiom CX user, against the service task. | T5 · T6 · R4a · R5c |
-| Close a service task at C-04 after its first ping or C-05 after the Resolved mark, recording one of four closure reasons. | T7 · T8 · T9 · R4 · C-04 · C-05 |
+| Auto close a service task at C-04 after the Resolved mark if it pinged before then, otherwise at C-05 after the mark, recording one of three closure reasons. | T7 · T8 · R4 · C-04 · C-05 |
 | Let a Wiom Product user change C-01, C-03, C-04 and C-05 within their ranges without a release. | C-01 · C-03 · C-04 · C-05 |
 | Send Quality OS and Compensation OS the resolution signal, with the closure reason, only at Closure. | R6 · G4 |
 | Show the Wiom CX team `IP` in Kapture during Pending Verification. | R8 |
@@ -360,7 +367,7 @@ stateDiagram-v2
 | §3 · R8b · AC-R8-2 | Kapture shows `CO` (Completed) at Closure, not `RS` or `CL` | Inference — `CO` is what a normal-priority service task gets today |
 | §3 · R1 MUST NOT | The CSP cannot mark the service task Resolved again while it is in Pending Verification (v3 says only that it cannot be pulled back) | Inference — a second mark would restart the check window |
 | §4 · AC-RACE-1, AC-RACE-2 · §5 Precedence | A customer answer at the same instant as a window expiry is applied first | Inference — the customer's word outranks a timer |
-| §4 · AC-RACE-4 · §5 Precedence | A first ping at the same instant C-05 runs out is applied first, so the service task moves to the C-04 clock | Inference — the Netbox being up is new evidence the closing window should follow |
+| §6 · C-05 · §4 · AC-CFG-5 | C-05 must stay longer than C-04, so a Product user cannot set them in the wrong order | Inference — a no-ping closure earlier than a ping-up closure would invert the rule |
 | §2 Boundary | The move to fixed M3 cycles applies to every service task M3 counts, not only ISD and RDNI | Inference — M3 is one count per CSP, so its cycles cannot differ by subtype |
 | §4 · AC-RACE-3 · §5 Precedence | When the M3 timer reaches 48 h at the same instant as a Resolved mark, the service task is counted | Inference — the timer had already run its full 48 hours |
 

@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.34 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
+| **Version** — v0.35 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
 ---
@@ -45,7 +45,7 @@
 **Objective.** A customer whose internet a CSP marks as fixed does not have the service task closed on the CSP's word alone. The customer is always asked whether the fix worked, and a customer who says it still does not work and asks to reopen gets the same CSP back on the same service task at once. Verification turns on what the customer says: the Internet Verdict only decides when and how the customer is first messaged, and the timers act only when the customer does not answer.
 
 **Boundary.** This spec governs service tasks of two subtypes, internet supply down (ISD) and recharge done but no internet (RDNI), from the CSP's Resolved mark until the service task is Closed. It leaves unchanged:
-- how a service task is created, assigned and worked on while In Progress, including escalation (AC-REG-1). A Wiom CX user closing it in Kapture while In Progress closes it exactly as today — reason, signals, messages and Kapture status — and this spec adds only that its M3 timer stops (G2 exception, T15);
+- how a service task is created, assigned and worked on while In Progress. A Wiom CX user closing it in Kapture while In Progress closes it exactly as today — reason, signals, messages and Kapture status — and this spec adds only that its M3 timer stops (G2 exception, T15);
 - every other service task subtype, which keeps closing at the Resolved mark as today (AC-REG-2);
 - the lifecycle of any new service task opened after a Closure. This spec sets only its repeat link (R9).
 
@@ -299,7 +299,6 @@ Each comment is added by Wiom in Kapture at the moment of the action, and only f
 | AC-FAIL-1 | **Given** a service task Resolved at 13:47 with no positive Internet Verdict, **When** C-01 (30 min) runs out at 14:17, **Then** it is in No positive verdict and the customer has the first message. | C-01 · R2b · R3b | Settled |
 | AC-FAIL-3 | **Given** a service task Resolved at 13:47 on 14 Oct whose Internet Verdict was positive at the mark, no answer, **When** C-04 (48 h) after the mark runs out at 13:47 on 16 Oct, **Then** the service task is Closed with POSITIVE_VERDICT_NO_RESPONSE and the customer received no message about it. | C-04 · R4b · R4e | Settled |
 | AC-FAIL-4 | **Given** a service task Resolved at 13:47 on 14 Oct that never gets a positive Internet Verdict, no answer, **When** C-05 (72 h) runs out at 13:47 on 17 Oct, **Then** the service task is Closed with FINAL_CLOSURE_UNVERIFIED and the customer received no message about it. | C-05 · R4c · R4e | Settled |
-| AC-REG-1 | **Given** a service task In Progress that has not been marked Resolved, **When** it reaches its escalation point, **Then** it escalates exactly as before this change [TBD — not asked]. | §2 Boundary | OPEN |
 | AC-REG-2 | **Given** a service task of a subtype other than ISD or RDNI, **When** the CSP marks it Resolved, **Then** it closes as before this change [TBD — not asked]. | §2 Boundary | OPEN |
 | AC-GRD-1 | **Given** service tasks Closed by each of the four closure reasons, **When** the customer replies yes, the CSP opens each one in the CSP app, and a Wiom CX user tries to reopen each one in Kapture, **Then** each stays Closed. | G1 | Settled |
 | AC-GRD-2 | **Given** an ISD service task never marked Resolved, **When** the customer replies yes to any message, or C-04 or C-05 passes from its creation, **Then** it is not Closed; the only way it closes is a Wiom CX user's close in Kapture (AC-R8-8). | G2 | Settled |
@@ -340,7 +339,7 @@ Each comment is added by Wiom in Kapture at the moment of the action, and only f
 
 **Lifecycle test:** persists yes · two or more named statuses yes (In Progress, Pending Verification, Closed) · moved later yes (the customer's answer, window expiry) → state diagram.
 
-Lifecycle of an **ISD or RDNI service task** from the CSP's Resolved mark to Closed. Pending Verification is drawn with its three stages (Initial Check, Positive verdict, No positive verdict); an edge leaving the Pending Verification box applies from any of them. It enters In Progress from the existing service task lifecycle; creation, assignment and escalation while In Progress are out of scope; so is the lifecycle of a new service task opened after Closure.
+Lifecycle of an **ISD or RDNI service task** from the CSP's Resolved mark to Closed. Pending Verification is drawn with its three stages (Initial Check, Positive verdict, No positive verdict); an edge leaving the Pending Verification box applies from any of them. It enters In Progress from the existing service task lifecycle; creation, assignment and work while In Progress are out of scope; so is the lifecycle of a new service task opened after Closure.
 
 ```mermaid
 stateDiagram-v2
@@ -360,7 +359,7 @@ stateDiagram-v2
     PendingVerification --> Closed : T14 · Wiom CX user sets Completed or Closed in Kapture / R4e, R4h, R4f, R6a, R6c, R8b, R8d, R8e, R10e, R11e
     InProgress --> Closed : T15 · Wiom CX user closes it in Kapture [never marked Resolved] — as today, G2 exception / R4h, R6d, R8e, R10e, R12a
     PendingVerification --> PendingVerification : T10 · customer's plan expires — nothing changes / R4g
-    InProgress --> [*] : existing In Progress handling, escalation included — §2 Boundary
+    InProgress --> [*] : existing In Progress handling — §2 Boundary
     InProgress --> [*] : CSP not on the rollout list marks Resolved — closes as today, §2 Boundary / R12b
     Closed --> [*] : T11 · customer says not working after Closure — the Wiom CX user raises a new service task, §2 Boundary / R8f, R9a
 ```
@@ -467,7 +466,7 @@ stateDiagram-v2
 | Location (section · ID) | What was never asked |
 |---|---|
 | §6 · C-13 · C-14 | The ranges a Wiom Product user may set them to, and whether the Connection Validation Service owners accept the load |
-| §4 · AC-REG-1, AC-REG-2 | What to observe to prove escalation and other subtypes are unchanged, and the reference for it |
+| §4 · AC-REG-2 | What to observe to prove other subtypes still close at the Resolved mark as today, and the reference for it |
 | §6 · C-06 to C-10 | Whether these numbers must change without a release (C-01, C-04, C-05 are Configurable by the PM's decision; the rest stay Fixed, the default) |
 | §3 · R4 / R6 | When the customer's existing "resolved" message and apology coupon fire — at Closure, or on which closure reasons |
 | §3 · R5 | Whether a customer raising the same issue again in the app during Pending Verification counts as a no |

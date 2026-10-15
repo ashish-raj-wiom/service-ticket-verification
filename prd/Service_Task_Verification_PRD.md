@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — [TBD — not asked] | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.6 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
+| **Version** — v0.7 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | **Consulted — Support Resolution OS rules** — Varun, Akhil |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
 ---
@@ -115,7 +115,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R4 | As a customer, I want my service task to close only when the fix is confirmed or I have had time to say otherwise, so that a closed service task means something. | **(a)** On T5, when the customer says yes, close the service task at once with reason CUSTOMER_CONFIRMED, whatever the verdict. **(b)** On T7, auto close at C-04 after the Resolved mark when the Netbox has pinged at least once since C-11 before the mark and the customer has not answered, with reason PING_UP_NO_RESPONSE. **(c)** On T8, auto close at C-05 after the Resolved mark when the Netbox did not ping before C-04 ran out and the customer has not answered, with reason FINAL_CLOSURE_UNVERIFIED. **(d)** Keep a service task on C-05 when its first ping arrives after C-04 has run out. **(e)** On T7 and T8, tell the customer how to raise a new service task. **(f)** On every Closure, show the CSP the closure reason. **(g)** On T10, when the customer's plan expires during Pending Verification: [CLARIFY — what happens to the service task]. | Close a service task in Pending Verification any way other than the customer's yes or an auto closure. Close it before the customer's answer or the auto-closure time that applies. |
+| R4 | As a customer, I want my service task to close only when the fix is confirmed or I have had time to say otherwise, so that a closed service task means something. | **(a)** On T5, when the customer says yes, close the service task at once with reason CUSTOMER_CONFIRMED, whatever the verdict. **(b)** On T7, auto close at C-04 after the Resolved mark when the Netbox has pinged at least once since C-11 before the mark and the customer has not answered, with reason PING_UP_NO_RESPONSE. **(c)** On T8, auto close at C-05 after the Resolved mark when the Netbox did not ping before C-04 ran out and the customer has not answered, with reason FINAL_CLOSURE_UNVERIFIED. **(d)** Keep a service task on C-05 when its first ping arrives after C-04 has run out. **(e)** On T7 and T8, tell the customer how to raise a new service task. **(f)** On every Closure, show the CSP the closure reason, and send the CSP a CSP app notification that the service task is Closed, with that reason, at the moment it closes ⚠️ *AI GENERATED — review*. **(g)** On T10, when the customer's plan expires during Pending Verification: [CLARIFY — what happens to the service task]. | Close a service task in Pending Verification any way other than the customer's yes or an auto closure. Close it before the customer's answer or the auto-closure time that applies. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -126,6 +126,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R4-4 | **Given** a service task Resolved at 13:47 on 14 Oct with no ping by 13:47 on 16 Oct, **When** its first ping arrives at 09:30 on 17 Oct and the customer never answers, **Then** it is Closed at 13:47 on 17 Oct with reason FINAL_CLOSURE_UNVERIFIED. | R4d · R2 MUST NOT | Settled |
 | AC-R4-5 | **Given** the service task from AC-R4-3, **When** it is Closed at 13:47 on 17 Oct, **Then** the customer receives a message telling them how to raise a new service task. | R4e · T8 | Settled |
 | AC-R4-6 | **Given** the service task from AC-R4-2, **When** it is Closed at 13:47 on 16 Oct, **Then** the CSP app shows it as Closed with reason PING_UP_NO_RESPONSE. | R4f · T7 | Settled |
+| AC-R4-10 | **Given** the service task from AC-R4-2, with CSP Shiv Net, **When** it auto closes at 13:47 on 16 Oct, **Then** Shiv Net receives a CSP app notification at 13:47 that the service task is Closed with reason PING_UP_NO_RESPONSE. | R4f · T7 | Settled |
 | AC-R4-8 | **Given** a service task Resolved at 13:47 on 14 Oct whose Netbox has not pinged, and no answer, **When** C-04 (48 h) after the mark passes at 13:47 on 16 Oct, **Then** it is still in Pending Verification, not Closed. | R4 MUST NOT | Settled |
 | AC-R4-7 | **Given** a service task in Pending Verification since 13:47 on 14 Oct, **When** the customer's plan expires at 23:59 on 15 Oct, **Then** [CLARIFY — the service task's state and the customer's message]. | R4g · T10 | OPEN |
 
@@ -133,7 +134,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R5 | As a customer whose internet still does not work, I want the same CSP back on my same service task at once, so that I never have to raise it again. | On T6: **(a)** move the service task back to In Progress at once, whatever the verdict; **(b)** keep the same service task and the same CSP, and tell the CSP it is the same issue; **(c)** count a plain "not working" recorded by a Wiom CX user against the service task as the customer's no; **(d)** resume the CSP TAT, from the start of CSP working hours (C-06) when the no arrives outside them; **(e)** start a new Pending Verification at the CSP's next Resolved mark. | Open a new service task for a no given during Pending Verification. Hand a Reopened service task to a different CSP. Count any customer contact other than a plain no as a no, or open a new service task for it, during Pending Verification. |
+| R5 | As a customer whose internet still does not work, I want the same CSP back on my same service task at once, so that I never have to raise it again. | On T6: **(a)** move the service task back to In Progress at once, whatever the verdict; **(b)** keep the same service task and the same CSP, and tell the CSP it is the same issue; **(c)** count a plain "not working" recorded by a Wiom CX user against the service task as the customer's no; **(d)** resume the CSP TAT, from the start of CSP working hours (C-06) when the no arrives outside them; **(e)** start a new Pending Verification at the CSP's next Resolved mark; **(f)** send the CSP a CSP app notification, at the moment of the Reopen, that the service task is back because the customer said it is not working ⚠️ *AI GENERATED — review*. | Open a new service task for a no given during Pending Verification. Hand a Reopened service task to a different CSP. Count any customer contact other than a plain no as a no, or open a new service task for it, during Pending Verification. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -144,6 +145,7 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R5-7 | **Given** a service task In Progress since 11:20, not yet marked Resolved, **When** a Wiom CX user records a plain "not working" from the customer at 12:40, **Then** it stays In Progress, unchanged, and no new service task exists. | G7 · R5 | Settled |
 | AC-R5-5 | **Given** a service task in Pending Verification with CSP TAT 2 h 27 min, **When** the customer replies "not working" at 22:30 on 14 Oct, **Then** it is In Progress at 22:30, and its CSP TAT reads 2 h 27 min until 11:00 on 15 Oct, then grows. | R5d · T6 | Settled |
 | AC-R5-6 | **Given** the Reopened service task from AC-R5-1, **When** the CSP marks it Resolved again at 19:12, **Then** it is in Pending Verification with a new check window ending at 19:42 and a new verdict. | R5e · T1 | Settled |
+| AC-R5-8 | **Given** the service task from AC-R5-1, **When** Rekha Verma replies "not working" at 16:05, **Then** CSP Shiv Net receives a CSP app notification at 16:05 that the service task is Reopened because the customer said it is not working, same issue. | R5f · T6 | Settled |
 
 ### R6 — Signals at Closure
 
@@ -206,11 +208,11 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R10-6 | **Given** a CSP with 3 service tasks counted toward M3 in the 1–15 Oct cycle, **When** Quality OS evaluates that cycle, **Then** the CSP's M3 result is FAIL. | R10f | Settled |
 | AC-R10-7 | **Given** a service task raised at 08:00 on 14 Oct and In Progress, **When** 21:00 on 14 Oct passes and the CSP's working hours end, **Then** its M3 timer keeps running through the night and reads 25 h at 09:00 on 15 Oct. | R10a · R10 MUST NOT | Settled |
 
-### R11 — Push notifications are tracked
+### R11 — Notifications are tracked in the Customer app and the CSP app
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R11 | As the Wiom Product team, I want every push notification in Verification tracked, so that we can see whether customers get, open and answer them before an auto closure. | **(a)** On T2, T3, T4, T7 and T8, record each push notification sent to the customer — the "fixed" message, the "is it working?" message, the reminder, and the message at auto closure — with the service task, the message type and the time sent ⚠️ *AI GENERATED — review*. **(b)** Record when the customer opens a push notification ⚠️ *AI GENERATED — review*. **(c)** Record a yes or no the customer gives from a push notification against the same service task ⚠️ *AI GENERATED — review*. **(d)** Record a push notification that could not be sent, and the SMS sent in its place ⚠️ *AI GENERATED — review*. | Delay or hold back a message while it is being recorded ⚠️ *AI GENERATED — review*. Let whether a push notification was opened change when the service task closes; sent still counts as told (R3d). |
+| R11 | As the Wiom Product team, I want every notification in Verification tracked in the Customer app and the CSP app, so that we can see whether customers and CSPs get, open and act on them. | **(a)** On T2, T3, T4, T7 and T8, record each push notification sent to the customer — the "fixed" message, the "is it working?" message, the reminder, and the message at auto closure — with the service task, the message type and the time sent ⚠️ *AI GENERATED — review*. **(b)** Record when the customer opens a push notification ⚠️ *AI GENERATED — review*. **(c)** Record a yes or no the customer gives from a push notification against the same service task ⚠️ *AI GENERATED — review*. **(d)** Record a push notification that could not be sent, and the SMS sent in its place ⚠️ *AI GENERATED — review*. **(e)** In the CSP app, record each Reopen and Closure notification sent to the CSP (R5f, R4f), with the service task, the type and the time sent, and when the CSP opens it ⚠️ *AI GENERATED — review*. | Delay or hold back a message while it is being recorded ⚠️ *AI GENERATED — review*. Let whether a push notification was opened change when the service task closes; sent still counts as told (R3d). |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -220,6 +222,8 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 | AC-R11-4 | **Given** a customer whose phone has no app notifications, **When** the "is it working?" message is due at 14:17, **Then** a record shows the push notification could not be sent and an SMS went at 14:17 instead. | R11d · R3c | Settled |
 | AC-R11-5 | **Given** a "fixed" push notification sent at 14:09 on 14 Oct that the customer never opens, **When** C-04 (48 h) after the mark runs out at 13:47 on 16 Oct, **Then** the service task auto closes at 13:47 on 16 Oct as usual. | R11 MUST NOT | Settled |
 | AC-R11-6 | **Given** the reminder due at 13:47 on 15 Oct, **When** it is sent, **Then** a record exists with message type "reminder" and time 13:47, and the reminder was not held back to be recorded. | R11a · T4 · R11 MUST NOT | Settled |
+| AC-R11-7 | **Given** the Reopen notification from AC-R5-8, sent at 16:05, **When** the CSP opens it in the CSP app at 16:20, **Then** records exist for that service task showing a "reopened" notification sent at 16:05 and opened at 16:20. | R11e · T6 | Settled |
+| AC-R11-8 | **Given** the Closure notification from AC-R4-10, sent at 13:47 on 16 Oct, **When** the CSP never opens it, **Then** a record exists for that service task showing a "closed" notification sent at 13:47 and no open. | R11e · T7 | Settled |
 
 ---
 
@@ -288,10 +292,10 @@ stateDiagram-v2
         WaitingPassed --> WaitingPassed : T4 · C-03 after the mark [no answer yet] / R3e, R11a
         WaitingFailed --> WaitingFailed : T4 · C-03 after the mark [no answer yet] / R3e, R11a
     }
-    PendingVerification --> Closed : T5 · customer says yes / R4a, R4f, R6a, R8b, R10e
-    PendingVerification --> InProgress : T6 · customer says no, or a Wiom CX user records a plain no / R5a, R5b, R5c, R5d, R10c
-    WaitingPassed --> Closed : T7 · auto closure at C-04 after the mark [no answer] / R4b, R4e, R4f, R6a, R8b, R10e, R11a
-    WaitingFailed --> Closed : T8 · auto closure at C-05 after the mark [no ping before C-04, no answer] / R4c, R4e, R4f, R6a, R6b, R8b, R10e, R11a
+    PendingVerification --> Closed : T5 · customer says yes / R4a, R4f, R6a, R8b, R10e, R11e
+    PendingVerification --> InProgress : T6 · customer says no, or a Wiom CX user records a plain no / R5a, R5b, R5c, R5d, R5f, R10c, R11e
+    WaitingPassed --> Closed : T7 · auto closure at C-04 after the mark [no answer] / R4b, R4e, R4f, R6a, R8b, R10e, R11a, R11e
+    WaitingFailed --> Closed : T8 · auto closure at C-05 after the mark [no ping before C-04, no answer] / R4c, R4e, R4f, R6a, R6b, R8b, R10e, R11a, R11e
     PendingVerification --> PendingVerification : T10 · customer's plan expires [CLARIFY — outcome undecided] / R4g
     InProgress --> [*] : existing In Progress handling, escalation included — §2 Boundary
     Closed --> [*] : T11 · customer says not working after Closure — a new service task, §2 Boundary / R9a
@@ -352,6 +356,8 @@ stateDiagram-v2
 | Compensation OS | Receives the resolution signal only at Closure | Solution flow v3 | No receiver of the resolution signal found in code today · AC-R6-1 · AC-R6-2 |
 | IVR service, Message orchestrator | Send the customer's message, the IVR call and the reminder | — | Today the customer gets a "resolved" app notification, or SMS if it fails, at the mark, with no way to answer · AC-R3-1 to AC-R3-5 |
 | CleverTap, Customer app project (R95-6RK-5K6Z, prod) | Holds the push notification records R11 needs | — | Not checked which push notification events exist today [TBD — not asked] · AC-R11-1 to AC-R11-6 |
+| CleverTap, CSP app project (44Z-644-777Z, prod; shared with the Technician App) | Holds the CSP app notification records R11e needs | — | Not checked which CSP app notification events exist today [TBD — not asked] · AC-R11-7 · AC-R11-8 |
+| Notification service (CSP side) | Sends the CSP the Reopen and Closure notifications | `csp-notification-service` main, 15 Oct 2026 | Today it notifies the owner, managers and Technician when a restore task is completed, which happens at the Resolved tap; there is no notification on a Reopen · AC-R4-10 · AC-R5-8 |
 | Customer backend | Says whether an RDNI customer's plan is active at the verdict | — | Not checked [TBD — not asked] · AC-R2-2 |
 
 ---
@@ -364,6 +370,7 @@ stateDiagram-v2
 | Read the customer's Netbox pings from C-11 before the Resolved mark onwards, pass the verdict at the first ping, and know whether an RDNI customer's plan is active. | T2 · T3 · T13 · R2 · C-01 · C-11 |
 | Send the customer one verdict-matched message, the moment the verdict passes or when C-01 runs out, by app notification, SMS and IVR call, and one reminder at C-03. | T2 · T3 · T4 · R3 · C-01 · C-03 · G3 |
 | Record every push notification in Verification — sent, opened, answered from, or failed with an SMS sent instead — against its service task, without delaying it. | T2 · T3 · T4 · T7 · T8 · R11 |
+| Send the CSP a CSP app notification at every Reopen and every Closure, with the reason, and record it and its opening. | T5 · T6 · T7 · T8 · R4f · R5f · R11e |
 | Take the customer's yes or no, and a plain no recorded by a Wiom CX user, against the service task. | T5 · T6 · R4a · R5c |
 | Auto close a service task at C-04 after the Resolved mark if it pinged before then, otherwise at C-05 after the mark, recording one of three closure reasons. | T7 · T8 · R4 · C-04 · C-05 |
 | Let a Wiom Product user change C-01, C-03, C-04 and C-05 within their ranges without a release. | C-01 · C-03 · C-04 · C-05 |
@@ -385,6 +392,8 @@ stateDiagram-v2
 | §4 · AC-RACE-1, AC-RACE-2 · §5 Precedence | A customer answer at the same instant as a window expiry is applied first | Inference — the customer's word outranks a timer |
 | §6 · C-05 · §4 · AC-CFG-5 | C-05 must stay longer than C-04, so a Product user cannot set them in the wrong order | Inference — a no-ping closure earlier than a ping-up closure would invert the rule |
 | §3 · R11a–d · R11 MUST NOT | What is recorded for each push notification (sent with type and time, opened, answered from, failed with SMS sent instead) and that recording never delays a message — you asked only that push notifications be instrumented | Inference from what the flow needs to show whether silent customers saw the message |
+| §3 · R4f · R5f | The CSP is told by a CSP app notification, at the moment of the Reopen or Closure — you asked that the CSP should know; the channel and timing are mine | Inference — the CSP app is where the CSP works the service task |
+| §3 · R11e | What is recorded for CSP app notifications: sent with type and time, and opened | Inference, mirroring R11a–b for the Customer app |
 | §2 Boundary | The move to fixed M3 cycles applies to every service task M3 counts, not only ISD and RDNI | Inference — M3 is one count per CSP, so its cycles cannot differ by subtype |
 | §4 · AC-RACE-3 · §5 Precedence | When the M3 timer reaches 48 h at the same instant as a Resolved mark, the service task is counted | Inference — the timer had already run its full 48 hours |
 
@@ -402,4 +411,5 @@ stateDiagram-v2
 | §3 · R5 | Whether a customer raising the same issue again in the app during Pending Verification counts as a no |
 | §3 · R8 | What Kapture shows after a Reopen, while the service task is back In Progress |
 | §7 · Quality OS, M3 | The minimum number of service tasks a CSP needs in an M3 cycle for a PASS or FAIL (today 10 in the rolling window), and from which date the fixed M3 cycles start |
-| §7 · CleverTap | Which push notification events the Customer app already sends, and whether R11 reuses them |
+| §7 · CleverTap | Which push notification events the Customer app, and which notification events the CSP app, already send, and whether R11 reuses them |
+| §3 · R4f · R5f | Whether the assigned Technician, and not only the CSP, is notified of a Reopen or Closure (today's completion notification also goes to the Technician) |

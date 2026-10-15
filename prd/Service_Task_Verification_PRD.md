@@ -3,7 +3,7 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — [TBD — not asked] | **Status** — Draft | **Sign-off** — Pending |
-| **Version** — v0.25 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
+| **Version** — v0.26 · 15 Oct 2026 | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
 
 ---
@@ -401,7 +401,7 @@ stateDiagram-v2
 | System / Service | Impact | Reference material | What was checked · ACs grounded on it |
 |---|---|---|---|
 | Support Resolution OS (`csp-support-resolution-service`) | Owns the service task; gains Pending Verification, the verdict, Reopen and the four closure reasons | `csp-os-yaml` main, 12 Oct 2026 | Today the service task closes at the Resolved mark whatever Connection Validation Service says, and repeats link only within the existing reopen window (`REOPEN_LINEAGE_WINDOW`), shorter than C-07 · AC-R1-1 · AC-R4-1 to AC-R4-4 · AC-R9-1 |
-| Connection Validation Service (called by Support Resolution OS) | Gives the Internet Verdict each time Wiom asks: at the Resolved mark, then every C-13 until the customer answers, the service task closes, or C-04 runs out. How it reaches the verdict stays its own (today router signals; later possibly optical power and more) | Same repository | Today it is asked once, at the mark, and its answer does not decide anything; its code is not in the wiom-tech organisation, so how it reaches the verdict was not checked · AC-R2-1 to AC-R2-8 |
+| Connection Validation Service (called by Support Resolution OS) | Gives the Internet Verdict each time Wiom asks: at the Resolved mark, then every C-13 until the customer answers, the service task closes, or C-04 runs out. How it reaches the verdict stays its own | `connection-validation-service-design.md` (wiom-tech/connection-validation-service, lines 148–173) and `README.md` (lines 77–84), as shared by the PM, 15 Oct 2026; repository not readable from this account | Today it is asked once, at the mark. Its answer is positive only when the router's latest signal is no older than its freshness window (a global setting, 10 minutes by default); otherwise it answers not positive, with a reason (stale signal, device unknown, telemetry unavailable, or connection not mapped to a device). Each request needs a new unique request ID, is answered within a 2-second budget, and is written to its own audit record before it answers — so asking every C-13 for up to C-04 adds one audit record per ask · AC-R2-1 to AC-R2-8 |
 | TAS (CSP app and Technician App) | Shows only that Wiom will verify the fix, then the Reopen and the closure reason; never the Internet Verdict | CSP app, 12 Oct 2026 | Today, after the mark, the CSP app says the connection is back online whatever Connection Validation Service said · AC-R1-3 · AC-R1-6 · AC-R4-6 · AC-R5-2 |
 | Kapture, through `ticket-service-java` | Shows Status Pending / Sub Status Resolved during Pending Verification, Pending / Open after a Reopen, Complete / Completed at Closure; carries a comment for every action; a Wiom CX user's close during Pending Verification closes the service task with CX_CLOSED_IN_KAPTURE, and before any Resolved mark works as today; a reopen of a Closed one is refused | `ticket-service-java` main, 29 Sep 2026 | Sub Status codes: `OP` Open, `IP` In progress, `RS` Resolved, `CO` Completed, `CL` Closed. Today the mark sends `RS` or `CO`. Today an `RS` coming **from** Kapture resolves the service task, `OP` reopens it, `CL` closes it and `IP` is rejected (`KaptureTicketController.java:178`); a CC-queue ticket left `OP` with a primary/existing disposition is auto-completed after 2 hours (`CCTicketAutoClosureHandler.java:57`) · AC-R8-1 to AC-R8-12 · AC-R4-11 |
 | Quality OS | Receives the resolution signal only at Closure | `csp-os-yaml` main, 12 Oct 2026 | Today it receives the signal at the mark · AC-R6-1 to AC-R6-3 · AC-GRD-4 |
@@ -456,7 +456,7 @@ stateDiagram-v2
 |---|---|
 | Header · Reviewer | Which engineering lead reviews this PRD |
 | §7 · Figma file | The link to Design's Figma file with the push notification copy |
-| §6 · C-13 | How often Wiom asks Connection Validation Service for the Internet Verdict, and its range |
+| §6 · C-13 | How often Wiom asks Connection Validation Service for the Internet Verdict, and its range. Asking at least every 10 minutes (its freshness window) leaves no gap between answers |
 | §4 · AC-REG-1, AC-REG-2 | What to observe to prove escalation and other subtypes are unchanged, and the reference for it |
 | §6 · C-06 to C-10 | Whether these numbers must change without a release (C-01, C-04, C-05 are Configurable by the PM's decision; the rest stay Fixed, the default) |
 | §3 · R3 | What happens when the app notification cannot be sent: is the customer still counted as told |

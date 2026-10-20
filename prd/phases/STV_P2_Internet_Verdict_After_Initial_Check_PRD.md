@@ -33,7 +33,7 @@ The terms of the P1 PRD apply here. This phase adds none.
 
 ### Phase and testing
 
-P2 of 4; needs P1 (`STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all 4 PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
+P2 of 4; needs P1 (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all 4 PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
 
 
 This phase must keep guardrails G3 and G6 (P1 §2).
@@ -46,13 +46,13 @@ This phase must keep guardrails G3 and G6 (P1 §2).
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R2 | As a customer, I want Wiom to check whether my internet is actually working, so that what I am told matches what is true. | **(c)** On T13, when a positive Internet Verdict is received after the Initial Check and before C-04 runs out from the mark, move to Positive verdict. **(d)** After the Initial Check, ask Connection Validation Service for the Internet Verdict every C-14 until the customer answers, the service task closes, or C-04 runs out. | Count a positive Internet Verdict received after C-04 has run out. |
+| R2 | As a customer, I want Wiom to check whether my internet is actually working, so that what I am told matches what is true. | **(c)** On T13, when a positive Internet Verdict is received after the Initial Check and before C-04 runs out from the mark, or at the same instant, move to Positive verdict. **(d)** After the Initial Check, ask Connection Validation Service for the Internet Verdict every C-14. Stop at the round's first positive Internet Verdict, the customer's answer, a Reopen, the Closure, or when C-04 runs out, whichever is first. | Count a positive Internet Verdict received after C-04 has run out. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
 | AC-R2-4 | **Given** a service task Resolved at 13:47 on 14 Oct, in No positive verdict since 14:17, **When** a positive Internet Verdict is received at 19:52 and the customer never answers, **Then** it is in Positive verdict at 19:52 and is Closed at 13:47 on 16 Oct, C-04 (48 h) after the mark, with closure reason “Internet working, no response”. | R2c · T13 · R4b · T7 | Settled |
-| AC-R2-7 | **Given** a service task in Positive verdict since 14:09, **When** the Internet Verdict at 15:30 is not positive, **Then** it stays in Positive verdict and still auto closes C-04 after the mark. | R2 MUST NOT | Settled |
 | AC-R2-8 | **Given** a service task Resolved at 13:47 on 14 Oct that gets no positive Internet Verdict and no answer from the customer, **When** C-04 runs out at 13:47 on 16 Oct, **Then** Wiom asked Connection Validation Service for the Internet Verdict at 13:47, 13:52, 13:57, 14:02, 14:07, 14:12 and 14:17 on 14 Oct, then every hour from 15:17 on 14 Oct to 13:17 on 16 Oct (47 asks), and not after. | R2d · T1 · C-13 · C-14 | Settled |
+| AC-R2-10 | **Given** a service task Resolved at 13:47 on 14 Oct, in No positive verdict since 14:17, **When** a Wiom CX user Reopens it at 16:00 (R5c), **Then** Wiom asks for no Internet Verdict from 16:00 until the CSP's next Resolved mark. | R2d · T6 | Settled |
 
 ### R3 — The first message *(the parts of R3 in this phase; letters kept from the full rule)*
 
@@ -84,6 +84,7 @@ This phase must keep guardrails G3 and G6 (P1 §2).
 | AC-BV-2 | **Given** a service task Resolved at 13:47:00, **When** its only positive Internet Verdict comes at 14:17:01, **Then** the customer got the first message at 14:17:00, it moves to Positive verdict at 14:17:01, and no second message is sent. | C-01 · R2b · R2c · R3e | Settled |
 | AC-CFG-6 | **Given** C-13 is 5 min and C-14 is 1 h, **When** a Wiom Product user tries to set C-13 to 6 min or C-14 to 5 min, **Then** each change is refused and the values stay 5 min and 1 h. | C-13 range · C-14 range | Settled |
 | AC-BV-12 | **Given** a service task Resolved at 13:47:00 on 14 Oct with no positive Internet Verdict since, **When** its only positive Internet Verdict comes at 13:46:59 on 16 Oct, 1 s before C-04 runs out, **Then** it auto closes at 13:47:00 on 16 Oct with “Internet working, no response”. | C-04 · R4b · R2c | Settled |
+| AC-BV-14 | **Given** a service task Resolved at 13:47:00 on 14 Oct with no positive Internet Verdict since, **When** a positive Internet Verdict comes at 13:47:00 on 16 Oct, the instant C-04 runs out, **Then** it counts as before C-04, and the service task auto closes at 13:47:00 on 16 Oct with “Internet working, no response”. | C-04 · R2c · R4b | Settled |
 
 ---
 
@@ -100,3 +101,5 @@ Lifecycle: P1 §5. This phase builds T13: No positive verdict → Positive verdi
 | ID | Parameter | Value / Default | Kind | Range · Owner · Why configurable |
 |---|---|---|---|---|
 | C-14 | How often Wiom asks Connection Validation Service for the Internet Verdict after the Initial Check, until the customer answers, the service task closes, or C-04 runs out | 1 hour | Configurable | 10 min–1 h · Wiom Product team · PM: every hour after the Initial Check; range set 15 Oct 2026 |
+
+**Changes to C-01, C-04, C-05, C-13 and C-14** apply from the next Resolved mark: each round of a service task keeps the values in force at its own Resolved mark.

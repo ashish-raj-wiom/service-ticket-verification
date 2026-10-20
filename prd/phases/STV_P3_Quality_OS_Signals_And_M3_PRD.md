@@ -39,7 +39,7 @@ The terms of the P1 PRD apply here. This phase adds:
 
 ### Phase and testing
 
-P3 of 4; needs P1 (`STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all 4 PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
+P3 of 4; needs P1 (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all 4 PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
 
 ### Guardrails this phase builds
 
@@ -56,7 +56,7 @@ P3 of 4; needs P1 (`STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycl
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R6 | As a CSP, I want my quality score to rest on what happened to the customer, so that a confirmed fix counts and a claimed one does not. | **(a)** At every Closure, send Quality OS the resolution signal with the closure reason. **(b)** For “Not verified”, never signal the service task as fixed. **(c)** For “Closed by the Wiom CX team”, signal the service task as fixed. **(d)** On T15, send whatever signal is sent today; this spec adds none. **(e)** At every Closure — the customer's yes, a Wiom CX user's close, or an auto closure at C-04 or C-05 — include in the resolution signal whether the service task was within TAT, judged the same way each time: its CSP TAT at Closure — In Progress rounds only, inside CSP working hours (C-06), summed over every round, with all time in Pending Verification left out — compared with the TAT for its subtype (C-15). | Send any resolution signal at the Resolved mark or during Pending Verification. Count any time in Pending Verification, or outside CSP working hours, toward the within-TAT judgement. |
+| R6 | As a CSP, I want my quality score to rest on what happened to the customer, so that a confirmed fix counts and a claimed one does not. | **(a)** At every Closure, send Quality OS the resolution signal with the closure reason. **(b)** Signal every Closure as fixed, whatever its closure reason: Quality OS judges only whether the service task was within TAT (R6e). **(c)** This includes “Closed by the Wiom CX team” and “Not verified”. **(d)** On T15, send whatever signal is sent today; this spec adds none. **(e)** At every Closure from Pending Verification — the customer's yes, a Wiom CX user's close, or an auto closure at C-04 or C-05 — include in the resolution signal whether the service task was within TAT, judged the same way each time: its CSP TAT at Closure — In Progress rounds only, inside CSP working hours (C-06), summed over every round, with all time in Pending Verification left out — compared with the TAT for its subtype (C-15). | Send any resolution signal at the Resolved mark or during Pending Verification. Count any time in Pending Verification, or outside CSP working hours, toward the within-TAT judgement. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -67,13 +67,13 @@ P3 of 4; needs P1 (`STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycl
 | AC-R6-6 | **Given** the service task from AC-R6-5, **When** the CSP marks it Resolved again at 14:30 on 15 Oct instead of 13:30, and the customer says yes at 15:00, **Then** the signal is marked breached: CSP TAT 4 h 30 min (1 h plus 3 h 30 min), over C-15. | R6e · C-15 | Settled |
 | AC-R6-7 | **Given** C-15 is 4 working hours, **When** one service task is Closed with a CSP TAT of exactly 4 h 00 min and another with 4 h 01 min, **Then** the first is marked within TAT and the second breached. | R6e · C-15 | Settled |
 | AC-R6-8 | **Given** an ISD service task that reaches CSP Shiv Net at 11:20 on 14 Oct and is marked Resolved at 13:47, with a positive Internet Verdict at 14:09 and no answer from the customer, **When** it auto closes at 13:47 on 16 Oct, **Then** Quality OS receives the resolution signal at 13:47 on 16 Oct marked within TAT: CSP TAT 2 h 27 min, the same as the CSP app SLA timer showed at the mark; the 48 h in Pending Verification are not counted. | R6e · R7 · G5 · T7 | Settled |
-| AC-R6-9 | **Given** an ISD service task that reaches CSP Shiv Net at 11:20 on 14 Oct and is marked Resolved at 13:47, with no positive Internet Verdict and no answer, **When** it auto closes at 13:47 on 17 Oct with closure reason “Not verified”, **Then** the resolution signal at 13:47 on 17 Oct is marked within TAT (CSP TAT 2 h 27 min), and still does not mark the service task as fixed (R6b). | R6e · R6b · G5 · T8 | Settled |
+| AC-R6-9 | **Given** an ISD service task that reaches CSP Shiv Net at 11:20 on 14 Oct and is marked Resolved at 13:47, with no positive Internet Verdict and no answer, **When** it auto closes at 13:47 on 17 Oct with closure reason “Not verified”, **Then** the resolution signal at 13:47 on 17 Oct is marked within TAT (CSP TAT 2 h 27 min), and marks the service task as fixed, as every Closure is (R6b). | R6e · R6b · G5 · T8 | Settled |
 
 ### R10 — M3 counts only time waiting on the CSP
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R10 | As a CSP, I want M3 to count only the time a service task waits on me, so that Wiom checking a fix never makes a service task look long-open. | **(a)** Start the M3 timer when the service task is raised, and run it on the wall clock, every hour of the day. **(b)** On T1, pause the M3 timer at the Resolved mark. **(c)** On T6, resume the M3 timer from where it stopped. **(d)** On T12, when the M3 timer reaches C-08, count the service task once toward M3, in the M3 cycle (C-09) in which that happens. **(e)** On T5, T7, T8, T14 and T15, stop the M3 timer; a service task whose timer never reached C-08 is never counted. **(f)** Give a CSP a PASS on M3 for a cycle when C-10 or fewer of its service tasks were counted in it, and a FAIL otherwise. | Count time in Pending Verification on the M3 timer. Count the same service task in more than one M3 cycle, even if it stays open or is Reopened. Pause the M3 timer for any reason other than Pending Verification. |
+| R10 | As a CSP, I want M3 to count only the time a service task waits on me, so that Wiom checking a fix never makes a service task look long-open. | **(a)** Start the M3 timer when the service task is raised, and run it on the wall clock, every hour of the day. **(b)** On T1, pause the M3 timer at the Resolved mark. **(c)** On T6, resume the M3 timer from where it stopped. **(d)** On T12, when the M3 timer reaches C-08, count the service task once toward M3, in the M3 cycle (C-09) in which that happens. **(e)** On T5, T7, T8, T14 and T15, stop the M3 timer; a service task whose timer never reached C-08 is never counted. **(f)** Give a CSP a PASS on M3 for a cycle when C-10 or fewer of its service tasks were counted in it, and a FAIL otherwise. **(g)** When a CSP is added to or removed from the rollout list during an M3 cycle, judge that whole cycle by the method that applied to it on the cycle's first day. | Count time in Pending Verification on the M3 timer. Count the same service task in more than one M3 cycle, even if it stays open or is Reopened. Pause the M3 timer for any reason other than Pending Verification. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -84,6 +84,8 @@ P3 of 4; needs P1 (`STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycl
 | AC-R10-5 | **Given** a CSP with 2 service tasks counted toward M3 in the 1–15 Oct cycle, **When** Quality OS evaluates that cycle, **Then** the CSP's M3 result is PASS. | R10f | Settled |
 | AC-R10-6 | **Given** a CSP with 3 service tasks counted toward M3 in the 1–15 Oct cycle, **When** Quality OS evaluates that cycle, **Then** the CSP's M3 result is FAIL. | R10f | Settled |
 | AC-R10-7 | **Given** a service task raised at 08:00 on 14 Oct and In Progress, **When** 21:00 on 14 Oct passes and the CSP's working hours end, **Then** its M3 timer keeps running through the night and reads 25 h at 09:00 on 15 Oct. | R10a · R10 MUST NOT | Settled |
+| AC-R10-8 | **Given** an ISD service task of CSP Shiv Net, on the rollout list, In Progress since 11:20 on 14 Oct and never marked Resolved, M3 timer at 3 h 10 min, **When** a Wiom CX user closes it in Kapture at 14:30 (AC-R8-8), **Then** its M3 timer stops at 3 h 10 min and it is never counted toward M3. | R10e · T15 | Settled |
+| AC-R10-9 | **Given** CSP Om Sai Cable is added to the rollout list on 8 Oct, **When** Quality OS judges its M3 for 1–15 Oct and for 16–31 Oct, **Then** 1–15 Oct is judged as today and 16–31 Oct by fixed M3 cycles. | R10g · R12b · G8 | Settled |
 
 ---
 
@@ -91,7 +93,6 @@ P3 of 4; needs P1 (`STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycl
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
-| AC-R8-8 | **Given** an ISD service task of CSP Shiv Net, on the rollout list, In Progress since 11:20 on 14 Oct and never marked Resolved, M3 timer at 3 h 10 min, **When** a Wiom CX user closes it in Kapture at 14:30, **Then** it is Closed at 14:30 without Pending Verification, with the same closure reason, signals, customer message and CSP notifications a Kapture close produces today; it does not get “Closed by the Wiom CX team”; and its M3 timer stops at 3 h 10 min. | R8e · R4h · R6d · R10e · R12a · T15 · G2 | Settled |
 | AC-R12-5 | **Given** CSP Om Sai Cable is not on the rollout list, **When** Quality OS counts M3 for it, **Then** it uses today's rolling window and today's clock, with no pause and no fixed M3 cycles. | R12b · R10 · G8 | Settled |
 | AC-BV-7 | **Given** a service task whose M3 timer reads 47 h 59 min when the CSP marks it Resolved, **When** it is later Closed with “Customer confirmed”, **Then** it is not counted toward M3. | C-08 · R10e | Settled |
 | AC-BV-8 | **Given** a service task In Progress, **When** its M3 timer reaches 48 h 00 min at 23:59 on 15 Oct, **Then** it is counted in the 1–15 Oct cycle, not the 16–31 Oct cycle. | C-09 · R10d | Settled |
@@ -113,9 +114,9 @@ Lifecycle: P1 §5. This phase builds T12 (In Progress → In Progress: the M3 ti
 
 | ID | Parameter | Value / Default | Kind | Range · Owner · Why configurable |
 |---|---|---|---|---|
-| C-08 | M3 long-open limit: M3 timer time, wall clock, after which a service task counts toward M3 | 48 hours | Fixed | — |
+| C-08 | M3 long-open limit: M3 timer time, wall clock, after which a service task counts toward M3 | 48 hours | Fixed — unchanged by this spec | — · today's value in Quality OS |
 | C-09 | M3 cycles | 1st–15th, and 16th–last day of each month (IST) | Fixed | — |
-| C-10 | M3 pass mark: most service tasks counted in one cycle for a PASS | 2 | Fixed | — |
+| C-10 | M3 pass mark: most service tasks counted in one cycle for a PASS | 2 | Fixed — unchanged by this spec | — · today's value in Quality OS |
 | C-15 | TAT for an ISD or RDNI service task: the most CSP TAT that still counts as within TAT | 4 working hours | Fixed — unchanged by this spec | — · today's per-subtype value in Support Resolution OS (`SR_SLA_NO_INTERNET`, `SR_SLA_RECHARGE_DONE_NO_INTERNET`: 4 h, working-hours basis) |
 
 **Interaction note (C-08 × C-04 / C-05):** the M3 timer runs only outside Pending Verification and the verification windows run only inside it, so the two never overlap. A service task can wait the full 72 hours of C-05 without moving closer to C-08.

@@ -3,9 +3,9 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) · Dhruv (product) | **Status** — Draft | **Sign-off** — — |
-| **Version** — P1 of 5 · 20 Oct 2026 · split from v1.2-short (from v1.2, signed off 15 Oct 2026) | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
+| **Version** — P1 of 4 · 20 Oct 2026 · split from v1.2-short (from v1.2, signed off 15 Oct 2026) | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
-| **Phase** — P1 of 5 · needs nothing · all five PRDs are tested together before release (P1 §2) | | | |
+| **Phase** — P1 of 4 · needs nothing · all 4 PRDs are tested together before release (P1 §2) | | | |
 
 **Designs (Figma)** — screens, flows and copy for this spec:
 
@@ -43,9 +43,9 @@ Only the terms this spec coins or gives a new meaning. Everything else follows t
 
 ## 2. Objective & Guardrails
 
-**Objective.** A service task never closes on the CSP's word alone: at the Resolved mark it waits in Pending Verification, the customer is asked once, a yes closes it, a Wiom CX user can send it back to the same CSP, and timers close it only when the customer does not answer. Closed is final, CSP TAT counts only the CSP's own time, and nothing changes for CSPs off the rollout list.
+**Objective.** A service task never closes on the CSP's word alone: at the Resolved mark it waits in Pending Verification, the customer is asked once, a yes closes it, a customer who says it still does not work and taps to reopen it gets the same CSP back at once (a Wiom CX user can do the same for them), and timers close it only when the customer does not answer. Closed is final, CSP TAT counts only the CSP's own time, and nothing changes for CSPs off the rollout list.
 
-**Only CSPs on the rollout list.** This feature applies only to ISD and RDNI service tasks of CSPs on the rollout list (C-12) at the Resolved mark. A CSP off the list never enters the verification flow: its service tasks, customers, CSP and Technician apps, Kapture, Quality OS and M3 work exactly as they do today (R12, G8; AC-R12-2, AC-GRD-9). Each later phase restates this for what it builds.
+**Only CSPs on the rollout list.** This feature applies only to ISD and RDNI service tasks of CSPs on the rollout list (C-12) at the Resolved mark. A CSP off the list never enters the verification flow: its service tasks, customers, the chat, the CSP and Technician apps, Kapture, Quality OS and M3 work exactly as they do today (R12, G8; AC-R12-2, AC-R12-6, AC-GRD-9). Each later phase restates this for what it builds.
 
 **Objective.** A customer whose internet a CSP marks as fixed does not have the service task closed on the CSP's word alone. The customer is always asked whether the fix worked, and a customer who says it still does not work and asks to reopen gets the same CSP back on the same service task at once. Verification turns on what the customer says: the Internet Verdict only decides when and how the customer is first messaged, and the timers act only when the customer does not answer.
 
@@ -64,21 +64,20 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 ### Phases and testing
 
-Service Task Verification is specified in five PRDs, one per phase. Each is built and tested on its own, behind the rollout list while it is empty, so no CSP and no customer sees a part-built feature. The feature is released once, after all five are tested together.
+Service Task Verification is specified in 4 PRDs, one per phase. Each is built and tested on its own, behind the rollout list while it is empty, so no CSP and no customer sees a part-built feature. The feature is released once, after all 4 are tested together.
 
 | Phase | PRD | Builds | Needs | ACs |
 |---|---|---|---|---|
-| P1 | Core loop (`STV_P1_Core_Loop_PRD.md`) | This PRD | — | 49 |
-| P2 | Customer reopens from the chat (`STV_P2_Customer_Reopen_From_Chat_PRD.md`) | A customer whose internet still does not work can send the same service task back to the same CSP from the chat | P1 | 15 |
-| P3 | Internet Verdict after the Initial Check (`STV_P3_Internet_Verdict_After_Initial_Check_PRD.md`) | Wiom keeps asking for the Internet Verdict every hour after the Initial Check | P1 | 9 |
-| P4 | Quality OS: signals at Closure and M3 (`STV_P4_Quality_OS_Signals_And_M3_PRD.md`) | A CSP's quality score rests on what happened to the customer | P1 | 22 |
-| P5 | Records: Kapture comments and notification tracking (`STV_P5_Records_PRD.md`) | Every action in Verification leaves a record | P1 | 15 |
+| P1 | Core loop (`STV_P1_Core_Loop_PRD.md`) | The whole verification loop, including the customer's reopen from the chat | — | 64 |
+| P2 | Internet Verdict after the Initial Check (`STV_P2_Internet_Verdict_After_Initial_Check_PRD.md`) | Hourly Internet Verdict asks after the Initial Check; a late positive verdict | P1 | 9 |
+| P3 | Quality OS: signals at Closure and M3 (`STV_P3_Quality_OS_Signals_And_M3_PRD.md`) | Signals only at Closure, within TAT on CSP time, the M3 pause and cycles | P1 | 22 |
+| P4 | Records: Kapture comments and notification tracking (`STV_P4_Records_PRD.md`) | Kapture comments K1–K12; notification and chat-answer records | P1 | 15 |
 
-P2 to P5 each need only P1, so they can be built in parallel.
+P2 to P4 each need only P1, so they can be built in parallel.
 
 **Test gates.**
 1. **Phase gate:** a phase is done when its own ACs pass and every P1 AC passes again on the same build.
-2. **Full feature test:** before the first CSP is added to the rollout list, all 110 ACs of the five PRDs are run together on one build with every phase in, end to end, including every guardrail (AC-GRD), race (AC-RACE), duplicate (AC-DUP) and regression (AC-REG-2) test. The feature is complete only when every AC passes in this run.
+2. **Full feature test:** before the first CSP is added to the rollout list, all 110 ACs of the 4 PRDs are run together on one build with every phase in, end to end, including every guardrail (AC-GRD), race (AC-RACE), duplicate (AC-DUP) and regression (AC-REG-2) test. The feature is complete only when every AC passes in this run.
 3. **Release:** CSPs are then added to the rollout list one by one (R12, C-12).
 
 AC ids are kept from v1.2 in every phase PRD, so a Given may name an AC in an earlier phase's PRD.
@@ -95,7 +94,7 @@ AC ids are kept from v1.2 in every phase PRD, so a Given may name an AC in an ea
 | G7 | **The customer reopens only in Pending Verification** (zero tolerance) | A Customer's No sends a service task back to the CSP only while it is in Pending Verification; a "not working" while In Progress changes nothing, and after Closure it leads to a new service task. | R5 · R9 · AC-R5-1 · AC-R9-1 · AC-GRD-8 |
 | G8 | **No change for CSPs off the rollout list** (zero tolerance) | A service task whose CSP is not on the rollout list behaves exactly as it does today, in every system this spec touches. | R12 · AC-R12-2 · AC-R12-5 · AC-R12-6 · AC-R12-7 · AC-R12-8 · AC-GRD-9 |
 
-G4 (signals only at Closed) and the within-TAT and M3 parts of G5 are built in P4.
+G4 (signals only at Closed) and the within-TAT and M3 parts of G5 are built in P3.
 
 ---
 
@@ -119,7 +118,7 @@ G4 (signals only at Closed) and the within-TAT and M3 parts of G5 are built in P
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R2 | As a customer, I want Wiom to check whether my internet is actually working, so that what I am told matches what is true. | **(a)** On T2, when a positive Internet Verdict is received during the Initial Check — at the Resolved mark itself or after it, before C-01 runs out — move to Positive verdict at once. **(b)** On T3, when C-01 runs out without that, including when Connection Validation Service gives no answer, move to No positive verdict. **(d)** On T1, ask Connection Validation Service for the Internet Verdict at the Resolved mark; during the Initial Check, ask again every C-13. (Asking after the Initial Check is P3, R2d there.) | Judge the Internet Verdict, or handle the service task in any way, differently for RDNI than for ISD. Move from Positive verdict back to No positive verdict. |
+| R2 | As a customer, I want Wiom to check whether my internet is actually working, so that what I am told matches what is true. | **(a)** On T2, when a positive Internet Verdict is received during the Initial Check — at the Resolved mark itself or after it, before C-01 runs out — move to Positive verdict at once. **(b)** On T3, when C-01 runs out without that, including when Connection Validation Service gives no answer, move to No positive verdict. **(d)** On T1, ask Connection Validation Service for the Internet Verdict at the Resolved mark; during the Initial Check, ask again every C-13. (Asking after the Initial Check is P2, R2d there.) | Judge the Internet Verdict, or handle the service task in any way, differently for RDNI than for ISD. Move from Positive verdict back to No positive verdict. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -156,17 +155,24 @@ G4 (signals only at Closed) and the within-TAT and M3 parts of G5 are built in P
 | AC-R4-13 | **Given** a service task with no assigned Technician, **When** it auto closes at 13:47 on 16 Oct, **Then** only the CSP's Owner, Manager and Manager+ receive the Closure notification. | R4f · T7 | Settled |
 | AC-R4-7 | **Given** a service task Resolved at 13:47 on 14 Oct with a positive Internet Verdict at 14:09 and no answer, **When** the customer's plan expires at 23:59 on 15 Oct, **Then** nothing changes: it stays in Pending Verification and auto closes at 13:47 on 16 Oct with “Internet working, no response”. | R4g · T10 | Settled |
 
-### R5 — Reopen on the customer's no *(the parts of R5 in this phase; letters kept from the full rule)*
+### R5 — Reopen on the customer's no
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R5 | As a customer whose internet still does not work, I want my previous service task reopened with the same CSP when I ask for it, or a way to raise a new one, so that I choose how to go on. | On T6: **(b)** keep the same service task and the same CSP, and tell the CSP it is the same issue; the CSP app shows it again in every case, and the Technician App shows it again when the last assignee was a Technician; **(c)** count a "not working" recorded by a Wiom CX user when the customer asks for this service task to be reopened, or a Wiom CX user setting it to Sub Status Open in Kapture, as a Customer's No; **(d)** resume the CSP TAT, from the start of CSP working hours (C-06) when the Reopen happens outside them, while everything else in the Reopen happens at once, whatever the hour; **(e)** start a new Pending Verification at the CSP's next Resolved mark; **(f)** send the CSP's Owner, Manager and Manager+ a CSP app notification, and the Technician assigned to the service task, if any, the same notification in the Technician App, at the moment of the Reopen, that the service task is back to be fixed (copy: Figma, header); only the last assignee, and earlier Technicians on the task are not notified. | Open a new service task by itself for a "not working" given during Pending Verification. Hand a Reopened service task to a different CSP. Tell the CSP or the Technician that the customer caused the Reopen: Wiom owns the verification. Treat any other customer contact as a "not working". |
+| R5 | As a customer whose internet still does not work, I want my previous service task reopened with the same CSP when I ask for it, or a way to raise a new one, so that I choose how to go on. | On T6: **(a)** move the service task back to In Progress at once, whatever the Internet Verdict, when the customer answers "not working" and chooses "पिछली शिकायत फिर से दर्ज करें"; **(b)** keep the same service task and the same CSP, and tell the CSP it is the same issue; the CSP app shows it again in every case, and the Technician App shows it again when the last assignee was a Technician; **(c)** count a "not working" recorded by a Wiom CX user when the customer asks for this service task to be reopened, or a Wiom CX user setting it to Sub Status Open in Kapture, as a Customer's No; **(d)** resume the CSP TAT, from the start of CSP working hours (C-06) when the Reopen happens outside them, while everything else in the Reopen happens at once, whatever the hour; **(e)** start a new Pending Verification at the CSP's next Resolved mark; **(f)** send the CSP's Owner, Manager and Manager+ a CSP app notification, and the Technician assigned to the service task, if any, the same notification in the Technician App, at the moment of the Reopen, that the service task is back to be fixed (copy: Figma, header); only the last assignee, and earlier Technicians on the task are not notified. **(g)** When the customer taps नहीं and chooses "नई शिकायत दर्ज करें", direct the customer to call the Wiom CX team; this is not a No, and the service task carries on as if the customer had not replied. **(h)** When the customer taps नहीं and chooses neither, it counts for nothing: the service task carries on exactly as if the customer had not replied. | Reopen on a नहीं alone, before the customer chooses to reopen the previous service task. Open a new service task by itself for a "not working" given during Pending Verification. Hand a Reopened service task to a different CSP. Tell the CSP or the Technician that the customer caused the Reopen: Wiom owns the verification. Treat any other customer contact as a "not working". |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
+| AC-R5-1 | **Given** the service task from AC-R2-1, positive Internet Verdict at 14:09, **When** Rekha Verma answers "नहीं, बंद है" at 16:04 and chooses "पिछली शिकायत फिर से दर्ज करें" at 16:05 on 14 Oct, **Then** the service task is In Progress at 16:05, with CSP Shiv Net, under the same service task. | R5a · T6 · G7 | Settled |
+| AC-R5-2 | **Given** the Reopen in AC-R5-1, **When** the CSP opens the service task at 16:10, **Then** the CSP app shows it as the same issue, Reopened, not as a new service task. | R5b · T6 | Settled |
+| AC-R5-13 | **Given** the service task from AC-R5-1, worked by Technician Suresh in an earlier round and last assigned to Technician Ravi, **When** it is Reopened at 16:05, **Then** it is back in Ravi's Technician App list and in Shiv Net's CSP app at 16:05; Shiv Net's Owner, Manager and Manager+ receive a CSP app notification, and Ravi the same notification in the Technician App, at 16:05 that the service task is back to be fixed; and no notification or screen says that the customer reopened it; Suresh gets nothing. Had it been last assigned to the CSP's owner, it would be back in the CSP app only. | R5b · R5f · T6 · R5 MUST NOT | Settled |
 | AC-R5-3 | **Given** a service task in Pending Verification, **When** the customer calls at 17:40, says it is not working and asks for this service task to be reopened, and a Wiom CX user records it, **Then** the service task is In Progress at 17:40 with the same CSP, and no new service task exists for that connection. | R5c · T6 | Settled |
 | AC-R5-4 | **Given** a service task in Pending Verification, **When** the customer calls the Wiom CX team at 17:40 to ask when the CSP will visit and does not ask for the service task to be reopened, **Then** the service task stays in Pending Verification and no new service task exists for that connection. | R5 MUST NOT | Settled |
 | AC-R5-7 | **Given** a service task In Progress since 11:20, not yet marked Resolved, **When** a Wiom CX user records the customer saying it is not working at 12:40, **Then** it stays In Progress, unchanged, and no new service task exists. | G7 · R5 | Settled |
+| AC-R5-5 | **Given** a service task of CSP Shiv Net in Pending Verification with CSP TAT 2 h 27 min, **When** the customer says No at 22:30 on 14 Oct, **Then** it is In Progress at 22:30, Shiv Net and the assigned Technician receive their Reopen notifications at 22:30, and its CSP TAT reads 2 h 27 min until 11:00 on 15 Oct, then grows. (Its M3 timer resumes at once, on the wall clock: AC-R10-3, AC-R10-7.) | R5d · R5f · T6 | Settled |
+| AC-R5-6 | **Given** the Reopened service task from AC-R5-1, **When** the CSP marks it Resolved again at 19:12, **Then** it is in Pending Verification with a new Initial Check ending at 19:42 and a new Internet Verdict. | R5e · T1 | Settled |
+| AC-R5-10 | **Given** a service task in Pending Verification, **When** Rekha Verma answers "नहीं, बंद है" at 16:04 and chooses "नई शिकायत दर्ज करें" at 16:05, **Then** the chat directs her to call the Wiom CX team, and the service task is still in Pending Verification at 16:05, unchanged. | R5g · R5 MUST NOT | Settled |
+| AC-R5-11 | **Given** a service task Resolved at 13:47 on 14 Oct, with a positive Internet Verdict at 14:09, **When** Rekha Verma taps नहीं at 16:04 and chooses neither option, **Then** it stays in Pending Verification and, with nothing else, auto closes at 13:47 on 16 Oct with “Internet working, no response”, as if she had not replied. | R5h · R4b · T7 | Settled |
 
 ### R7 — CSP TAT
 
@@ -189,21 +195,24 @@ G4 (signals only at Closed) and the within-TAT and M3 parts of G5 are built in P
 |---|---|---|---|
 | AC-R8-1 | **Given** the service task from AC-R1-1, Resolved at 13:47 on 14 Oct, **When** a Wiom CX user opens it in Kapture at 14:30, **Then** it shows Status Pending and Sub Status Resolved, not Status Complete. | R8a · T1 · R8 MUST NOT | Settled |
 | AC-R8-2 | **Given** the service task from AC-R4-1, Closed at 18:32 on 14 Oct, **When** a Wiom CX user opens it in Kapture at 18:40, **Then** it shows Status Complete and Sub Status Completed. | R8b · T5 | Settled |
+| AC-R8-3 | **Given** the service task from AC-R5-1, Reopened at 16:05 on 14 Oct, **When** a Wiom CX user opens it in Kapture at 16:30, **Then** it shows Status Pending and Sub Status Open, not Sub Status Resolved. | R8c · T6 | Settled |
 | AC-R8-9 | **Given** the service task from AC-R1-1, set to Status Pending and Sub Status Resolved in Kapture by Wiom at 13:47 on 14 Oct, **When** no Wiom CX user acts on it and no customer answers by 13:47 on 15 Oct, **Then** it is still in Pending Verification, and no closure, signal or customer message has come from that Sub Status. | R8g · R8 MUST NOT · G6 | Settled |
+| AC-R8-10 | **Given** the service task from AC-R5-1, Reopened at 16:05 on 14 Oct and shown Open in Kapture, **When** no one acts on it until 20:05 on 14 Oct, **Then** it is still In Progress with CSP Shiv Net, not Completed. | R8 MUST NOT · G6 | Settled |
 | AC-R8-13 | **Given** the service task from AC-R1-1, Resolved at 13:47 on 14 Oct, no answer, **When** a Wiom CX user sets it to Sub Status Closed in Kapture at 17:20, **Then** it is Closed at 17:20 with closure reason “Closed by the Wiom CX team”, exactly as when they set Complete / Completed (AC-R4-11). | R4h · R8e · T14 | Settled |
 | AC-R8-14 | **Given** the service task from AC-R1-1, Resolved at 13:47 on 14 Oct, **When** a Wiom CX user sets it to Sub Status Open in Kapture at 17:40, **Then** it is Reopened at 17:40, In Progress with CSP Shiv Net, and no new service task exists. | R5c · R8e · T6 | Settled |
 | AC-R8-15 | **Given** the service task from AC-R1-1, Resolved at 13:47 on 14 Oct, **When** a Wiom CX user changes its priority from Low to High in Kapture at 17:50, **Then** it is still in Pending Verification, with Status Pending / Sub Status Resolved. | R8 MUST NOT | Settled |
 
-### R9 — After Closure *(the parts of R9 in this phase; letters kept from the full rule)*
+### R9 — After Closure
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R9 | As a customer whose internet fails again after my service task closed, I want a new service task raised for me, so that the fault is fixed again. | **(a)** On T11, when the customer says it is not working after Closure, open a new service task and count it as fresh: its own CSP TAT, its own within-TAT judgement and its own M3 timer, with no link to the Closed one. **(b)** When the customer says yes after Closure, change nothing. | Reopen or change a Closed service task. Link the new service task to the Closed one, or count it as a reopen of it. |
+| R9 | As a customer whose internet fails again after my service task closed, I want a new service task raised for me, so that the fault is fixed again. | **(a)** On T11, when the customer says it is not working after Closure, open a new service task and count it as fresh: its own CSP TAT, its own within-TAT judgement and its own M3 timer, with no link to the Closed one. **(b)** When the customer says yes after Closure, change nothing. **(c)** When the customer tries to reopen a Closed service task — for example by choosing "पिछली शिकायत फिर से दर्ज करें" in the chat after it closed — do not reopen it; tell the customer it is closed and offer a new service task instead. | Reopen or change a Closed service task. Link the new service task to the Closed one, or count it as a reopen of it. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
 | AC-R9-1 | **Given** the service task from AC-R4-2, Closed at 13:47 on 16 Oct, **When** Rekha Verma reports "not working" at 09:15 on 2 Nov and a Wiom CX user raises a new service task that reaches CSP Shiv Net at 11:30, **Then** the new service task is counted as fresh: its CSP TAT and M3 timer start from zero at 11:30, its within-TAT judgement uses only its own time, it has no link to the Closed one and is not counted as its reopen; the Closed service task is still Closed. | R9a · R8f · R9 MUST NOT · T11 · G1 · G7 | Settled |
 | AC-R9-2 | **Given** the service task from AC-R4-2, **When** Rekha Verma replies yes at 10:00 on 17 Oct, **Then** it is still Closed with closure reason “Internet working, no response”, and no signal is sent. | R9b | Settled |
+| AC-R9-4 | **Given** the service task from AC-R4-2, Closed at 13:47 on 16 Oct, **When** Rekha Verma answers "नहीं, बंद है" in the chat at 18:00 on 16 Oct and chooses "पिछली शिकायत फिर से दर्ज करें", **Then** it stays Closed, and the chat tells her it is closed and offers to raise a new service task. | R9c · R9 MUST NOT · G1 | Settled |
 
 ### R12 — Live only for CSPs on the rollout list
 
@@ -216,6 +225,7 @@ G4 (signals only at Closed) and the within-TAT and M3 parts of G5 are built in P
 | AC-R12-2 | **Given** CSP Om Sai Cable is not on the rollout list, **When** it marks an ISD service task Resolved at 13:47, **Then** the service task closes at 13:47 as today, the customer gets today's "resolved" message, and Quality OS receives the resolution signal at 13:47. | R12b · G8 | Settled |
 | AC-R12-3 | **Given** CSP Om Sai Cable is added to the rollout list at 15:00, **When** one of its service tasks was marked Resolved at 14:40 and another is marked Resolved at 15:10, **Then** the 14:40 one closed as today and the 15:10 one is in Pending Verification. | R12a · R12c · R12 MUST NOT | Settled |
 | AC-R12-4 | **Given** a service task of CSP Shiv Net in Pending Verification since 13:47, **When** Shiv Net is removed from the rollout list at 16:00, **Then** the service task stays in Pending Verification and closes by the customer's yes, a Wiom CX user's close in Kapture, or an auto closure, as this spec sets out. | R12d | Settled |
+| AC-R12-6 | **Given** CSP Om Sai Cable is not on the rollout list and its ISD service task closed at its Resolved mark at 13:47 as today, **When** the customer opens the chat at 16:00, **Then** the chat offers only what it offers today, with no नहीं or "पिछली शिकायत फिर से दर्ज करें" choice from this spec, and any reopen follows today's handling. | R12b · R12 MUST NOT · G8 · R5a | Settled |
 
 ---
 
@@ -223,6 +233,7 @@ G4 (signals only at Closed) and the within-TAT and M3 parts of G5 are built in P
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
+| AC-WF-2 | **Given** an ISD service task In Progress from 11:20 on 14 Oct, marked Resolved by the Technician at 13:47, **When** no positive Internet Verdict comes by 14:17, the customer says No at 16:05, the CSP marks it Resolved again at 19:12, a positive Internet Verdict comes at 19:20, and no answer comes, **Then** it is Closed at 19:12 on 16 Oct (C-04 after the second Resolved mark) with closure reason “Internet working, no response” and CSP TAT 5 h 34 min. | T1 · T3 · T6 · T2 · T7 · G5 | Settled |
 | AC-REG-2 | **Given** a slow-internet service task of CSP Shiv Net, which is on the rollout list, **When** the CSP marks it Resolved at 13:47, **Then** it is Closed at 13:47, immediately after the mark, as today; it never enters Pending Verification. | §2 Boundary | Settled |
 | AC-GRD-1 | **Given** service tasks Closed by each of the four closure reasons, **When** the customer replies yes, the CSP opens each one in the CSP app, a Wiom CX user tries to reopen each one in Kapture, and any actor tries to move each to In Progress or Pending Verification, **Then** each stays Closed, and Kapture refuses the reopen. | G1 · R9 MUST NOT · R8 MUST NOT | Settled |
 | AC-GRD-2 | **Given** an ISD service task never marked Resolved, **When** the customer replies yes to any message, or C-04 or C-05 passes from its creation, **Then** it is not Closed; the only way it closes is a Wiom CX user's close in Kapture (AC-R8-8). | G2 | Settled |
@@ -230,12 +241,15 @@ G4 (signals only at Closed) and the within-TAT and M3 parts of G5 are built in P
 | AC-GRD-8 | **Given** three service tasks for the same customer area — one In Progress, one in Pending Verification, one Closed at 10:00 that day — **When** each customer reports "not working" at 15:00, **Then** only the one in Pending Verification goes back to In Progress; the In Progress one is unchanged, and for the Closed one a new service task opens while it stays Closed. | G7 | Settled |
 | AC-GRD-9 | **Given** every service task Resolved in a day by CSPs not on the rollout list, **When** a Wiom Product user compares them with the same day a week earlier, before the feature, **Then** none entered Pending Verification, every one closed at its Resolved mark, none received a verification message, Kapture showed today's statuses, and the CSPs and Technicians got today's notifications. | G8 · R12b · R12 MUST NOT | Settled |
 | AC-BV-1 | **Given** a service task Resolved at 13:47:00, **When** its only positive Internet Verdict comes at 14:16:59, **Then** it moves to Positive verdict and the customer gets the first message at 14:16:59. | C-01 · R2a | Settled |
+| AC-RACE-1 | **Given** a positive Internet Verdict and no answer, **When** the customer says No at the same instant C-04 runs out, **Then** the service task is Reopened, not Closed. | Precedence · T6 · T7 | Settled |
 | AC-RACE-2 | **Given** no positive Internet Verdict and no answer, **When** the customer replies yes at the same instant C-05 runs out, **Then** it is Closed with “Customer confirmed”. | Precedence · T5 · T8 | Settled |
+| AC-RACE-5 | **Given** a service task in Pending Verification, **When** the customer says No at the same instant a Wiom CX user closes it in Kapture, **Then** it is Reopened, not Closed. | Precedence · T6 · T14 | Settled |
 | AC-CFG-1 | **Given** a Wiom Product user has set C-01 to 45 min, **When** a service task is Resolved at 13:47 and no positive Internet Verdict comes, **Then** the customer gets the first message at 14:32, not 14:17. | C-01 · R3b | Settled |
 | AC-CFG-2 | **Given** a Wiom Product user has set C-04 to 36 h, **When** a service task Resolved at 13:47 on 14 Oct gets a positive Internet Verdict at 14:09 and the customer never answers, **Then** it is Closed with “Internet working, no response” at 01:47 on 16 Oct. | C-04 · R4b | Settled |
 | AC-CFG-3 | **Given** a Wiom Product user has set C-05 to 96 h, **When** a service task Resolved at 13:47 on 14 Oct never gets a positive Internet Verdict and the customer never answers, **Then** it is Closed with “Not verified” at 13:47 on 18 Oct. | C-05 · R4c | Settled |
 | AC-CFG-5 | **Given** C-04 is 48 h, **When** a Wiom Product user tries to set C-05 to 48 h, **Then** the change is refused, because C-05 must be longer than C-04. | C-05 range | Settled |
 | AC-BV-11 | **Given** C-01 is 30 min, **When** a Wiom Product user tries to set it to 61 min, outside its range of 15–60 min, **Then** the change is refused and C-01 stays 30 min. | C-01 range | Settled |
+| AC-DUP-2 | **Given** a service task in Pending Verification, **When** the customer says No twice, at 16:05 and 16:06, **Then** it is Reopened once, at 16:05. | T6 · R5a | Settled |
 | AC-DUP-3 | **Given** a service task In Progress, **When** the Technician taps Resolved twice, at 13:47:00 and 13:47:02, **Then** one Pending Verification starts, with one Initial Check ending at 14:17:00. | T1 · R1a | Settled |
 
 ---
@@ -269,7 +283,7 @@ stateDiagram-v2
     Closed --> [*] : T11 · customer says not working after Closure — the Wiom CX user raises a new service task, §2 Boundary / R8f, R9a
 ```
 
-**Phases on the diagram:** the diagram shows the whole lifecycle. Every edge is built in P1, except T13 (P3) and T12 (P4); T6 by the customer's own choice in the chat is P2, by a Wiom CX user P1.
+**Phases on the diagram:** the diagram shows the whole lifecycle. Every edge is built in P1, except T13 (P2) and T12 (P3).
 
 **Not possible from here** (only what no rule already rules out; every other state × trigger without an edge is ruled out by a rule (R1–R12), a guardrail (G1–G8) or the §2 Boundary):
 - In Progress × Initial Check end, C-04, C-05 — these clocks start only at the Resolved mark (R1a).
@@ -294,4 +308,4 @@ stateDiagram-v2
 
 **Interaction note (C-01 × C-04 / C-05 × C-13 × C-14):** everything turns on the customer's answer; the timers act only when there is none. A positive Internet Verdict at the Resolved mark sends the first message at once. Otherwise the customer hears nothing until a positive Internet Verdict or until C-01 runs out, whichever is first. The CSP sees only that Wiom will verify the fix, throughout. A positive Internet Verdict after C-01 sends nothing new. Wiom asks every C-13 during the Initial Check and every C-14 after it, until C-04 runs out; a positive Internet Verdict after the Initial Check can therefore be seen up to C-14 late, which changes nothing for the customer (no new message) and only decides between closing at C-04 and C-05. Both auto closures count from the Resolved mark: a positive Internet Verdict before C-04 runs out closes the service task at C-04; otherwise Wiom stops asking at C-04 and it closes at C-05.
 
-C-14 is set in the P3 PRD; until P3 is in, Wiom asks only at the mark and during the Initial Check.
+C-14 is set in the P2 PRD; until P2 is in, Wiom asks only at the mark and during the Initial Check.

@@ -54,6 +54,7 @@ const DOCS = [
   { id: "p2",    group: "Phase PRDs",   label: "P2 Internet Verdict after the Initial Check", file: "phases/STV_P2_Internet_Verdict_After_Initial_Check_PRD.md" },
   { id: "p3",    group: "Phase PRDs",   label: "P3 Quality OS and M3",       file: "phases/STV_P3_Quality_OS_Signals_And_M3_PRD.md" },
   { id: "p4",    group: "Phase PRDs",   label: "P4 Records",                 file: "phases/STV_P4_Records_PRD.md" },
+  { id: "how",   group: "How it was done", label: "Shortening, phasing and gap finder", file: "Shortening_Phasing_GapFinder.md" },
 ];
 const want = new URLSearchParams(location.search).get("doc");
 const cur = DOCS.find(d => d.id === want) || DOCS[0];

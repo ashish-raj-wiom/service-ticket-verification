@@ -46,7 +46,7 @@ This phase must keep guardrails G6 (P1 §2).
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R8 | As a Wiom CX user, I want Kapture to show live where a service task stands in Verification and every action taken on it, so that I can tell a customer the truth and act on their call. | **(d)** Add a Kapture comment for every action in this spec, at the moment it happens, with exactly the text in the table *Kapture status and comment per action* below (K1–K12), filling each `{…}` with the actual value. | Show the CSP or the Technician what the Kapture comments say about the verdict. |
+| R8 | As a Wiom CX user, I want Kapture to show live where a service task stands in Verification and every action taken on it, so that I can tell a customer the truth and act on their call. | **(d)** Add a Kapture comment for every action in this spec, at the moment it happens, with exactly the text in the table *Kapture status and comment per action* below (K1–K14), filling each `{…}` with the actual value. | Show the CSP or the Technician what the Kapture comments say about the verdict. |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -111,7 +111,7 @@ In P1, Kapture already shows the Status and Sub Status in this table (R8a–c); 
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
-| AC-R12-8 | **Given** CSP Om Sai Cable is not on the rollout list, **When** it marks an ISD service task Resolved at 13:47 and it closes as today, **Then** Kapture shows today's status and comments, with none of K1–K12, and no record of this spec's notifications or chat answers is made for it. | R12b · R12 MUST NOT · G8 · R8d · R11 | Settled |
+| AC-R12-8 | **Given** CSP Om Sai Cable is not on the rollout list, **When** it marks an ISD service task Resolved at 13:47 and it closes as today, **Then** Kapture shows today's status and comments, with none of K1–K14, and no record of this spec's notifications or chat answers is made for it. | R12b · R12 MUST NOT · G8 · R8d · R11 | Settled |
 | AC-GRD-6 | **Given** every service task that left Pending Verification in a day, **When** a Wiom Product user reads the recorded cause of each exit, **Then** each was the customer's yes, the customer's Reopen, a Wiom CX user recording the customer asking to reopen, a Wiom CX user's Open or close in Kapture, or an auto closure, and each has a matching Kapture comment. | G6 · R8d | Settled |
 
 ---

@@ -71,7 +71,7 @@ Service Task Verification is specified in 4 PRDs, one per phase. Each is built a
 | P1 | Core loop (`STV_P1_Core_Loop_PRD.md`) | The whole verification loop, including the customer's reopen from the chat | — | 72 |
 | P2 | Internet Verdict after the Initial Check (`STV_P2_Internet_Verdict_After_Initial_Check_PRD.md`) | Hourly Internet Verdict asks after the Initial Check; a late positive verdict | P1 | 10 |
 | P3 | Quality OS: signals at Closure and M3 (`STV_P3_Quality_OS_Signals_And_M3_PRD.md`) | Signals only at Closure, within TAT on CSP time, the M3 pause and cycles | P1 | 23 |
-| P4 | Records: Kapture comments and notification tracking (`STV_P4_Records_PRD.md`) | Kapture comments K1–K12; notification and chat-answer records | P1; P2 for one comment (K4) | 24 |
+| P4 | Records: Kapture comments and notification tracking (`STV_P4_Records_PRD.md`) | Kapture comments K1–K14; notification and chat-answer records | P1; P2 for one comment (K4) | 24 |
 
 P2 and P3 need only P1; P4 needs P1, and P2 for one comment (K4, a late positive Internet Verdict). They can be built in parallel.
 

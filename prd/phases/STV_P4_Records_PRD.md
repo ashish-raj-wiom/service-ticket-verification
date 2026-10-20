@@ -29,7 +29,7 @@ The terms of the P1 PRD apply here. This phase adds none.
 
 **Objective.** Every action in Verification leaves a record: a Kapture comment the Wiom CX team can read, and a record of every notification and chat answer in the Customer app and the CSP app. Records never change behaviour.
 
-**Only CSPs on the rollout list.** Kapture comments and the tracking records are made only for service tasks of CSPs on the rollout list (R12). For a CSP off the list, Kapture and the records stay exactly as today (G8; AC-R12-8).
+**Only CSPs on the rollout list.** Kapture comments and the tracking records are made only for service tasks under this spec: CSPs on the rollout list at the first Resolved mark, and every later round of such a service task (R12a, R12d). For a CSP off the list, Kapture and the records stay exactly as today (G8; AC-R12-8).
 
 ### Phase and testing
 
@@ -67,6 +67,7 @@ This phase must keep guardrails G6 (P1 §2).
 | AC-R8-26 | **Given** the service task from AC-R1-9, **When** the Netbox swap commits at 13:47, **Then** its Kapture record has the K1 comment at 13:47 beginning "Netbox swapped from SY000111 to GX000222 by Technician Ravi at 13:47", with Status Pending, Sub Status Resolved. | R8d · R8a · T1 | Settled |
 | AC-R8-27 | **Given** an ISD service task of Shiv Net, **When** its Manager Rakesh marks it Resolved at 13:47, **Then** its K1 comment begins "Marked Resolved by Rakesh (Manager, CSP Shiv Net) at 13:47". | R8d · T1 | Settled |
 | AC-R8-28 | **Given** the service task from AC-R4-2, positive Internet Verdict at 14:09 on 14 Oct, **When** it auto closes at 13:47 on 16 Oct, **Then** its K8 comment says the Internet Verdict was positive at 14:09 on 14 Oct, with the date. | R8d · T7 | Settled |
+| AC-R8-29 | **Given** the service task from AC-R4-17, **When** a Wiom CX user closes it in Kapture at 17:20 while it is back with Shiv Net, **Then** its K10 comment says it was closed "while back with CSP Shiv Net", not "during verification". | R8d · T14 | Settled |
 
 ### R11 — Notifications are tracked in the Customer app and the CSP app
 
@@ -101,7 +102,7 @@ Each comment is added by Wiom in Kapture at the moment of the action, and only f
 | K7 | T6 · Wiom CX user records the customer asking to reopen, or sets Open in Kapture | Pending · Open | {Agent name} recorded at {time} that the customer said it is not working and asked to reopen it — or, when the agent set it Open: {Agent name} set the ticket to Open in Kapture at {time}. Either way: ticket reopened and sent back to CSP {CSP name}; CSP {CSP name} and Technician {name} notified. |
 | K8 | T7 · auto closure at C-04 | Complete · Completed | No answer from the customer within {C-04} of the Resolved mark; Internet Verdict was positive at {time}. Ticket closed automatically — reason: Internet working, no response. No message sent to the customer. CSP {CSP name} and Technician {name} notified. |
 | K9 | T8 · auto closure at C-05 | Complete · Completed | No answer from the customer within {C-05} of the Resolved mark, and no positive Internet Verdict within {C-04}. Ticket closed automatically — reason: Not verified. No message sent to the customer. CSP {CSP name} and Technician {name} notified. |
-| K10 | T14 · Wiom CX user sets Completed or Closed during Pending Verification | Complete · Completed | Closed by {Agent name} in Kapture at {time} during verification — reason: Closed by the Wiom CX team. Customer sent the usual closure message. CSP {CSP name} and Technician {name} notified. |
+| K10 | T14 · Wiom CX user sets Completed or Closed during Pending Verification, or after a Reopen | Complete · Completed | Closed by {Agent name} in Kapture at {time} during verification (after a Reopen: "while back with CSP {CSP name}" in place of "during verification") — reason: Closed by the Wiom CX team. Customer sent the usual closure message. CSP {CSP name} and Technician {name} notified. |
 | K11 | A Wiom CX user tries to reopen a Closed ticket in Kapture — blocked | Unchanged (Complete · Completed) | Reopen blocked at {time}: a closed ticket cannot be reopened. Raise a new ticket for the customer. |
 | K12 | Customer says not working and chooses to raise a new ticket | Unchanged (Pending · Resolved) | Customer said the internet is not working at {time} and chose to raise a new ticket; directed to call Wiom. Ticket unchanged. |
 | K13 | Customer taps नहीं and chooses neither option | Unchanged (Pending · Resolved) | Customer said the internet is not working at {time}; no reopen chosen yet. Ticket unchanged. |

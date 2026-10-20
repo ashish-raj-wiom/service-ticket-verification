@@ -50,11 +50,10 @@ import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.es
 const DOCS = [
   { id: "v1.2",  group: "Full PRD",     label: "v1.2 · signed off 15 Oct",   file: "Service_Task_Verification_PRD.md" },
   { id: "short", group: "Full PRD",     label: "Shortened · draft 20 Oct",   file: "Service_Task_Verification_PRD_v1.2-short.md" },
-  { id: "p1",    group: "Phase PRDs",   label: "P1 Core loop",               file: "phases/STV_P1_Core_Loop_PRD.md" },
-  { id: "p2",    group: "Phase PRDs",   label: "P2 Customer reopens from chat", file: "phases/STV_P2_Customer_Reopen_From_Chat_PRD.md" },
-  { id: "p3",    group: "Phase PRDs",   label: "P3 Internet Verdict after the Initial Check", file: "phases/STV_P3_Internet_Verdict_After_Initial_Check_PRD.md" },
-  { id: "p4",    group: "Phase PRDs",   label: "P4 Quality OS and M3",       file: "phases/STV_P4_Quality_OS_Signals_And_M3_PRD.md" },
-  { id: "p5",    group: "Phase PRDs",   label: "P5 Records",                 file: "phases/STV_P5_Records_PRD.md" },
+  { id: "p1",    group: "Phase PRDs",   label: "P1 Core loop (incl. chat reopen)", file: "phases/STV_P1_Core_Loop_PRD.md" },
+  { id: "p2",    group: "Phase PRDs",   label: "P2 Internet Verdict after the Initial Check", file: "phases/STV_P2_Internet_Verdict_After_Initial_Check_PRD.md" },
+  { id: "p3",    group: "Phase PRDs",   label: "P3 Quality OS and M3",       file: "phases/STV_P3_Quality_OS_Signals_And_M3_PRD.md" },
+  { id: "p4",    group: "Phase PRDs",   label: "P4 Records",                 file: "phases/STV_P4_Records_PRD.md" },
 ];
 const want = new URLSearchParams(location.search).get("doc");
 const cur = DOCS.find(d => d.id === want) || DOCS[0];
@@ -71,7 +70,7 @@ for (const g of [...new Set(DOCS.map(d => d.group))]) {
   nav.appendChild(row);
 }
 const note = cur.group === "Phase PRDs"
-  ? " The phase PRDs are split from the shortened PRD; all five are tested together before release (P1 §2)."
+  ? " The phase PRDs are split from the shortened PRD; all four are tested together before release (P1 §2)."
   : cur.id === "short" ? " A shortened draft of v1.2; v1.2 stays the signed-off version." : "";
 document.getElementById("src").innerHTML =
   'Rendered live from <a href="' + cur.file + '">' + cur.file.split("/").pop() + "</a>. This page adds nothing to the document." + note;

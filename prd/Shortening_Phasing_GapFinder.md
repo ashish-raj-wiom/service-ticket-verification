@@ -294,6 +294,19 @@ The same gap-finder prompt that found the first gaps was run on the shortened PR
 
 20 ACs added (P1: AC-R3-8, AC-R5-14, AC-R5-15, AC-R5-16, AC-R12-9, AC-CFG-7 · P2: AC-R2-10, AC-BV-14 · P3: AC-R10-8, AC-R10-9 · P4: AC-R8-18 to AC-R8-25, AC-R11-10); AC-R2-7 rewritten; AC-R8-8, AC-R8-8 and AC-R6-9 edited. Total 129.
 
+
+### Review feedback after approval (ongoing)
+
+Validation of the phase PRDs against Dhruv's latest docs (Harsh posts each finding on the ticket). Wording only; no rule, AC or behaviour changes. Each fix is made in the shortened PRD or the build script, so a rebuild keeps it.
+
+| Date | PRD | Was | Now |
+|---|---|---|---|
+| 20 Oct 2026 | P1 §2 "Only CSPs on the rollout list" | its service tasks, customers | its service tasks, connections |
+| 20 Oct 2026 | P1 §1 Internet Verdict (and the shortened PRD) | today from router signals | today from Netbox signals |
+| 20 Oct 2026 | P2 §2 Objective | a router that comes back late | a Netbox that comes back online late |
+
+After these, no PRD uses "router".
+
 ### Blast radius (20 Oct 2026)
 
 PM: this is a CSP-level rollout. A CSP not on the rollout list must never enter the verification flow; its world works exactly as today. A must-have, to keep the blast radius small. Already the rule (R12, G8, zero tolerance); now stated in every phase PRD and tested in every system: AC-R12-2, AC-R12-5, AC-R12-6, AC-R12-7, AC-R12-8 and the restored whole-day AC-GRD-9 (see Part A §7).

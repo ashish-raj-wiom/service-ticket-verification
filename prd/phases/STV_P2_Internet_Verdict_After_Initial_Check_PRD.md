@@ -27,7 +27,7 @@ The terms of the P1 PRD apply here. This phase adds none.
 
 ## 2. Objective & Guardrails
 
-**Objective.** Wiom keeps asking for the Internet Verdict every hour after the Initial Check, so a router that comes back late is seen: the service task then closes at C-04 as "Internet working, no response" instead of at C-05 as "Not verified". The customer gets no new message.
+**Objective.** Wiom keeps asking for the Internet Verdict every hour after the Initial Check, so a Netbox that comes back online late is seen: the service task then closes at C-04 as "Internet working, no response" instead of at C-05 as "Not verified". The customer gets no new message.
 
 **Only CSPs on the rollout list.** Wiom asks for the Internet Verdict after the Initial Check only for service tasks of CSPs on the rollout list (R12). For a CSP off the list, Wiom asks exactly as today (G8; AC-R12-7).
 

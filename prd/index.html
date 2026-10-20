@@ -52,9 +52,8 @@ const DOCS = [
   { id: "short", group: "Full PRD",     label: "Shortened · draft 20 Oct",   file: "Service_Task_Verification_PRD_v1.2-short.md" },
   { id: "p1",    group: "Phase PRDs",   label: "P1 Core loop (incl. chat reopen)", file: "phases/STV_P1_Core_Loop_PRD.md" },
   { id: "p2",    group: "Phase PRDs",   label: "P2 Internet Verdict after the Initial Check", file: "phases/STV_P2_Internet_Verdict_After_Initial_Check_PRD.md" },
-  { id: "p3",    group: "Phase PRDs",   label: "P3 Quality OS and M3",       file: "phases/STV_P3_Quality_OS_Signals_And_M3_PRD.md" },
+  { id: "p3",    group: "Phase PRDs",   label: "P3 Closure signals: Quality OS, M3, IVR PIN",       file: "phases/STV_P3_Quality_OS_Signals_And_M3_PRD.md" },
   { id: "p4",    group: "Phase PRDs",   label: "P4 Records",                 file: "phases/STV_P4_Records_PRD.md" },
-  { id: "p5",    group: "Phase PRDs",   label: "P5 IVR PIN until Closure",   file: "phases/STV_P5_IVR_PIN_PRD.md" },
   { id: "how",   group: "How it was done", label: "Shortening, phasing and gap finder", file: "Shortening_Phasing_GapFinder.md" },
 ];
 const want = new URLSearchParams(location.search).get("doc");
@@ -72,7 +71,7 @@ for (const g of [...new Set(DOCS.map(d => d.group))]) {
   nav.appendChild(row);
 }
 const note = cur.group === "Phase PRDs"
-  ? " The phase PRDs are split from the shortened PRD; all five are tested together before release (P1 §2)."
+  ? " The phase PRDs are split from the shortened PRD; all four are tested together before release (P1 §2)."
   : cur.id === "short" ? " A shortened draft of v1.2; v1.2 stays the signed-off version." : "";
 document.getElementById("src").innerHTML =
   'Rendered live from <a href="' + cur.file + '">' + cur.file.split("/").pop() + "</a>. This page adds nothing to the document." + note;

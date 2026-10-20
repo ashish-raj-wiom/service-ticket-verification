@@ -3,9 +3,9 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) · Dhruv (product) | **Status** — Draft | **Sign-off** — — |
-| **Version** — P4 of 4 · 20 Oct 2026 · split from v1.2-short (from v1.2, signed off 15 Oct 2026) | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
+| **Version** — P4 of 5 · 20 Oct 2026 · split from v1.2-short (from v1.2, signed off 15 Oct 2026) | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
-| **Phase** — P4 of 4 · needs P1; P2 for one comment (K4) · all 4 PRDs are tested together before release (P1 §2) | | | |
+| **Phase** — P4 of 5 · needs P1; P2 for one comment (K4) · all 5 PRDs are tested together before release (P1 §2) | | | |
 
 **Designs (Figma)** — screens, flows and copy for this spec:
 
@@ -33,7 +33,7 @@ The terms of the P1 PRD apply here. This phase adds none.
 
 ### Phase and testing
 
-P4 of 4; needs P1; P2 for one comment (K4) (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all 4 PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
+P4 of 5; needs P1; P2 for one comment (K4) (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all 5 PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
 
 
 This phase must keep guardrails G6 (P1 §2).
@@ -65,12 +65,14 @@ This phase must keep guardrails G6 (P1 §2).
 | AC-R8-24 | **Given** a service task with the K1 to K3 comments in Kapture, **When** the CSP and the Technician open it in the CSP app and the Technician App, **Then** neither app shows any Kapture comment or the Internet Verdict. | R8 MUST NOT | Settled |
 | AC-R8-25 | **Given** a service task in Pending Verification, **When** the customer replies yes twice, at 15:02 and 15:03, **Then** its Kapture record has one K5 comment, at 15:02. | R8d · T5 | Settled |
 | AC-R8-26 | **Given** the service task from AC-R1-9, **When** the Netbox swap commits at 13:47, **Then** its Kapture record has the K1 comment at 13:47 beginning "Netbox swapped from SY000111 to GX000222 by Technician Ravi at 13:47", with Status Pending, Sub Status Resolved. | R8d · R8a · T1 | Settled |
+| AC-R8-27 | **Given** an ISD service task of Shiv Net, **When** its Manager Rakesh marks it Resolved at 13:47, **Then** its K1 comment begins "Marked Resolved by Rakesh (Manager, CSP Shiv Net) at 13:47". | R8d · T1 | Settled |
+| AC-R8-28 | **Given** the service task from AC-R4-2, positive Internet Verdict at 14:09 on 14 Oct, **When** it auto closes at 13:47 on 16 Oct, **Then** its K8 comment says the Internet Verdict was positive at 14:09 on 14 Oct, with the date. | R8d · T7 | Settled |
 
 ### R11 — Notifications are tracked in the Customer app and the CSP app
 
 | ID | Story | MUST | MUST NOT |
 |---|---|---|---|
-| R11 | As the Wiom Product team, I want every notification in Verification tracked in the Customer app and the CSP app, so that we can see whether customers, CSPs and Technicians get, click and act on them. | **(a)** On T2, T3 and T14, record each push notification sent to the customer — the first message, and the closure message at a Kapture close — with the service task, the message type and the time sent. **(b)** Record when each push notification to the customer is delivered and when it is clicked. **(c)** Record each answer the customer gives in the chat — yes, not working, and the choice to reopen the previous service task or raise a new one — against the same service task. **(d)** Record a push notification that could not be sent. **(e)** In the CSP app and the Technician App, record each Reopen and Closure notification sent to the CSP and the assigned Technician (R5f, R4f), with the service task, the type and the time sent, and when it is delivered and when it is clicked, or that it could not be sent. | Delay or hold back a message while it is being recorded. Let whether a notification was delivered or clicked change when the service task closes; sent still counts as told (R3d). |
+| R11 | As the Wiom Product team, I want every notification in Verification tracked in the Customer app and the CSP app, so that we can see whether customers, CSPs and Technicians get, click and act on them. | **(a)** On T2, T3 and T14, record each push notification sent to the customer — the first message, and the closure message at a Kapture close — with the service task, the message type and the time sent. **(b)** Record when each push notification to the customer is delivered and when it is clicked. **(c)** Record each answer the customer gives in the chat — yes, not working, and the choice to reopen the previous service task or raise a new one — against the same service task. **(d)** Record a push notification that could not be sent. **(e)** In the CSP app and the Technician App, record each Reopen and Closure notification sent to each of the CSP's Owner, Manager and Manager+ and the assigned Technician (R5f, R4f), one record per person, with the service task, the type and the time sent, and when it is delivered and when it is clicked, or that it could not be sent. | Delay or hold back a message while it is being recorded. Let whether a notification was delivered or clicked change when the service task closes; sent still counts as told (R3d). |
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
@@ -82,10 +84,11 @@ This phase must keep guardrails G6 (P1 §2).
 | AC-R11-8 | **Given** the Closure notification from AC-R4-10, sent at 13:47 on 16 Oct and delivered at 13:48, **When** the CSP never clicks it, **Then** a record exists for that service task showing a "closed" notification sent at 13:47, delivered at 13:48 and not clicked. | R11e · T7 | Settled |
 | AC-R11-9 | **Given** the Reopen from AC-R5-13, **When** the assigned Technician's phone receives the Technician App notification at 16:06 and the Technician clicks it at 16:12, **Then** records exist for that service task showing a "reopened" Technician App notification sent at 16:05, delivered at 16:06 and clicked at 16:12. | R11e · T6 | Settled |
 | AC-R11-10 | **Given** the Reopen from AC-R5-13, **When** the CSP app notification to Shiv Net's Owner cannot be sent at 16:05, **Then** a record exists for that service task showing a "reopened" notification that could not be sent at 16:05. | R11e · T6 | Settled |
+| AC-R11-11 | **Given** the Closure notification from AC-R4-10, sent at 13:47 to Shiv Net's Owner, Manager and Manager+, **When** only the Manager clicks it, at 14:00, **Then** three records exist for that service task, one per person, and only the Manager's shows clicked at 14:00. | R11e · T7 | Settled |
 
 #### Kapture status and comment per action
 
-Each comment is added by Wiom in Kapture at the moment of the action, and only for the actions listed here (an app notification that could not be sent gets no comment), with the Status and Sub Status shown. `{…}` is filled with the actual value; times are IST; durations are the current values of C-01, C-04 and C-05. A Kapture close before any Resolved mark (T15) adds nothing new: it works as today. Wherever a comment names the Technician, "and Technician {name}" is left out when no Technician is assigned. One comment per action that takes effect: a repeated tap that changes nothing (for example a second yes) adds none.
+Each comment is added by Wiom in Kapture at the moment of the action, and only for the actions listed here (an app notification that could not be sent gets no comment), with the Status and Sub Status shown. `{…}` is filled with the actual value; times are IST, with the date added when the event was on a different day from the comment; {name} is the person who acted, with their designation (Owner, Manager, Manager+ or Technician); durations are the current values of C-01, C-04 and C-05. A Kapture close before any Resolved mark (T15) adds nothing new: it works as today. Wherever a comment names the Technician, "and Technician {name}" is left out when no Technician is assigned. One comment per action that takes effect: a repeated tap that changes nothing (for example a second yes) adds none.
 
 | # | Action | Status · Sub Status after it | Comment text |
 |---|---|---|---|
@@ -101,7 +104,7 @@ Each comment is added by Wiom in Kapture at the moment of the action, and only f
 | K10 | T14 · Wiom CX user sets Completed or Closed during Pending Verification | Complete · Completed | Closed by {Agent name} in Kapture at {time} during verification — reason: Closed by the Wiom CX team. Customer sent the usual closure message. CSP {CSP name} and Technician {name} notified. |
 | K11 | A Wiom CX user tries to reopen a Closed ticket in Kapture — blocked | Unchanged (Complete · Completed) | Reopen blocked at {time}: a closed ticket cannot be reopened. Raise a new ticket for the customer. |
 | K12 | Customer says not working and chooses to raise a new ticket | Unchanged (Pending · Resolved) | Customer said the internet is not working at {time} and chose to raise a new ticket; directed to call Wiom. Ticket unchanged. |
-| K13 | Customer taps नहीं and chooses neither option | Unchanged (Pending · Resolved) | Customer said the internet is not working at {time} but did not choose to reopen the ticket. Ticket unchanged. |
+| K13 | Customer taps नहीं and chooses neither option | Unchanged (Pending · Resolved) | Customer said the internet is not working at {time}; no reopen chosen yet. Ticket unchanged. |
 | K14 | Customer tries to reopen a Closed ticket in the chat — refused | Unchanged (Complete · Completed) | Customer tried to reopen the closed ticket at {time} (via app); refused, as a closed ticket cannot be reopened. |
 
 In P1, Kapture already shows the Status and Sub Status in this table (R8a–c); P4 adds the comments.

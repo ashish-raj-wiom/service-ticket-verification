@@ -5,10 +5,10 @@ What was done to PRD v1.2 (signed off 15 Oct 2026) after Marut's review, 20 Oct 
 | Step | Output | Part |
 |---|---|---|
 | 1. Shorten v1.2 by removing repetition | `Service_Task_Verification_PRD_v1.2-short.md` | A |
-| 2. Split the shortened PRD into phases | Four phase PRDs in `phases/`: P1 Core loop · P2 Internet Verdict after the Initial Check · P3 Quality OS signals and M3 · P4 Records | B |
+| 2. Split the shortened PRD into phases | Five phase PRDs in `phases/`: P1 Core loop · P2 Internet Verdict after the Initial Check · P3 Quality OS signals and M3 · P4 Records · P5 IVR PIN until Closure | B |
 | 3. Run the product-gap prompt on every PRD, and decide every gap | Decisions applied to the shortened PRD, and from it to the phase PRDs | C |
 
-The four phase PRDs are built and tested one by one, then tested together and shipped together, CSP by CSP through the rollout list (P1 §2).
+The five phase PRDs are built and tested one by one, then tested together and shipped together, CSP by CSP through the rollout list (P1 §2).
 
 ---
 
@@ -18,10 +18,10 @@ Step 1 of 2 (shortening). Sizes include the small additions from Part C (20 Oct 
 
 | | v1.2 | v1.2-short |
 |---|---|---|
-| Characters | 91,710 | 85,741 (−7%) |
-| Words | 16,797 | 15,876 |
+| Characters | 91,710 | 91,913 (+0%) |
+| Words | 16,797 | 17,050 |
 | Terms in §1 | 25 | 16 |
-| ACs | 133 | 137 (27 removed, 1 restored, 31 added; see §7 and Part C) |
+| ACs | 133 | 152 (27 removed, 1 restored, 45 added; see §7 and Part C) |
 | Sections | §1–§8 | §1–§6 |
 | Rule obligations and guardrails with a test | 110 | 110 (none lost) |
 
@@ -135,33 +135,34 @@ PM: a CSP off the rollout list must never enter the verification flow; its world
 
 Not a cut: the gap finder was run again on the shortened PRD and the phase PRDs, and the PM's decisions were applied. 20 ACs added and 3 edited, R2d, R3, R4h, R5b, R5g, R6b, R6c, R6e, R9c, R10, R11e, R12d and the K table changed. Every change is listed in Part C, round 2. It is noted here because it moves the size table.
 
-### 8. Why it is still 86k characters
+### 8. Why it is still 92k characters
 
-Shortening alone took v1.2 from 91.7k to 72.6k characters (−20%); the tests added for the blast radius, the gap review and the Netbox swap (Part C) bring it to 86k (−7%). The 27 removed ACs were the repeats. What remains is one test per obligation, plus edge, race and config tests. Most of the remaining size is the rule rows (the R4, R5 and R8 MUST cells are long) and the K1–K14 Kapture comment table. Shortening those would change wording that was signed off, so it was left for a separate decision.
+Shortening alone took v1.2 from 91.7k to 72.6k characters (−20%); the tests added for the blast radius, the gap reviews, the Netbox swap and the IVR PIN (Part C) bring it to 92k (+0%). The 27 removed ACs were the repeats. What remains is one test per obligation, plus edge, race and config tests. Most of the remaining size is the rule rows (the R4, R5 and R8 MUST cells are long) and the K1–K14 Kapture comment table. Shortening those would change wording that was signed off, so it was left for a separate decision.
 
 ---
 
 ## Part B — Phasing
 
-Step 2 of 2 (phases), 20 Oct 2026. Split from `Service_Task_Verification_PRD_v1.2-short.md` (Part A) into four PRDs in `phases/`. Neither v1.2 nor v1.2-short is edited by the split. Built by script (scratchpad `split_prd4.js`), so the PRDs can be rebuilt after any change to v1.2-short. An earlier phasing proposal was not used and has been deleted (PM, 20 Oct).
+Step 2 of 2 (phases), 20 Oct 2026. Split from `Service_Task_Verification_PRD_v1.2-short.md` (Part A) into five PRDs in `phases/`. Neither v1.2 nor v1.2-short is edited by the split. Built by script (scratchpad `split_prd4.js`), so the PRDs can be rebuilt after any change to v1.2-short. An earlier phasing proposal was not used and has been deleted (PM, 20 Oct).
 
 ### The model
 
 - **Marut:** too long to implement and test in one go, so roll it out in phases.
 - **PM:** the whole feature must be tested together for completeness.
-- **So:** four PRDs, one per phase. Each phase is built and tested behind the rollout list while it is empty. All four are then tested together on one build, and released once, with CSPs added to the rollout list one by one. Nothing goes live between phases, so no in-between behaviour, no new ACs and no change to any rule were needed.
+- **So:** five PRDs, one per phase. Each phase is built and tested behind the rollout list while it is empty. All five are then tested together on one build, and released once, with CSPs added to the rollout list one by one. Nothing goes live between phases, so no in-between behaviour, no new ACs and no change to any rule were needed.
 
-### The four PRDs
+### The five PRDs
 
 | Phase | File | Builds | Needs | ACs | Characters |
 |---|---|---|---|---|---|
-| P1 Core loop | `phases/STV_P1_Core_Loop_PRD.md` | Pending Verification, Internet Verdict at the mark and through the Initial Check, first message, yes, the three closure paths and reasons, the customer's reopen from the chat and a Wiom CX user's reopen, Kapture close, CSP TAT, Closed is final, CSP and Technician notifications, Kapture statuses (never acting on a status Wiom set), rollout list | — | 78 | 59,381 |
-| P2 Internet Verdict after the Initial Check | `phases/STV_P2_Internet_Verdict_After_Initial_Check_PRD.md` | Asks every C-14 until C-04; a late positive verdict; stopping at C-04 (R2c, R2d after the Initial Check, R3e, R4d) | P1 | 10 | 9,604 |
-| P3 Quality OS | `phases/STV_P3_Quality_OS_Signals_And_M3_PRD.md` | Signals only at Closure, with reason and within TAT; M3 pause, resume, fixed cycles, pass mark (R6, R10) | P1 | 24 | 16,251 |
-| P4 Records | `phases/STV_P4_Records_PRD.md` | Kapture comments K1–K14 (R8d); notification and chat-answer records (R11) | P1 | 25 | 17,743 |
-| **Total** | | | | **137** | |
+| P1 Core loop | `phases/STV_P1_Core_Loop_PRD.md` | Pending Verification, Internet Verdict at the mark and through the Initial Check, first message, yes, the three closure paths and reasons, the customer's reopen from the chat and a Wiom CX user's reopen, Kapture close, CSP TAT, Closed is final, CSP and Technician notifications, Kapture statuses (never acting on a status Wiom set), rollout list | — | 83 | 61,697 |
+| P2 Internet Verdict after the Initial Check | `phases/STV_P2_Internet_Verdict_After_Initial_Check_PRD.md` | Asks every C-14 until C-04; a late positive verdict; stopping at C-04 (R2c, R2d after the Initial Check, R3e, R4d) | P1 | 10 | 9,815 |
+| P3 Quality OS | `phases/STV_P3_Quality_OS_Signals_And_M3_PRD.md` | Signals only at Closure, with reason and within TAT; M3 pause, resume, fixed cycles, pass mark (R6, R10) | P1 | 26 | 17,215 |
+| P4 Records | `phases/STV_P4_Records_PRD.md` | Kapture comments K1–K14 (R8d); notification and chat-answer records (R11) | P1 | 28 | 18,759 |
+| P5 IVR PIN until Closure | `phases/STV_P5_IVR_PIN_PRD.md` | The IVR PIN stays allocated through Pending Verification and every Reopen, and is released at Closure (R13) | P1 | 5 | 5,237 |
+| **Total** | | | | **152** | |
 
-Every one of the 137 ACs is in exactly one PRD (checked by the script). P2 and P3 need only P1; P4 needs P1, and P2 for one comment (K4). They can be built in parallel.
+Every one of the 152 ACs is in exactly one PRD (checked by the script). P2, P3 and P5 need only P1; P4 needs P1, and P2 for one comment (K4). They can be built in parallel.
 
 **Why the chat reopen is in P1 (PM, 20 Oct):** it is one tap on a path P1 already builds (the Reopen), and the customer's own reopen is the core of the objective. The first split had it as its own phase; merging it also removed the gap where three P1 behaviours (R5b, R5e, R5f) were first tested at a later gate.
 
@@ -178,7 +179,7 @@ Every one of the 137 ACs is in exactly one PRD (checked by the script). P2 and P
 | Phases and test gates | P1 §2 in full (table of the four PRDs, three test gates); a short version in each other PRD |
 | Guardrails | P1: G1, G2, G3, G5, G6, G7, G8; P3: G4, G5; P2 and P4 name the ones they must keep |
 | Rules split by letter | R2: P1 (a, b, d at the mark and in the Initial Check) · P2 (c, d after it). R3: P1 (a–d) · P2 (e). R4: P1 (a–c, e–h) · P2 (d). R8: P1 (a–c, e–g) · P4 (d). Letters are kept, so every cross-reference still holds |
-| Whole rules | P1: R1, R5, R7, R9, R12 · P3: R6, R10 · P4: R11 |
+| Whole rules | P1: R1, R5, R7, R9, R12 · P3: R6, R10 · P4: R11 · P5: R13 |
 | MUST NOT split | R2 "count a positive Internet Verdict after C-04" → P2. R8 "show the CSP what the Kapture comments say" → P4. P2's R4 points to P1's MUST NOT |
 | R2d | Rewritten in two halves: P1 asks at the mark and every C-13 in the Initial Check; P2 asks every C-14 after it. Same meaning, split at the Initial Check |
 | K1–K14 table | P4; P1's R8a–c already set the Status and Sub Status columns |
@@ -194,14 +195,15 @@ The earliest phase at which everything it checks exists:
 
 Corrected by hand: AC-R2-8 → P2 (47 hourly asks); AC-R2-7 → P2 (its verdict is asked at 15:30, after the Initial Check).
 
-### Assignment (137 ACs)
+### Assignment (152 ACs)
 
 | Phase | ACs | IDs |
 |---|---|---|
-| P1 | 78 | R1-1 · R1-2 · R1-4 · R1-6 · R1-5 · R2-1 · R2-6 · R2-2 · R2-3 · R2-7 · R3-1 · R3-2 · R3-4 · R4-1 · R4-2 · R4-3 · R4-10 · R4-11 · R4-13 · R4-7 · R5-1 · R5-2 · R5-13 · R5-3 · R5-4 · R5-7 · R5-5 · R5-6 · R5-10 · R5-11 · R7-1 · R7-2 · R8-1 · R8-2 · R8-3 · R8-8 · R8-9 · R8-10 · R8-13 · R8-14 · R8-15 · R9-1 · R9-2 · R9-4 · R12-2 · R12-3 · R12-4 · WF-2 · REG-2 · GRD-1 · GRD-2 · GRD-3 · GRD-8 · BV-1 · RACE-1 · RACE-2 · RACE-5 · CFG-1 · CFG-2 · CFG-3 · CFG-5 · BV-11 · DUP-2 · DUP-3 · GRD-9 · R12-6 · R3-8 · R12-9 · R5-14 · R5-15 · R5-16 · CFG-7 · R1-9 · R1-10 · R2-11 · R3-9 · R5-17 · R12-10 |
+| P1 | 83 | R1-1 · R1-2 · R1-4 · R1-6 · R1-5 · R2-1 · R2-6 · R2-2 · R2-3 · R2-7 · R3-1 · R3-2 · R3-4 · R4-1 · R4-2 · R4-3 · R4-10 · R4-11 · R4-13 · R4-7 · R5-1 · R5-2 · R5-13 · R5-3 · R5-4 · R5-7 · R5-5 · R5-6 · R5-10 · R5-11 · R7-1 · R7-2 · R8-1 · R8-2 · R8-3 · R8-8 · R8-9 · R8-10 · R8-13 · R8-14 · R8-15 · R9-1 · R9-2 · R9-4 · R12-2 · R12-3 · R12-4 · WF-2 · REG-2 · GRD-1 · GRD-2 · GRD-3 · GRD-8 · BV-1 · RACE-1 · RACE-2 · RACE-5 · CFG-1 · CFG-2 · CFG-3 · CFG-5 · BV-11 · DUP-2 · DUP-3 · GRD-9 · R12-6 · R3-8 · R12-9 · R5-14 · R5-15 · R5-16 · CFG-7 · R1-9 · R1-10 · R2-11 · R3-9 · R5-17 · R12-10 · R4-17 · R3-10 · RACE-6 · RACE-7 · R5-18 |
 | P2 | 10 | R2-4 · R2-8 · R3-6 · R4-8 · BV-2 · CFG-6 · BV-12 · R12-7 · R2-10 · BV-14 |
-| P3 | 24 | R6-1 · R6-3 · R6-4 · R6-5 · R6-6 · R6-7 · R6-8 · R6-9 · R10-1 · R10-2 · R10-3 · R10-4 · R10-5 · R10-6 · R10-7 · R12-5 · BV-7 · BV-8 · BV-9 · RACE-3 · DUP-1 · R10-8 · R10-9 · R6-11 |
-| P4 | 25 | R8-4 · R8-5 · R8-6 · R8-11 · R8-12 · R8-16 · R11-2 · R11-3 · R11-4 · R11-5 · R11-7 · R11-8 · R11-9 · GRD-6 · R12-8 · R8-18 · R8-19 · R8-20 · R8-21 · R8-22 · R8-23 · R8-24 · R8-25 · R11-10 · R8-26 |
+| P3 | 26 | R6-1 · R6-3 · R6-4 · R6-5 · R6-6 · R6-7 · R6-8 · R6-9 · R10-1 · R10-2 · R10-3 · R10-4 · R10-5 · R10-6 · R10-7 · R12-5 · BV-7 · BV-8 · BV-9 · RACE-3 · DUP-1 · R10-8 · R10-9 · R6-11 · R10-10 · R6-12 |
+| P4 | 28 | R8-4 · R8-5 · R8-6 · R8-11 · R8-12 · R8-16 · R11-2 · R11-3 · R11-4 · R11-5 · R11-7 · R11-8 · R11-9 · GRD-6 · R12-8 · R8-18 · R8-19 · R8-20 · R8-21 · R8-22 · R8-23 · R8-24 · R8-25 · R11-10 · R8-26 · R11-11 · R8-27 · R8-28 |
+| P5 | 5 | R13-1 · R13-2 · R13-3 · R13-4 · R13-5 |
 
 Machine-readable: `notes/phase-assignment.json`.
 
@@ -217,6 +219,7 @@ Every phase PRD opens §2 with **Only CSPs on the rollout list**: what that phas
 | 20 Oct 2026 | Chat reopen merged into P1 (PM: "it's just a tap which reopens the ticket"). Four PRDs; the others renumbered (P3→P2, P4→P3, P5→P4). The live page and the publish script follow |
 | 20 Oct 2026 | Gap review round 2: 20 ACs added and placed (P1 +6, P2 +2, P3 +2, P4 +10); AC-R8-8 and AC-R2-7 moved to P1; P4 now also needs P2 for K4 (Part C) |
 | 20 Oct 2026 | Netbox swap counts as the Resolved mark: 8 ACs added (P1 +6, P3 +1, P4 +1); R2e added to P1 (Part C) |
+| 20 Oct 2026 | Gap review round 3: P1, P2, P3, P4 gain the round-3 ACs; IVR PIN rule R13 becomes its own phase P5 (needs P1). Five PRDs (Part C) |
 
 ### Fixes made while splitting
 
@@ -224,7 +227,7 @@ Every phase PRD opens §2 with **Only CSPs on the rollout list**: what that phas
 
 ### Open
 
-- P1 is about 59k characters, well over the 20k Marut used; it holds the core and 78 ACs. Shortening it further means cutting signed-off rule wording or ACs that are the only test of an obligation.
+- P1 is about 62k characters, well over the 20k Marut used; it holds the core and 83 ACs. Shortening it further means cutting signed-off rule wording or ACs that are the only test of an obligation.
 - Engineering to confirm the build order and whether P2–P4 run in parallel.
 - Rebuild with `split_prd4.js` after any change to v1.2-short, then update this part.
 
@@ -315,6 +318,30 @@ PM: a committed swap should go to Pending Verification like any Resolved mark. S
 | ACs | AC-R1-5 edited (no swap offered in Pending Verification). New: AC-R1-9, AC-R1-10, AC-R2-11, AC-R3-9, AC-R5-17, AC-R12-10 (P1) · AC-R6-11 (P3) · AC-R8-26 (P4) |
 
 Code reference for engineering (not in the PRD): `DeviceSwapServiceImpl.handleSwapCommitted` → `ResolutionFinalizer.finalizeResolvedSystemVerified(…, "PASS")`; a swap starts only for an ASSIGNED or ESCALATED complaint; `SWAP_FAILED` leaves it open.
+
+### Round 3 — gap finder run again after the swap change (20 Oct 2026)
+
+Same prompt, one reviewer per document (shortened PRD, P1–P4). 23 findings, 17 distinct after merging: 4 already decided (fallback channel, coupon timing, where Product reads exit causes, attribution after a CSP move), 3 fixed without a decision, 10 for the PM.
+
+| # | Finding | Decision (PM) | Change |
+|---|---|---|---|
+| F1 | Is 2 per half-month as strict as today's M3? | — (fact) | C-10 notes today's rolling 15-day window, so the bar is the same |
+| F2 | Comment times without a date | — | Comments add the date when the event was on another day; AC-R8-28 |
+| F3 | K13 at the नहीं tap contradicts a later reopen | — | K13 reads "no reopen chosen yet" |
+| D1 | Kapture close of a Reopened task | Same as a close in Pending Verification | R4h; diagram edge; AC-R4-17 |
+| D2 | G3 vs a CX reopen or close in the Initial Check | No first message when a CX user reopens (or closes) before it is due | New R3g; G3 narrowed; AC-R3-10 |
+| D3 | Other same-instant ties | Customer's answer first, then a CX action, then a timer | Precedence line; AC-RACE-6, AC-RACE-7 |
+| D4 | What the customer sees after a chat Reopen | Already in the customer app design | New R5i points to the design; AC-R5-18 |
+| D5 | No check in the last 30–59 min before C-04 | One last ask at the moment C-04 runs out | R2d; AC-R2-8 (48 asks); AC-BV-12 rewritten |
+| D6 | A late verdict from another task's fix | No issue: every task has its own verification window | None |
+| D7 | M3 in the cycle a CSP joins or leaves | The pause in Pending Verification applies to every task under this spec; counted once | R10g; AC-R10-10 |
+| D8 | Quality OS period for a task Resolved and Closed in different periods | The period of Closure | New R6f; AC-R6-12 |
+| D9 | Comments for answers that change nothing | Ignore | None |
+| D10 | Tracking per person or per CSP; whose name in comments | Per person; name with designation | R11e; comment preamble; AC-R11-11, AC-R8-27 |
+
+### IVR PIN until Closure (20 Oct 2026)
+
+PM: the IVR PIN is released at Closure, not at the Resolved mark; it is not part of the core (P1). No PRD covered it. New rule R13 (keep the PIN through Pending Verification and every Reopen; release at Closure; off-list CSPs and T15 as today; never at the mark or a swap), with AC-R13-1 to AC-R13-5, in its own phase **P5 IVR PIN until Closure**, which needs only P1. R12b also says the PIN is released as today for off-list CSPs. Engineering reference (not in the PRD): the PIN lives in the `IVR_PIN_Registry` table of the IVR service.
 
 ### Review feedback after approval (ongoing)
 

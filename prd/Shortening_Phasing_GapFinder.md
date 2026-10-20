@@ -18,10 +18,10 @@ Step 1 of 2 (shortening). Sizes include the small additions from Part C (20 Oct 
 
 | | v1.2 | v1.2-short |
 |---|---|---|
-| Characters | 91,710 | 81,989 (−11%) |
-| Words | 16,797 | 15,176 |
+| Characters | 91,710 | 85,741 (−7%) |
+| Words | 16,797 | 15,876 |
 | Terms in §1 | 25 | 16 |
-| ACs | 133 | 129 (27 removed, 1 restored, 23 added; see §7 and Part C, round 2) |
+| ACs | 133 | 137 (27 removed, 1 restored, 31 added; see §7 and Part C) |
 | Sections | §1–§8 | §1–§6 |
 | Rule obligations and guardrails with a test | 110 | 110 (none lost) |
 
@@ -135,9 +135,9 @@ PM: a CSP off the rollout list must never enter the verification flow; its world
 
 Not a cut: the gap finder was run again on the shortened PRD and the phase PRDs, and the PM's decisions were applied. 20 ACs added and 3 edited, R2d, R3, R4h, R5b, R5g, R6b, R6c, R6e, R9c, R10, R11e, R12d and the K table changed. Every change is listed in Part C, round 2. It is noted here because it moves the size table.
 
-### 8. Why it is still 82k characters
+### 8. Why it is still 86k characters
 
-Shortening alone took v1.2 from 91.7k to 72.6k characters (−20%); the tests added for the blast radius and the gap review (Part C) bring it to 82k (−11%). The 27 removed ACs were the repeats. What remains is one test per obligation, plus edge, race and config tests. Most of the remaining size is the rule rows (the R4, R5 and R8 MUST cells are long) and the K1–K14 Kapture comment table. Shortening those would change wording that was signed off, so it was left for a separate decision.
+Shortening alone took v1.2 from 91.7k to 72.6k characters (−20%); the tests added for the blast radius, the gap review and the Netbox swap (Part C) bring it to 86k (−7%). The 27 removed ACs were the repeats. What remains is one test per obligation, plus edge, race and config tests. Most of the remaining size is the rule rows (the R4, R5 and R8 MUST cells are long) and the K1–K14 Kapture comment table. Shortening those would change wording that was signed off, so it was left for a separate decision.
 
 ---
 
@@ -155,13 +155,13 @@ Step 2 of 2 (phases), 20 Oct 2026. Split from `Service_Task_Verification_PRD_v1.
 
 | Phase | File | Builds | Needs | ACs | Characters |
 |---|---|---|---|---|---|
-| P1 Core loop | `phases/STV_P1_Core_Loop_PRD.md` | Pending Verification, Internet Verdict at the mark and through the Initial Check, first message, yes, the three closure paths and reasons, the customer's reopen from the chat and a Wiom CX user's reopen, Kapture close, CSP TAT, Closed is final, CSP and Technician notifications, Kapture statuses (never acting on a status Wiom set), rollout list | — | 72 | 56,353 |
-| P2 Internet Verdict after the Initial Check | `phases/STV_P2_Internet_Verdict_After_Initial_Check_PRD.md` | Asks every C-14 until C-04; a late positive verdict; stopping at C-04 (R2c, R2d after the Initial Check, R3e, R4d) | P1 | 10 | 9,597 |
-| P3 Quality OS | `phases/STV_P3_Quality_OS_Signals_And_M3_PRD.md` | Signals only at Closure, with reason and within TAT; M3 pause, resume, fixed cycles, pass mark (R6, R10) | P1 | 23 | 15,995 |
-| P4 Records | `phases/STV_P4_Records_PRD.md` | Kapture comments K1–K14 (R8d); notification and chat-answer records (R11) | P1 | 24 | 17,273 |
-| **Total** | | | | **129** | |
+| P1 Core loop | `phases/STV_P1_Core_Loop_PRD.md` | Pending Verification, Internet Verdict at the mark and through the Initial Check, first message, yes, the three closure paths and reasons, the customer's reopen from the chat and a Wiom CX user's reopen, Kapture close, CSP TAT, Closed is final, CSP and Technician notifications, Kapture statuses (never acting on a status Wiom set), rollout list | — | 78 | 59,381 |
+| P2 Internet Verdict after the Initial Check | `phases/STV_P2_Internet_Verdict_After_Initial_Check_PRD.md` | Asks every C-14 until C-04; a late positive verdict; stopping at C-04 (R2c, R2d after the Initial Check, R3e, R4d) | P1 | 10 | 9,604 |
+| P3 Quality OS | `phases/STV_P3_Quality_OS_Signals_And_M3_PRD.md` | Signals only at Closure, with reason and within TAT; M3 pause, resume, fixed cycles, pass mark (R6, R10) | P1 | 24 | 16,251 |
+| P4 Records | `phases/STV_P4_Records_PRD.md` | Kapture comments K1–K14 (R8d); notification and chat-answer records (R11) | P1 | 25 | 17,743 |
+| **Total** | | | | **137** | |
 
-Every one of the 129 ACs is in exactly one PRD (checked by the script). P2 and P3 need only P1; P4 needs P1, and P2 for one comment (K4). They can be built in parallel.
+Every one of the 137 ACs is in exactly one PRD (checked by the script). P2 and P3 need only P1; P4 needs P1, and P2 for one comment (K4). They can be built in parallel.
 
 **Why the chat reopen is in P1 (PM, 20 Oct):** it is one tap on a path P1 already builds (the Reopen), and the customer's own reopen is the core of the objective. The first split had it as its own phase; merging it also removed the gap where three P1 behaviours (R5b, R5e, R5f) were first tested at a later gate.
 
@@ -194,14 +194,14 @@ The earliest phase at which everything it checks exists:
 
 Corrected by hand: AC-R2-8 → P2 (47 hourly asks); AC-R2-7 → P2 (its verdict is asked at 15:30, after the Initial Check).
 
-### Assignment (129 ACs)
+### Assignment (137 ACs)
 
 | Phase | ACs | IDs |
 |---|---|---|
-| P1 | 72 | R1-1 · R1-2 · R1-4 · R1-6 · R1-5 · R2-1 · R2-6 · R2-2 · R2-3 · R2-7 · R3-1 · R3-2 · R3-4 · R4-1 · R4-2 · R4-3 · R4-10 · R4-11 · R4-13 · R4-7 · R5-1 · R5-2 · R5-13 · R5-3 · R5-4 · R5-7 · R5-5 · R5-6 · R5-10 · R5-11 · R7-1 · R7-2 · R8-1 · R8-2 · R8-3 · R8-8 · R8-9 · R8-10 · R8-13 · R8-14 · R8-15 · R9-1 · R9-2 · R9-4 · R12-2 · R12-3 · R12-4 · WF-2 · REG-2 · GRD-1 · GRD-2 · GRD-3 · GRD-8 · BV-1 · RACE-1 · RACE-2 · RACE-5 · CFG-1 · CFG-2 · CFG-3 · CFG-5 · BV-11 · DUP-2 · DUP-3 · GRD-9 · R12-6 · R3-8 · R12-9 · R5-14 · R5-15 · R5-16 · CFG-7 |
+| P1 | 78 | R1-1 · R1-2 · R1-4 · R1-6 · R1-5 · R2-1 · R2-6 · R2-2 · R2-3 · R2-7 · R3-1 · R3-2 · R3-4 · R4-1 · R4-2 · R4-3 · R4-10 · R4-11 · R4-13 · R4-7 · R5-1 · R5-2 · R5-13 · R5-3 · R5-4 · R5-7 · R5-5 · R5-6 · R5-10 · R5-11 · R7-1 · R7-2 · R8-1 · R8-2 · R8-3 · R8-8 · R8-9 · R8-10 · R8-13 · R8-14 · R8-15 · R9-1 · R9-2 · R9-4 · R12-2 · R12-3 · R12-4 · WF-2 · REG-2 · GRD-1 · GRD-2 · GRD-3 · GRD-8 · BV-1 · RACE-1 · RACE-2 · RACE-5 · CFG-1 · CFG-2 · CFG-3 · CFG-5 · BV-11 · DUP-2 · DUP-3 · GRD-9 · R12-6 · R3-8 · R12-9 · R5-14 · R5-15 · R5-16 · CFG-7 · R1-9 · R1-10 · R2-11 · R3-9 · R5-17 · R12-10 |
 | P2 | 10 | R2-4 · R2-8 · R3-6 · R4-8 · BV-2 · CFG-6 · BV-12 · R12-7 · R2-10 · BV-14 |
-| P3 | 23 | R6-1 · R6-3 · R6-4 · R6-5 · R6-6 · R6-7 · R6-8 · R6-9 · R10-1 · R10-2 · R10-3 · R10-4 · R10-5 · R10-6 · R10-7 · R12-5 · BV-7 · BV-8 · BV-9 · RACE-3 · DUP-1 · R10-8 · R10-9 |
-| P4 | 24 | R8-4 · R8-5 · R8-6 · R8-11 · R8-12 · R8-16 · R11-2 · R11-3 · R11-4 · R11-5 · R11-7 · R11-8 · R11-9 · GRD-6 · R12-8 · R8-18 · R8-19 · R8-20 · R8-21 · R8-22 · R8-23 · R8-24 · R8-25 · R11-10 |
+| P3 | 24 | R6-1 · R6-3 · R6-4 · R6-5 · R6-6 · R6-7 · R6-8 · R6-9 · R10-1 · R10-2 · R10-3 · R10-4 · R10-5 · R10-6 · R10-7 · R12-5 · BV-7 · BV-8 · BV-9 · RACE-3 · DUP-1 · R10-8 · R10-9 · R6-11 |
+| P4 | 25 | R8-4 · R8-5 · R8-6 · R8-11 · R8-12 · R8-16 · R11-2 · R11-3 · R11-4 · R11-5 · R11-7 · R11-8 · R11-9 · GRD-6 · R12-8 · R8-18 · R8-19 · R8-20 · R8-21 · R8-22 · R8-23 · R8-24 · R8-25 · R11-10 · R8-26 |
 
 Machine-readable: `notes/phase-assignment.json`.
 
@@ -216,6 +216,7 @@ Every phase PRD opens §2 with **Only CSPs on the rollout list**: what that phas
 | 20 Oct 2026 | First split: five PRDs (P1 core, P2 customer reopens from the chat, P3 verdict after the Initial Check, P4 Quality OS, P5 records) |
 | 20 Oct 2026 | Chat reopen merged into P1 (PM: "it's just a tap which reopens the ticket"). Four PRDs; the others renumbered (P3→P2, P4→P3, P5→P4). The live page and the publish script follow |
 | 20 Oct 2026 | Gap review round 2: 20 ACs added and placed (P1 +6, P2 +2, P3 +2, P4 +10); AC-R8-8 and AC-R2-7 moved to P1; P4 now also needs P2 for K4 (Part C) |
+| 20 Oct 2026 | Netbox swap counts as the Resolved mark: 8 ACs added (P1 +6, P3 +1, P4 +1); R2e added to P1 (Part C) |
 
 ### Fixes made while splitting
 
@@ -223,7 +224,7 @@ Every phase PRD opens §2 with **Only CSPs on the rollout list**: what that phas
 
 ### Open
 
-- P1 is about 56k characters, well over the 20k Marut used; it holds the core and 72 ACs. Shortening it further means cutting signed-off rule wording or ACs that are the only test of an obligation.
+- P1 is about 59k characters, well over the 20k Marut used; it holds the core and 78 ACs. Shortening it further means cutting signed-off rule wording or ACs that are the only test of an obligation.
 - Engineering to confirm the build order and whether P2–P4 run in parallel.
 - Rebuild with `split_prd4.js` after any change to v1.2-short, then update this part.
 
@@ -294,6 +295,26 @@ The same gap-finder prompt that found the first gaps was run on the shortened PR
 
 20 ACs added (P1: AC-R3-8, AC-R5-14, AC-R5-15, AC-R5-16, AC-R12-9, AC-CFG-7 · P2: AC-R2-10, AC-BV-14 · P3: AC-R10-8, AC-R10-9 · P4: AC-R8-18 to AC-R8-25, AC-R11-10); AC-R2-7 rewritten; AC-R8-8, AC-R8-8 and AC-R6-9 edited. Total 129.
 
+
+### Netbox swap as a Resolved mark (20 Oct 2026)
+
+Found by a code review after approval: today a committed Netbox swap resolves and closes the service task on its own ("swap-as-closure"), with no Resolved mark, recorded as system verified without asking Connection Validation Service, and with the Quality OS signal at the swap. About 30 swaps a day (about 1.7% of service tasks created, 6–19 Oct). None of the PRDs mentioned it, so for CSPs on the rollout list a swap would have skipped verification.
+
+PM: a committed swap should go to Pending Verification like any Resolved mark. Same Initial Check (no swap-specific timer); the Kapture comment names whoever confirmed the swap.
+
+| Where | Change |
+|---|---|
+| §1 | New term: Netbox swap |
+| §2 Boundary | The swap itself (start, run, confirm, fail) is unchanged; this spec sets only what happens at commit |
+| G2 | "…or committed a Netbox swap on it" |
+| R1 | New (e): a committed swap is the Resolved mark; a failed swap is not. MUST NOT: close at the swap, record it as verified without the Internet Verdict, start a swap in Pending Verification |
+| R2 | New (e): after a swap, ask for the Internet Verdict of the Netbox swapped in |
+| R12b | Off-list CSPs: a swap closes the task as today |
+| §5 | T1 includes a committed swap; Not possible: Pending Verification × start of a swap |
+| K1 | Swap wording: "Netbox swapped from {old} to {new} by {CSP / Technician} {name} at {time}" |
+| ACs | AC-R1-5 edited (no swap offered in Pending Verification). New: AC-R1-9, AC-R1-10, AC-R2-11, AC-R3-9, AC-R5-17, AC-R12-10 (P1) · AC-R6-11 (P3) · AC-R8-26 (P4) |
+
+Code reference for engineering (not in the PRD): `DeviceSwapServiceImpl.handleSwapCommitted` → `ResolutionFinalizer.finalizeResolvedSystemVerified(…, "PASS")`; a swap starts only for an ASSIGNED or ESCALATED complaint; `SWAP_FAILED` leaves it open.
 
 ### Review feedback after approval (ongoing)
 

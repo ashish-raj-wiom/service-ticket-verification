@@ -64,6 +64,7 @@ This phase must keep guardrails G6 (P1 §2).
 | AC-R8-23 | **Given** the service task from AC-R9-4, **When** Rekha Verma tries to reopen it in the chat at 18:00 on 16 Oct, **Then** its Kapture record has the K14 comment at 18:00. | R8d · R9c | Settled |
 | AC-R8-24 | **Given** a service task with the K1 to K3 comments in Kapture, **When** the CSP and the Technician open it in the CSP app and the Technician App, **Then** neither app shows any Kapture comment or the Internet Verdict. | R8 MUST NOT | Settled |
 | AC-R8-25 | **Given** a service task in Pending Verification, **When** the customer replies yes twice, at 15:02 and 15:03, **Then** its Kapture record has one K5 comment, at 15:02. | R8d · T5 | Settled |
+| AC-R8-26 | **Given** the service task from AC-R1-9, **When** the Netbox swap commits at 13:47, **Then** its Kapture record has the K1 comment at 13:47 beginning "Netbox swapped from SY000111 to GX000222 by Technician Ravi at 13:47", with Status Pending, Sub Status Resolved. | R8d · R8a · T1 | Settled |
 
 ### R11 — Notifications are tracked in the Customer app and the CSP app
 
@@ -88,7 +89,7 @@ Each comment is added by Wiom in Kapture at the moment of the action, and only f
 
 | # | Action | Status · Sub Status after it | Comment text |
 |---|---|---|---|
-| K1 | T1 · CSP or Technician marks Resolved | Pending · Resolved | Marked Resolved by {CSP / Technician} {name} at {time}. Wiom is now verifying the fix with the customer. The ticket closes when the customer confirms, or automatically after {C-04} or {C-05}. |
+| K1 | T1 · CSP or Technician marks Resolved, or commits a Netbox swap | Pending · Resolved | For a swap, the first sentence reads: Netbox swapped from {old Netbox} to {new Netbox} by {CSP / Technician} {name} at {time}. Otherwise: Marked Resolved by {CSP / Technician} {name} at {time}. Wiom is now verifying the fix with the customer. The ticket closes when the customer confirms, or automatically after {C-04} or {C-05}. |
 | K2 | T2 · positive Internet Verdict during the Initial Check | Pending · Resolved | Internet Verdict positive at {time}. First message sent to the customer at {time}, asking whether the internet is working. |
 | K3 | T3 · C-01 runs out with no positive Internet Verdict | Pending · Resolved | No positive Internet Verdict within {C-01} of the Resolved mark. First message sent to the customer at {time}, asking whether the internet is working. |
 | K4 | T13 · positive Internet Verdict after C-01, before C-04 runs out | Pending · Resolved | Internet Verdict positive at {time}, after the Initial Check. No new message sent to the customer. |

@@ -68,6 +68,7 @@ P3 of 4; needs P1 (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, life
 | AC-R6-7 | **Given** C-15 is 4 working hours, **When** one service task is Closed with a CSP TAT of exactly 4 h 00 min and another with 4 h 01 min, **Then** the first is marked within TAT and the second breached. | R6e · C-15 | Settled |
 | AC-R6-8 | **Given** an ISD service task that reaches CSP Shiv Net at 11:20 on 14 Oct and is marked Resolved at 13:47, with a positive Internet Verdict at 14:09 and no answer from the customer, **When** it auto closes at 13:47 on 16 Oct, **Then** Quality OS receives the resolution signal at 13:47 on 16 Oct marked within TAT: CSP TAT 2 h 27 min, the same as the CSP app SLA timer showed at the mark; the 48 h in Pending Verification are not counted. | R6e · R7 · G5 · T7 | Settled |
 | AC-R6-9 | **Given** an ISD service task that reaches CSP Shiv Net at 11:20 on 14 Oct and is marked Resolved at 13:47, with no positive Internet Verdict and no answer, **When** it auto closes at 13:47 on 17 Oct with closure reason “Not verified”, **Then** the resolution signal at 13:47 on 17 Oct is marked within TAT (CSP TAT 2 h 27 min), and marks the service task as fixed, as every Closure is (R6b). | R6e · R6b · G5 · T8 | Settled |
+| AC-R6-11 | **Given** the service task from AC-R1-9, **When** the Netbox swap commits at 13:47 and the customer says yes at 18:32, **Then** Quality OS receives one resolution signal, at 18:32, and none at 13:47. | R6a · R6 MUST NOT · R1e · G4 | Settled |
 
 ### R10 — M3 counts only time waiting on the CSP
 

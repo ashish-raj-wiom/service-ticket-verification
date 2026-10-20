@@ -1,11 +1,11 @@
-# Service Task Verification — P3: Quality OS: signals at Closure and M3
+# Service Task Verification — P3: Closure signals: Quality OS, M3 and the IVR PIN
 
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) · Dhruv (product) | **Status** — Draft | **Sign-off** — — |
-| **Version** — P3 of 5 · 20 Oct 2026 · split from v1.2-short (from v1.2, signed off 15 Oct 2026) | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
+| **Version** — P3 of 4 · 20 Oct 2026 · split from v1.2-short (from v1.2, signed off 15 Oct 2026) | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
-| **Phase** — P3 of 5 · needs P1 · all 5 PRDs are tested together before release (P1 §2) | | | |
+| **Phase** — P3 of 4 · needs P1 · all 4 PRDs are tested together before release (P1 §2) | | | |
 
 **Designs (Figma)** — screens, flows and copy for this spec:
 
@@ -33,13 +33,13 @@ The terms of the P1 PRD apply here. This phase adds:
 
 ## 2. Objective & Guardrails
 
-**Objective.** A CSP's quality score rests on what happened to the customer: Quality OS hears about a service task only at Closure, with its closure reason and a within-TAT judgement on the CSP's own time, and M3 never counts time spent in Pending Verification.
+**Objective.** A CSP's quality score rests on what happened to the customer: Quality OS hears about a service task only at Closure, with its closure reason and a within-TAT judgement on the CSP's own time, and M3 never counts time spent in Pending Verification. In the same way, the IVR PIN is released only at Closure, so the customer can keep calling the CSP through Pending Verification and every Reopen.
 
-**Only CSPs on the rollout list.** Signals at Closure, the within-TAT judgement on CSP time and the M3 changes apply only to service tasks of CSPs on the rollout list (R12). For a CSP off the list, Quality OS hears at the mark and M3 counts exactly as today (G8; AC-R12-2, AC-R12-5).
+**Only CSPs on the rollout list.** Signals at Closure, the within-TAT judgement on CSP time and the M3 changes apply only to service tasks of CSPs on the rollout list (R12). The IVR PIN is likewise kept until Closure only for them. For a CSP off the list, Quality OS hears at the mark, M3 counts and the PIN is released exactly as today (G8; AC-R12-2, AC-R12-5, AC-R13-5).
 
 ### Phase and testing
 
-P3 of 5; needs P1 (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all 5 PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
+P3 of 4; needs P1 (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all 4 PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
 
 ### Guardrails this phase builds
 
@@ -90,6 +90,20 @@ P3 of 5; needs P1 (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, life
 | AC-R10-9 | **Given** CSP Om Sai Cable is added to the rollout list on 8 Oct, **When** Quality OS judges its M3 for 1–15 Oct and for 16–31 Oct, **Then** 1–15 Oct is judged as today and 16–31 Oct by fixed M3 cycles. | R10g · R12b · G8 | Settled |
 | AC-R10-10 | **Given** CSP Om Sai Cable is added to the rollout list on 8 Oct, **When** one of its service tasks, M3 timer at 30 h, is marked Resolved at 10:00 on 10 Oct and waits 72 h in Pending Verification before closing as “Not verified”, **Then** its M3 timer stays at 30 h and it is not counted in the 1–15 Oct cycle. | R10g · R10b · G5 | Settled |
 
+### R13 — The IVR PIN stays until Closure
+
+| ID | Story | MUST | MUST NOT |
+|---|---|---|---|
+| R13 | As a customer whose fix is being verified, I want to keep reaching my CSP through the IVR until my service task is Closed, so that I can call while Wiom is still checking or after a Reopen. | **(a)** Keep the service task's IVR PIN allocated through Pending Verification and every Reopen, and release it at Closure (T5, T7, T8, T14), as a Closure releases it today. **(b)** For a Kapture close before any Resolved mark (T15), and for a CSP not on the rollout list, release it as today. | Release the IVR PIN at the Resolved mark or when a Netbox swap commits. |
+
+| AC | Given / When / Then | Verifies | Status |
+|---|---|---|---|
+| AC-R13-1 | **Given** the service task from AC-R1-1, Resolved at 13:47 on 14 Oct, **When** Rekha Verma calls the IVR with its PIN at 15:00, **Then** the PIN is still allocated and the call goes through as before the mark. | R13a · R13 MUST NOT · T1 | Settled |
+| AC-R13-2 | **Given** the service task from AC-R5-1, Reopened at 16:05, **When** Rekha Verma calls the IVR with its PIN at 16:30, **Then** the PIN is still allocated. | R13a · T6 | Settled |
+| AC-R13-3 | **Given** the service task from AC-R4-1, **When** it is Closed with “Customer confirmed” at 18:32, **Then** its IVR PIN is released at 18:32, and not before. | R13a · T5 | Settled |
+| AC-R13-4 | **Given** the service task from AC-R1-9, **When** the Netbox swap commits at 13:47, **Then** its IVR PIN is still allocated after 13:47. | R13 MUST NOT · R1e | Settled |
+| AC-R13-5 | **Given** CSP Om Sai Cable is not on the rollout list, **When** one of its service tasks closes at its Resolved mark at 13:47, **Then** its IVR PIN is released as today. | R13b · R12b · G8 | Settled |
+
 ---
 
 ## 4. Cross-cutting Acceptance Criteria
@@ -107,7 +121,7 @@ P3 of 5; needs P1 (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, life
 
 ## 5. System Behaviour
 
-Lifecycle: P1 §5. This phase builds T12 (In Progress → In Progress: the M3 timer reaches C-08, counted once) and adds to T1, T5, T6, T7, T8, T14 and T15 what Quality OS hears and what the M3 timer does (R6, R10).
+Lifecycle: P1 §5. This phase builds T12 (In Progress → In Progress: the M3 timer reaches C-08, counted once) and adds to T1, T5, T6, T7, T8, T14 and T15 what Quality OS hears, what the M3 timer does, and when the IVR PIN is released: at Closure (T5, T7, T8, T14), never at T1, and it stays allocated through T6 (R6, R10, R13).
 
 **Precedence:** the M3 timer reaching C-08 at the same instant as a Resolved mark is applied before the mark (AC-RACE-3).
 

@@ -3,9 +3,9 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) · Dhruv (product) | **Status** — Draft | **Sign-off** — — |
-| **Version** — P1 of 5 · 20 Oct 2026 · split from v1.2-short (from v1.2, signed off 15 Oct 2026) | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
+| **Version** — P1 of 4 · 20 Oct 2026 · split from v1.2-short (from v1.2, signed off 15 Oct 2026) | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
-| **Phase** — P1 of 5 · needs nothing · all 5 PRDs are tested together before release (P1 §2) | | | |
+| **Phase** — P1 of 4 · needs nothing · all 4 PRDs are tested together before release (P1 §2) | | | |
 
 **Designs (Figma)** — screens, flows and copy for this spec:
 
@@ -66,21 +66,20 @@ Version 1 sets no limit on reopen rounds. A Reopened service task always goes ba
 
 ### Phases and testing
 
-Service Task Verification is specified in 5 PRDs, one per phase. Each is built and tested on its own, behind the rollout list while it is empty, so no CSP and no customer sees a part-built feature. The feature is released once, after all 5 are tested together.
+Service Task Verification is specified in 4 PRDs, one per phase. Each is built and tested on its own, behind the rollout list while it is empty, so no CSP and no customer sees a part-built feature. The feature is released once, after all 4 are tested together.
 
 | Phase | PRD | Builds | Needs | ACs |
 |---|---|---|---|---|
 | P1 | Core loop (`STV_P1_Core_Loop_PRD.md`) | The whole verification loop, including the customer's reopen from the chat | — | 83 |
 | P2 | Internet Verdict after the Initial Check (`STV_P2_Internet_Verdict_After_Initial_Check_PRD.md`) | Hourly Internet Verdict asks after the Initial Check; a late positive verdict | P1 | 10 |
-| P3 | Quality OS: signals at Closure and M3 (`STV_P3_Quality_OS_Signals_And_M3_PRD.md`) | Signals only at Closure, within TAT on CSP time, the M3 pause and cycles | P1 | 26 |
+| P3 | Closure signals: Quality OS, M3 and the IVR PIN (`STV_P3_Quality_OS_Signals_And_M3_PRD.md`) | Signals only at Closure, within TAT on CSP time, the M3 pause and cycles, the IVR PIN released at Closure | P1 | 31 |
 | P4 | Records: Kapture comments and notification tracking (`STV_P4_Records_PRD.md`) | Kapture comments K1–K14; notification and chat-answer records | P1; P2 for one comment (K4) | 28 |
-| P5 | IVR PIN until Closure (`STV_P5_IVR_PIN_PRD.md`) | The IVR PIN stays allocated until Closure | P1 | 5 |
 
-P2, P3 and P5 need only P1; P4 needs P1, and P2 for one comment (K4, a late positive Internet Verdict). They can be built in parallel.
+P2 and P3 need only P1; P4 needs P1, and P2 for one comment (K4, a late positive Internet Verdict). They can be built in parallel.
 
 **Test gates.**
 1. **Phase gate:** a phase is done when its own ACs pass and every P1 AC passes again on the same build.
-2. **Full feature test:** before the first CSP is added to the rollout list, all 152 ACs of the 5 PRDs are run together on one build with every phase in, end to end, including every guardrail (AC-GRD), race (AC-RACE), duplicate (AC-DUP) and regression (AC-REG-2) test. The feature is complete only when every AC passes in this run.
+2. **Full feature test:** before the first CSP is added to the rollout list, all 152 ACs of the 4 PRDs are run together on one build with every phase in, end to end, including every guardrail (AC-GRD), race (AC-RACE), duplicate (AC-DUP) and regression (AC-REG-2) test. The feature is complete only when every AC passes in this run.
 3. **Release:** CSPs are then added to the rollout list one by one (R12, C-12).
 
 AC ids are kept from v1.2 in every phase PRD, so a Given may name an AC in an earlier phase's PRD.

@@ -3,9 +3,9 @@
 | | | | |
 |---|---|---|---|
 | **Owner** — Ashish Raj (PM) | **Reviewer** — Akash (engineering) · Dhruv (product) | **Status** — Draft | **Sign-off** — — |
-| **Version** — P4 of 5 · 20 Oct 2026 · split from v1.2-short (from v1.2, signed off 15 Oct 2026) | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
+| **Version** — P4 of 4 · 20 Oct 2026 · split from v1.2-short (from v1.2, signed off 15 Oct 2026) | **Consulted — Solution design** — Ashish Agrawal | **Consulted — Customer OS** — Shail Patel, Manas | |
 | **Terminology source** — Wiom Operational Terminology (v0.7) · 15 Oct 2026 · Wiom System Terminology (v0.7) · 15 Oct 2026 | | | |
-| **Phase** — P4 of 5 · needs P1; P2 for one comment (K4) · all 5 PRDs are tested together before release (P1 §2) | | | |
+| **Phase** — P4 of 4 · needs P1; P2 for one comment (K4) · all 4 PRDs are tested together before release (P1 §2) | | | |
 
 **Designs (Figma)** — screens, flows and copy for this spec:
 
@@ -33,7 +33,7 @@ The terms of the P1 PRD apply here. This phase adds none.
 
 ### Phase and testing
 
-P4 of 5; needs P1; P2 for one comment (K4) (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all 5 PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
+P4 of 4; needs P1; P2 for one comment (K4) (P1: `STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all 4 PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
 
 
 This phase must keep guardrails G6 (P1 §2).

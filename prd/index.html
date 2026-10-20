@@ -5,12 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Service Task Verification PRD</title>
 <style>
-  :root { --bg:#fbfaf7; --fg:#22211f; --muted:#6b6a65; --line:#e3e1da; --card:#ffffff; --accent:#1f5fa8; --code:#f2f0ea; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#1b1b19; --fg:#e8e6df; --muted:#a3a19a; --line:#3a3935; --card:#242422; --accent:#7fb2ee; --code:#2c2b28; } }
+  :root { --bg:#fbfaf7; --fg:#22211f; --muted:#6b6a65; --line:#e3e1da; --card:#ffffff; --accent:#1f5fa8; --code:#f2f0ea; --on:#1f5fa8; --onfg:#ffffff; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#1b1b19; --fg:#e8e6df; --muted:#a3a19a; --line:#3a3935; --card:#242422; --accent:#7fb2ee; --code:#2c2b28; --on:#7fb2ee; --onfg:#1b1b19; } }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.65 -apple-system, "Segoe UI", Roboto, sans-serif; }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 16px 80px; }
-  .src { font-size:13px; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:8px; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 16px 16px 80px; }
+  nav { position:sticky; top:0; z-index:5; background:var(--bg); border-bottom:1px solid var(--line); padding:10px 0; }
+  nav .group { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:3px 0; }
+  nav .label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; min-width:92px; }
+  nav a { font-size:13px; text-decoration:none; color:var(--fg); border:1px solid var(--line); background:var(--card); border-radius:999px; padding:3px 11px; white-space:nowrap; }
+  nav a:hover { border-color:var(--accent); }
+  nav a[aria-current="page"] { background:var(--on); color:var(--onfg); border-color:var(--on); }
+  .src { font-size:13px; color:var(--muted); padding:10px 0 8px; }
   .src a { color:var(--accent); }
   h1 { font-size:28px; line-height:1.25; margin:18px 0 12px; }
   h2 { font-size:21px; margin:40px 0 12px; padding-top:12px; border-top:1px solid var(--line); }
@@ -27,21 +33,53 @@
   hr { border:0; border-top:1px solid var(--line); margin:28px 0; }
   .mermaid { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px; overflow-x:auto; text-align:center; }
   .err { color:#b2291f; }
+  @media (max-width: 600px) { nav .label { min-width:100%; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="src">Rendered live from <a href="Service_Task_Verification_PRD.md">Service_Task_Verification_PRD.md</a>. This page adds nothing to the document.</div>
+  <nav id="nav"></nav>
+  <div class="src" id="src"></div>
   <main id="doc">Loading…</main>
 </div>
 <script type="module">
 import { marked } from "https://cdn.jsdelivr.net/npm/marked@12.0.2/lib/marked.esm.js";
 import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";
 
+// Every document on this page. Each is rendered as-is from its markdown file.
+const DOCS = [
+  { id: "v1.2",  group: "Full PRD",     label: "v1.2 · signed off 15 Oct",   file: "Service_Task_Verification_PRD.md" },
+  { id: "short", group: "Full PRD",     label: "Shortened · draft 20 Oct",   file: "Service_Task_Verification_PRD_v1.2-short.md" },
+  { id: "p1",    group: "Phase PRDs",   label: "P1 Core loop",               file: "phases/STV_P1_Core_Loop_PRD.md" },
+  { id: "p2",    group: "Phase PRDs",   label: "P2 Customer reopens from chat", file: "phases/STV_P2_Customer_Reopen_From_Chat_PRD.md" },
+  { id: "p3",    group: "Phase PRDs",   label: "P3 Internet Verdict after the Initial Check", file: "phases/STV_P3_Internet_Verdict_After_Initial_Check_PRD.md" },
+  { id: "p4",    group: "Phase PRDs",   label: "P4 Quality OS and M3",       file: "phases/STV_P4_Quality_OS_Signals_And_M3_PRD.md" },
+  { id: "p5",    group: "Phase PRDs",   label: "P5 Records",                 file: "phases/STV_P5_Records_PRD.md" },
+];
+const want = new URLSearchParams(location.search).get("doc");
+const cur = DOCS.find(d => d.id === want) || DOCS[0];
+
+const nav = document.getElementById("nav");
+for (const g of [...new Set(DOCS.map(d => d.group))]) {
+  const row = document.createElement("div"); row.className = "group";
+  const l = document.createElement("span"); l.className = "label"; l.textContent = g; row.appendChild(l);
+  for (const d of DOCS.filter(x => x.group === g)) {
+    const a = document.createElement("a"); a.href = "?doc=" + d.id; a.textContent = d.label;
+    if (d === cur) a.setAttribute("aria-current", "page");
+    row.appendChild(a);
+  }
+  nav.appendChild(row);
+}
+const note = cur.group === "Phase PRDs"
+  ? " The phase PRDs are split from the shortened PRD; all five are tested together before release (P1 §2)."
+  : cur.id === "short" ? " A shortened draft of v1.2; v1.2 stays the signed-off version." : "";
+document.getElementById("src").innerHTML =
+  'Rendered live from <a href="' + cur.file + '">' + cur.file.split("/").pop() + "</a>. This page adds nothing to the document." + note;
+
 const doc = document.getElementById("doc");
 try {
-  const res = await fetch("Service_Task_Verification_PRD.md", { cache: "no-store" });
-  if (!res.ok) throw new Error("Could not load the PRD (" + res.status + ")");
+  const res = await fetch(cur.file, { cache: "no-store" });
+  if (!res.ok) throw new Error("Could not load " + cur.file + " (" + res.status + ")");
   const md = await res.text();
   doc.innerHTML = marked.parse(md);
 

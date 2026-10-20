@@ -29,6 +29,8 @@ The terms of the P1 PRD apply here. This phase adds none.
 
 **Objective.** Every action in Verification leaves a record: a Kapture comment the Wiom CX team can read, and a record of every notification and chat answer in the Customer app and the CSP app. Records never change behaviour.
 
+**Only CSPs on the rollout list.** Kapture comments and the tracking records are made only for service tasks of CSPs on the rollout list (R12). For a CSP off the list, Kapture and the records stay exactly as today (G8; AC-R12-8).
+
 ### Phase and testing
 
 P5 of 5; needs P1 (`STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all five PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
@@ -98,6 +100,7 @@ In P1, Kapture already shows the Status and Sub Status in this table (R8a–c); 
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
+| AC-R12-8 | **Given** CSP Om Sai Cable is not on the rollout list, **When** it marks an ISD service task Resolved at 13:47 and it closes as today, **Then** Kapture shows today's status and comments, with none of K1–K12, and no record of this spec's notifications or chat answers is made for it. | R12b · R12 MUST NOT · G8 · R8d · R11 | Settled |
 | AC-GRD-6 | **Given** every service task that left Pending Verification in a day, **When** a Wiom Product user reads the recorded cause of each exit, **Then** each was the customer's yes, the customer's Reopen, a Wiom CX user recording the customer asking to reopen, a Wiom CX user's Open or close in Kapture, or an auto closure, and each has a matching Kapture comment. | G6 · R8d | Settled |
 
 ---

@@ -35,6 +35,8 @@ The terms of the P1 PRD apply here. This phase adds:
 
 **Objective.** A CSP's quality score rests on what happened to the customer: Quality OS hears about a service task only at Closure, with its closure reason and a within-TAT judgement on the CSP's own time, and M3 never counts time spent in Pending Verification.
 
+**Only CSPs on the rollout list.** Signals at Closure, the within-TAT judgement on CSP time and the M3 changes apply only to service tasks of CSPs on the rollout list (R12). For a CSP off the list, Quality OS hears at the mark and M3 counts exactly as today (G8; AC-R12-2, AC-R12-5).
+
 ### Phase and testing
 
 P4 of 5; needs P1 (`STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all five PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.

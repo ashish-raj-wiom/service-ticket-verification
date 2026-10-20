@@ -29,6 +29,8 @@ The terms of the P1 PRD apply here. This phase adds none.
 
 **Objective.** A customer whose internet still does not work can send the same service task back to the same CSP from the chat, by tapping नहीं and choosing to reopen the previous service task; any other choice changes nothing, and after Closure the chat offers a new service task instead.
 
+**Only CSPs on the rollout list.** The chat choices in this phase appear only for service tasks of CSPs on the rollout list (R12). For a CSP off the list the chat works exactly as today (G8; AC-R12-6).
+
 ### Phase and testing
 
 P2 of 5; needs P1 (`STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all five PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
@@ -74,6 +76,7 @@ This phase must keep guardrails G1, G6 and G7 (P1 §2).
 |---|---|---|---|
 | AC-R8-3 | **Given** the service task from AC-R5-1, Reopened at 16:05 on 14 Oct, **When** a Wiom CX user opens it in Kapture at 16:30, **Then** it shows Status Pending and Sub Status Open, not Sub Status Resolved. | R8c · T6 | Settled |
 | AC-R8-10 | **Given** the service task from AC-R5-1, Reopened at 16:05 on 14 Oct and shown Open in Kapture, **When** no one acts on it until 20:05 on 14 Oct, **Then** it is still In Progress with CSP Shiv Net, not Completed. | R8 MUST NOT · G6 | Settled |
+| AC-R12-6 | **Given** CSP Om Sai Cable is not on the rollout list and its ISD service task closed at its Resolved mark at 13:47 as today, **When** the customer opens the chat at 16:00, **Then** the chat offers only what it offers today, with no नहीं or "पिछली शिकायत फिर से दर्ज करें" choice from this spec, and any reopen follows today's handling. | R12b · R12 MUST NOT · G8 · R5a | Settled |
 | AC-WF-2 | **Given** an ISD service task In Progress from 11:20 on 14 Oct, marked Resolved by the Technician at 13:47, **When** no positive Internet Verdict comes by 14:17, the customer says No at 16:05, the CSP marks it Resolved again at 19:12, a positive Internet Verdict comes at 19:20, and no answer comes, **Then** it is Closed at 19:12 on 16 Oct (C-04 after the second Resolved mark) with closure reason “Internet working, no response” and CSP TAT 5 h 34 min. | T1 · T3 · T6 · T2 · T7 · G5 | Settled |
 | AC-RACE-1 | **Given** a positive Internet Verdict and no answer, **When** the customer says No at the same instant C-04 runs out, **Then** the service task is Reopened, not Closed. | Precedence · T6 · T7 | Settled |
 | AC-RACE-5 | **Given** a service task in Pending Verification, **When** the customer says No at the same instant a Wiom CX user closes it in Kapture, **Then** it is Reopened, not Closed. | Precedence · T6 · T14 | Settled |

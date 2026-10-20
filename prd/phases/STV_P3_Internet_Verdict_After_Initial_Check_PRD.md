@@ -29,6 +29,8 @@ The terms of the P1 PRD apply here. This phase adds none.
 
 **Objective.** Wiom keeps asking for the Internet Verdict every hour after the Initial Check, so a router that comes back late is seen: the service task then closes at C-04 as "Internet working, no response" instead of at C-05 as "Not verified". The customer gets no new message.
 
+**Only CSPs on the rollout list.** Wiom asks for the Internet Verdict after the Initial Check only for service tasks of CSPs on the rollout list (R12). For a CSP off the list, Wiom asks exactly as today (G8; AC-R12-7).
+
 ### Phase and testing
 
 P3 of 5; needs P1 (`STV_P1_Core_Loop_PRD.md`), whose terms, guardrails, lifecycle and rollout list (R12) apply here unchanged. It is built and tested behind the rollout list while it is empty. **Phase gate:** its ACs pass and every P1 AC passes again on the same build. **Full feature test:** before release, the ACs of all five PRDs are run together on one build (P1 §2). AC ids are kept from v1.2, so a Given may name an AC in the P1 PRD.
@@ -78,6 +80,7 @@ This phase must keep guardrails G3 and G6 (P1 §2).
 
 | AC | Given / When / Then | Verifies | Status |
 |---|---|---|---|
+| AC-R12-7 | **Given** CSP Om Sai Cable is not on the rollout list, **When** it marks an ISD service task Resolved at 13:47, **Then** Wiom asks Connection Validation Service for the Internet Verdict only as it does today, at the mark, and never again every C-13 or every C-14. | R12b · R12 MUST NOT · G8 · C-14 | Settled |
 | AC-BV-2 | **Given** a service task Resolved at 13:47:00, **When** its only positive Internet Verdict comes at 14:17:01, **Then** the customer got the first message at 14:17:00, it moves to Positive verdict at 14:17:01, and no second message is sent. | C-01 · R2b · R2c · R3e | Settled |
 | AC-CFG-6 | **Given** C-13 is 5 min and C-14 is 1 h, **When** a Wiom Product user tries to set C-13 to 6 min or C-14 to 5 min, **Then** each change is refused and the values stay 5 min and 1 h. | C-13 range · C-14 range | Settled |
 | AC-BV-12 | **Given** a service task Resolved at 13:47:00 on 14 Oct with no positive Internet Verdict since, **When** its only positive Internet Verdict comes at 13:46:59 on 16 Oct, 1 s before C-04 runs out, **Then** it auto closes at 13:47:00 on 16 Oct with “Internet working, no response”. | C-04 · R4b · R2c | Settled |

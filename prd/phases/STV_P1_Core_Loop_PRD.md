@@ -45,6 +45,8 @@ Only the terms this spec coins or gives a new meaning. Everything else follows t
 
 **Objective.** A service task never closes on the CSP's word alone: at the Resolved mark it waits in Pending Verification, the customer is asked once, a yes closes it, a Wiom CX user can send it back to the same CSP, and timers close it only when the customer does not answer. Closed is final, CSP TAT counts only the CSP's own time, and nothing changes for CSPs off the rollout list.
 
+**Only CSPs on the rollout list.** This feature applies only to ISD and RDNI service tasks of CSPs on the rollout list (C-12) at the Resolved mark. A CSP off the list never enters the verification flow: its service tasks, customers, CSP and Technician apps, Kapture, Quality OS and M3 work exactly as they do today (R12, G8; AC-R12-2, AC-GRD-9). Each later phase restates this for what it builds.
+
 **Objective.** A customer whose internet a CSP marks as fixed does not have the service task closed on the CSP's word alone. The customer is always asked whether the fix worked, and a customer who says it still does not work and asks to reopen gets the same CSP back on the same service task at once. Verification turns on what the customer says: the Internet Verdict only decides when and how the customer is first messaged, and the timers act only when the customer does not answer.
 
 **Boundary.** This spec governs service tasks of two subtypes, internet supply down (ISD) and recharge done but no internet (RDNI), from the CSP's Resolved mark until the service task is Closed. It leaves unchanged:
@@ -66,17 +68,17 @@ Service Task Verification is specified in five PRDs, one per phase. Each is buil
 
 | Phase | PRD | Builds | Needs | ACs |
 |---|---|---|---|---|
-| P1 | Core loop (`STV_P1_Core_Loop_PRD.md`) | This PRD | — | 48 |
-| P2 | Customer reopens from the chat (`STV_P2_Customer_Reopen_From_Chat_PRD.md`) | A customer whose internet still does not work can send the same service task back to the same CSP from the chat | P1 | 14 |
-| P3 | Internet Verdict after the Initial Check (`STV_P3_Internet_Verdict_After_Initial_Check_PRD.md`) | Wiom keeps asking for the Internet Verdict every hour after the Initial Check | P1 | 8 |
+| P1 | Core loop (`STV_P1_Core_Loop_PRD.md`) | This PRD | — | 49 |
+| P2 | Customer reopens from the chat (`STV_P2_Customer_Reopen_From_Chat_PRD.md`) | A customer whose internet still does not work can send the same service task back to the same CSP from the chat | P1 | 15 |
+| P3 | Internet Verdict after the Initial Check (`STV_P3_Internet_Verdict_After_Initial_Check_PRD.md`) | Wiom keeps asking for the Internet Verdict every hour after the Initial Check | P1 | 9 |
 | P4 | Quality OS: signals at Closure and M3 (`STV_P4_Quality_OS_Signals_And_M3_PRD.md`) | A CSP's quality score rests on what happened to the customer | P1 | 22 |
-| P5 | Records: Kapture comments and notification tracking (`STV_P5_Records_PRD.md`) | Every action in Verification leaves a record | P1 | 14 |
+| P5 | Records: Kapture comments and notification tracking (`STV_P5_Records_PRD.md`) | Every action in Verification leaves a record | P1 | 15 |
 
 P2 to P5 each need only P1, so they can be built in parallel.
 
 **Test gates.**
 1. **Phase gate:** a phase is done when its own ACs pass and every P1 AC passes again on the same build.
-2. **Full feature test:** before the first CSP is added to the rollout list, all 106 ACs of the five PRDs are run together on one build with every phase in, end to end, including every guardrail (AC-GRD), race (AC-RACE), duplicate (AC-DUP) and regression (AC-REG-2) test. The feature is complete only when every AC passes in this run.
+2. **Full feature test:** before the first CSP is added to the rollout list, all 110 ACs of the five PRDs are run together on one build with every phase in, end to end, including every guardrail (AC-GRD), race (AC-RACE), duplicate (AC-DUP) and regression (AC-REG-2) test. The feature is complete only when every AC passes in this run.
 3. **Release:** CSPs are then added to the rollout list one by one (R12, C-12).
 
 AC ids are kept from v1.2 in every phase PRD, so a Given may name an AC in an earlier phase's PRD.
@@ -91,7 +93,7 @@ AC ids are kept from v1.2 in every phase PRD, so a Given may name an AC in an ea
 | G5 | **Verification never counts against the CSP** | Time in Pending Verification never counts in the CSP TAT, in the within-TAT judgement sent to Quality OS, or on the M3 timer. | R1 · R6 · R7 · R10 · AC-R1-2 · AC-R6-4 · AC-R6-5 · AC-R7-1 · AC-R10-2 |
 | G6 | **Every exit has a recorded cause** | Every exit from Pending Verification comes from the customer's answer, a Wiom CX user's action in Kapture, or an auto closure, and its cause is recorded — never a silent change. | R4 · R5 · R8 · AC-GRD-6 |
 | G7 | **The customer reopens only in Pending Verification** (zero tolerance) | A Customer's No sends a service task back to the CSP only while it is in Pending Verification; a "not working" while In Progress changes nothing, and after Closure it leads to a new service task. | R5 · R9 · AC-R5-1 · AC-R9-1 · AC-GRD-8 |
-| G8 | **No change for CSPs off the rollout list** (zero tolerance) | A service task whose CSP is not on the rollout list behaves exactly as it does today, in every system this spec touches. | R12 · AC-R12-2 · AC-R12-3 · AC-R12-5 |
+| G8 | **No change for CSPs off the rollout list** (zero tolerance) | A service task whose CSP is not on the rollout list behaves exactly as it does today, in every system this spec touches. | R12 · AC-R12-2 · AC-R12-5 · AC-R12-6 · AC-R12-7 · AC-R12-8 · AC-GRD-9 |
 
 G4 (signals only at Closed) and the within-TAT and M3 parts of G5 are built in P4.
 
@@ -226,6 +228,7 @@ G4 (signals only at Closed) and the within-TAT and M3 parts of G5 are built in P
 | AC-GRD-2 | **Given** an ISD service task never marked Resolved, **When** the customer replies yes to any message, or C-04 or C-05 passes from its creation, **Then** it is not Closed; the only way it closes is a Wiom CX user's close in Kapture (AC-R8-8). | G2 | Settled |
 | AC-GRD-3 | **Given** every service task that entered Pending Verification in a day, **When** a Wiom Product user reads the first messages sent, **Then** every customer got exactly one, with the same wording whether or not there was a positive Internet Verdict. | G3 | Settled |
 | AC-GRD-8 | **Given** three service tasks for the same customer area — one In Progress, one in Pending Verification, one Closed at 10:00 that day — **When** each customer reports "not working" at 15:00, **Then** only the one in Pending Verification goes back to In Progress; the In Progress one is unchanged, and for the Closed one a new service task opens while it stays Closed. | G7 | Settled |
+| AC-GRD-9 | **Given** every service task Resolved in a day by CSPs not on the rollout list, **When** a Wiom Product user compares them with the same day a week earlier, before the feature, **Then** none entered Pending Verification, every one closed at its Resolved mark, none received a verification message, Kapture showed today's statuses, and the CSPs and Technicians got today's notifications. | G8 · R12b · R12 MUST NOT | Settled |
 | AC-BV-1 | **Given** a service task Resolved at 13:47:00, **When** its only positive Internet Verdict comes at 14:16:59, **Then** it moves to Positive verdict and the customer gets the first message at 14:16:59. | C-01 · R2a | Settled |
 | AC-RACE-2 | **Given** no positive Internet Verdict and no answer, **When** the customer replies yes at the same instant C-05 runs out, **Then** it is Closed with “Customer confirmed”. | Precedence · T5 · T8 | Settled |
 | AC-CFG-1 | **Given** a Wiom Product user has set C-01 to 45 min, **When** a service task is Resolved at 13:47 and no positive Internet Verdict comes, **Then** the customer gets the first message at 14:32, not 14:17. | C-01 · R3b | Settled |

@@ -375,6 +375,18 @@ Validation of the phase PRDs against Dhruv's latest docs (Harsh posts each findi
 
 After these, no PRD uses "router".
 
+### Engineering design questions (23 Oct 2026)
+
+Five questions from engineering on the CSP and Technician designs against the current P1 (not an old copy). PM decisions; no PRD text changed.
+
+| # | Question | Decision (PM) |
+|---|---|---|
+| 1 | The Closed banner "हमने पाया कि समस्या ठीक हो गई है" and the time-over banner (7d) seem to reveal the closure reason and the Internet Verdict (R4f, R1) | No issue: the copy states Wiom's best proxy, not the exact closure reason. Designs stand |
+| 2 | The Reopen copy "कस्टमर को अभी भी दिक्कत आ रही है" seems to blame the customer (R5 MUST NOT) | No issue: it says the customer is facing the issue again, not that the customer reported it. Designs stand |
+| 3 | Who sees the new pre-mark UI (live SLA timer, "SLA timer will pause" sheet)? | Rollout CSPs only (G8). Engineering's per-task flag follows the live list until the Resolved mark and is frozen from then on (R12a, R12d) |
+| 4 | Does a Netbox swap as the Resolved mark (R1e) go through the verification sheet? | Yes: the swap also shows the "क्या हम वेरिफ़िकेशन प्रोसेस शुरू करें?" sheet. Open for design: where the sheet sits relative to the swap commit (R1e makes the commit the mark) |
+| 5 | How long does a Closed card stay on the home feed? | As today; no new rule |
+
 ### Blast radius (20 Oct 2026)
 
 PM: this is a CSP-level rollout. A CSP not on the rollout list must never enter the verification flow; its world works exactly as today. A must-have, to keep the blast radius small. Already the rule (R12, G8, zero tolerance); now stated in every phase PRD and tested in every system: AC-R12-2, AC-R12-5, AC-R12-6, AC-R12-7, AC-R12-8 and the restored whole-day AC-GRD-9 (see Part A §7).

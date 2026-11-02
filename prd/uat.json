@@ -6,6 +6,7 @@
     "AC-R1-1":  { "status": "pass", "note": "Resolved mark moves the task to Pending Verification" },
     "AC-R1-2":  { "status": "pass", "note": "CSP TAT stops at the mark" },
     "AC-R1-4":  { "status": "pass", "note": "No customer message between the mark and the first message" },
+    "AC-R1-6":  { "status": "pass", "note": "CSP app shows only that Wiom will verify; Technician App drops the task as today; no verdict shown (checked by Ashish)" },
     "AC-R2-3":  { "status": "pass", "note": "No answer by the end of the Initial Check gives No positive verdict (timer fired by hand)" },
     "AC-R3-2":  { "status": "pass", "note": "First message with the new copy and हाँ / नहीं (template updated 2 Nov)" },
     "AC-R4-3":  { "status": "pass", "note": "C-05 closes as Not verified (timer fired by hand)" },

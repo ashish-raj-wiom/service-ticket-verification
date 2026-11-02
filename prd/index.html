@@ -33,6 +33,12 @@
   hr { border:0; border-top:1px solid var(--line); margin:28px 0; }
   .mermaid { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px; overflow-x:auto; text-align:center; }
   .err { color:#b2291f; }
+  .uat { display:inline-block; margin-left:6px; font-size:11px; font-weight:600; line-height:1.5; padding:0 7px; border-radius:999px; white-space:nowrap; vertical-align:1px; cursor:help; }
+  .uat.pass { background:#e3f3e6; color:#1d6b2f; }
+  .uat.fail { background:#fbe5e2; color:#a12a1d; }
+  .uat.todo { background:var(--code); color:var(--muted); }
+  @media (prefers-color-scheme: dark) { .uat.pass { background:#1f3a25; color:#8fd6a0; } .uat.fail { background:#4a221d; color:#f2a59b; } }
+  .uatsum { font-size:13px; color:var(--muted); padding:0 0 8px; }
   @media (max-width: 600px) { nav .label { min-width:100%; } }
 </style>
 </head>
@@ -40,6 +46,7 @@
 <div class="wrap">
   <nav id="nav"></nav>
   <div class="src" id="src"></div>
+  <div class="uatsum" id="uatsum"></div>
   <main id="doc">Loading…</main>
 </div>
 <script type="module">
@@ -74,7 +81,7 @@ const note = cur.group === "Phase PRDs"
   ? " The phase PRDs are split from the shortened PRD; all four are tested together before release (P1 §2)."
   : cur.id === "short" ? " A shortened draft of v1.2; v1.2 stays the signed-off version." : "";
 document.getElementById("src").innerHTML =
-  'Rendered live from <a href="' + cur.file + '">' + cur.file.split("/").pop() + "</a>. This page adds nothing to the document." + note;
+  'Rendered live from <a href="' + cur.file + '">' + cur.file.split("/").pop() + "</a>. This page adds nothing to the document except the UAT tags, which come from uat.json." + note;
 
 const doc = document.getElementById("doc");
 try {
@@ -90,6 +97,27 @@ try {
     const w = document.createElement("div"); w.className = "tw";
     t.replaceWith(w); w.appendChild(t);
   });
+
+  // UAT tags come from uat.json, not from the PRD files.
+  try {
+    const u = await (await fetch("uat.json", { cache: "no-store" })).json();
+    if (u.docs.includes(cur.id)) {
+      const label = { pass: "UAT passed", fail: "UAT failed", todo: "Yet to test" };
+      const count = { pass: 0, fail: 0, todo: 0 };
+      doc.querySelectorAll("tr > td:first-child").forEach(td => {
+        const id = td.textContent.trim();
+        if (!/^AC-[A-Z0-9]+-\d+[a-z]?$/.test(id)) return;
+        const r = u.results[id] || { status: "todo", note: "Not tested yet" };
+        count[r.status]++;
+        const s = document.createElement("span");
+        s.className = "uat " + r.status; s.textContent = label[r.status]; s.title = r.note;
+        td.appendChild(s);
+      });
+      if (count.pass + count.fail + count.todo)
+        document.getElementById("uatsum").textContent =
+          `UAT on ${u.env}, as of ${u.asOf}: ${count.pass} passed · ${count.fail} failed · ${count.todo} yet to test. Hover a tag for the note.`;
+    }
+  } catch (e) { /* no tags if uat.json is missing */ }
 
   doc.querySelectorAll("pre > code.language-mermaid").forEach(c => {
     const d = document.createElement("div"); d.className = "mermaid"; d.textContent = c.textContent;

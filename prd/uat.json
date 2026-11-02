@@ -1,38 +1,145 @@
 {
   "asOf": "2 Nov 2026",
   "env": "QA",
-  "docs": ["short", "p1", "p2", "p3", "p4"],
+  "docs": [
+    "short",
+    "p1",
+    "p2",
+    "p3",
+    "p4"
+  ],
   "results": {
-    "AC-R1-1":  { "status": "pass", "note": "Resolved mark moves the task to Pending Verification" },
-    "AC-R1-2":  { "status": "pass", "note": "CSP TAT stops at the mark" },
-    "AC-R1-4":  { "status": "pass", "note": "No customer message between the mark and the first message" },
-    "AC-R1-6":  { "status": "pass", "note": "CSP app shows only that Wiom will verify; Technician App drops the task as today; no verdict shown (checked by Ashish)" },
-    "AC-R2-3":  { "status": "pass", "note": "No answer by the end of the Initial Check gives No positive verdict (timer fired by hand)" },
-    "AC-R3-2":  { "status": "pass", "note": "First message with the new copy and हाँ / नहीं (template updated 2 Nov)" },
-    "AC-R4-3":  { "status": "pass", "note": "C-05 closes as Not verified (timer fired by hand)" },
-    "AC-R4-8":  { "status": "pass", "note": "C-04 with no positive verdict keeps the task in Pending Verification" },
-    "AC-R4-10": { "status": "pass", "note": "Closure notification to CSP users and the Technician" },
-    "AC-R5-1":  { "status": "pass", "note": "Customer's No + reopen previous returns the same task to the same CSP" },
-    "AC-R5-6":  { "status": "pass", "note": "Resolved again starts a new round" },
-    "AC-R5-13": { "status": "pass", "note": "Reopen returns the task to the Technician's list, with a notification" },
-    "AC-R5-18": { "status": "pass", "note": "Chat confirms the Reopen (copy not checked against Figma)" },
-    "AC-R8-1":  { "status": "pass", "note": "Kapture Pending / Resolved at the mark" },
-    "AC-R8-2":  { "status": "pass", "note": "Kapture Complete / Completed at Closure" },
-    "AC-R8-3":  { "status": "pass", "note": "Kapture Pending / Open on Reopen" },
-    "AC-R8-16": { "status": "pass", "note": "K9 comment on Not verified closure" },
-    "AC-R8-20": { "status": "pass", "note": "Kapture reopen of a Closed task is blocked, K11 comment. A second reopen within seconds left Kapture Pending for ~2 min (duplicate-webhook guard)" },
-    "AC-R8-23": { "status": "pass", "note": "K14 comment when the customer tries to reopen a Closed task" },
-    "AC-R9-4":  { "status": "pass", "note": "Closed task stays Closed; chat says it cannot be reopened" },
-    "AC-REG-2": { "status": "pass", "note": "Out-of-scope subtype (frequent disconnection) closes at the mark, no Pending Verification" },
-    "AC-R6-1":  { "status": "pass", "note": "One Quality OS signal, at Closure only" },
-    "AC-R6-9":  { "status": "pass", "note": "Signal at auto closure, within TAT, counted as fixed" },
-    "AC-R13-2": { "status": "pass", "note": "IVR PIN kept after a Reopen" },
-    "AC-R13-3": { "status": "pass", "note": "IVR PIN released at Closure, not before" },
-
-    "AC-R4-1":  { "status": "fail", "note": "Yes closes only after a rating is submitted (old flow). Minor, being fixed" },
-    "AC-R4-18": { "status": "fail", "note": "Thank-you + rate message not sent on the old flow. Accepted: not needed while the old flow is used" },
-    "AC-R9-1":  { "status": "fail", "note": "New ticket after Closure is linked as a reopen (within 48 h of the last mark). Backlog" },
-    "AC-R8-5":  { "status": "fail", "note": "K6 names the CSP by ID (a0a0m0), not name. Minor" },
-    "AC-R8-25": { "status": "fail", "note": "Closing comment posted 6 times on the customer-yes path (closure event taskId null, outbox resend). Raised, being fixed" }
+    "AC-R1-1": {
+      "status": "pass",
+      "note": "Resolved mark moves the task to Pending Verification"
+    },
+    "AC-R1-2": {
+      "status": "pass",
+      "note": "CSP TAT stops at the mark"
+    },
+    "AC-R1-4": {
+      "status": "pass",
+      "note": "No customer message between the mark and the first message"
+    },
+    "AC-R1-6": {
+      "status": "pass",
+      "note": "CSP app shows only that Wiom will verify; Technician App drops the task as today; no verdict shown (checked by Ashish)"
+    },
+    "AC-R2-3": {
+      "status": "pass",
+      "note": "No answer by the end of the Initial Check gives No positive verdict (timer fired by hand)"
+    },
+    "AC-R3-2": {
+      "status": "pass",
+      "note": "First message with the new copy and हाँ / नहीं (template updated 2 Nov)"
+    },
+    "AC-R4-3": {
+      "status": "pass",
+      "note": "C-05 closes as Not verified (timer fired by hand)"
+    },
+    "AC-R4-8": {
+      "status": "pass",
+      "note": "C-04 with no positive verdict keeps the task in Pending Verification"
+    },
+    "AC-R4-10": {
+      "status": "todo",
+      "note": "Backend sends Closure notification to CSP users and the Technician (CleverTap upload seen); device push not enabled on QA yet"
+    },
+    "AC-R5-1": {
+      "status": "pass",
+      "note": "Customer's No + reopen previous returns the same task to the same CSP"
+    },
+    "AC-R5-6": {
+      "status": "pass",
+      "note": "Resolved again starts a new round"
+    },
+    "AC-R5-13": {
+      "status": "todo",
+      "note": "Task returns to the Technician list (seen); Reopen notification sent by backend; device push not enabled on QA yet"
+    },
+    "AC-R5-18": {
+      "status": "pass",
+      "note": "Chat confirms the Reopen (copy not checked against Figma)"
+    },
+    "AC-R8-1": {
+      "status": "pass",
+      "note": "Kapture Pending / Resolved at the mark"
+    },
+    "AC-R8-2": {
+      "status": "pass",
+      "note": "Kapture Complete / Completed at Closure"
+    },
+    "AC-R8-3": {
+      "status": "pass",
+      "note": "Kapture Pending / Open on Reopen"
+    },
+    "AC-R8-16": {
+      "status": "pass",
+      "note": "K9 comment on Not verified closure"
+    },
+    "AC-R8-20": {
+      "status": "pass",
+      "note": "Kapture reopen of a Closed task is blocked, K11 comment. A second reopen within seconds left Kapture Pending for ~2 min (duplicate-webhook guard)"
+    },
+    "AC-R8-23": {
+      "status": "pass",
+      "note": "K14 comment when the customer tries to reopen a Closed task"
+    },
+    "AC-R9-4": {
+      "status": "pass",
+      "note": "Closed task stays Closed; chat says it cannot be reopened"
+    },
+    "AC-REG-2": {
+      "status": "pass",
+      "note": "Out-of-scope subtype (frequent disconnection) closes at the mark, no Pending Verification"
+    },
+    "AC-R6-1": {
+      "status": "pass",
+      "note": "One Quality OS signal, at Closure only"
+    },
+    "AC-R6-9": {
+      "status": "pass",
+      "note": "Signal at auto closure, within TAT, counted as fixed"
+    },
+    "AC-R13-2": {
+      "status": "pass",
+      "note": "IVR PIN kept after a Reopen"
+    },
+    "AC-R13-3": {
+      "status": "pass",
+      "note": "IVR PIN released at Closure, not before"
+    },
+    "AC-R4-1": {
+      "status": "fail",
+      "note": "Yes closes only after a rating is submitted (old flow). Minor, being fixed"
+    },
+    "AC-R4-18": {
+      "status": "fail",
+      "note": "Thank-you + rate message not sent on the old flow. Accepted: not needed while the old flow is used"
+    },
+    "AC-R9-1": {
+      "status": "fail",
+      "note": "New ticket after Closure is linked as a reopen (within 48 h of the last mark). Backlog"
+    },
+    "AC-R8-5": {
+      "status": "fail",
+      "note": "K6 names the CSP by ID (a0a0m0), not name. Minor"
+    },
+    "AC-R8-25": {
+      "status": "fail",
+      "note": "Closing comment posted 6 times on the customer-yes path (closure event taskId null, outbox resend). Raised, being fixed"
+    },
+    "AC-R1-5": {
+      "status": "pass",
+      "note": "CSP app in Pending Verification offers no Resolved, no Netbox swap, no move back to In Progress (checked by Ashish)"
+    },
+    "AC-R5-2": {
+      "status": "pass",
+      "note": "After the customer Reopen the CSP app shows the same task, Reopened (checked by Ashish)"
+    },
+    "AC-R8-24": {
+      "status": "pass",
+      "note": "Neither app shows Kapture comments or the Internet Verdict (checked by Ashish)"
+    }
   }
 }

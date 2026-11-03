@@ -1,5 +1,5 @@
 {
-  "asOf": "3 Nov 2026",
+  "asOf": "4 Nov 2026",
   "env": "QA",
   "docs": [
     "short",
@@ -220,6 +220,26 @@
     "AC-R3-10": {
       "status": "fail",
       "note": "Blocked by the AC-R8-14 bug: a Wiom CX reopen during the Initial Check (disposition Open or ReOpen) creates a second task instead of reopening this one"
+    },
+    "AC-R8-10": {
+      "status": "pass",
+      "note": "Ticket 1793624994687000: reopened 3 Nov 09:10 (Kapture Open), left alone until the next mark at 14:02 — ~5 h, Kapture stayed Open, task stayed In Progress with the CSP, nothing auto-completed"
+    },
+    "AC-R8-27": {
+      "status": "fail",
+      "note": "K1 reads \"Marked Resolved by Updated chaturvedi (Owner) at 20:09\" and \"by Saurabh (Technician) at 17:28\": role is right, but the CSP name is missing (AC expects \"(Manager, CSP Shiv Net)\")"
+    },
+    "AC-GRD-6": {
+      "status": "pass",
+      "note": "Every Pending Verification exit seen in UAT carried a recorded cause: customer yes (CUSTOMER_CONFIRMED), customer Reopen, Wiom CX close (CLOSED_BY_WIOM_CX_TEAM), C-05 (NOT_VERIFIED). The Wiom CX reopen exit is broken separately (AC-R8-14)"
+    },
+    "AC-R8-13": {
+      "status": "todo",
+      "note": "Not reachable from the Kapture UI: \"Closed\" is not in the disposition list (only Completed, ReOpen, New, Waiting for Customer, Resolved on Call, Under Observation). Completed closes correctly (AC-R4-11)"
+    },
+    "AC-GRD-1": {
+      "status": "todo",
+      "note": "Partly seen: customer reopen of a Closed task refused (AC-R9-4), Wiom CX reopen refused (AC-R8-20). Still needed: customer yes after Closure (AC-R9-2)"
     }
   }
 }

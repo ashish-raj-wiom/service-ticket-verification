@@ -160,6 +160,10 @@
     "AC-R8-15": {
       "status": "pass",
       "note": "Priority Low→High in Kapture during Pending Verification: no webhook, no state change; Kapture stays Pending / Resolved (Kapture 793716748464, 3 Nov)"
+    },
+    "AC-R5-4": {
+      "status": "pass",
+      "note": "Wiom CX note in Kapture without a status change (\"customer asked when partner will visit\"): no webhook, task stays in Pending Verification, no new task (Kapture 793716748464, 3 Nov)"
     }
   }
 }

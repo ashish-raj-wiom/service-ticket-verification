@@ -119,7 +119,7 @@
     },
     "AC-R9-1": {
       "status": "fail",
-      "note": "New ticket after Closure is linked as a reopen (within 48 h of the last mark). Backlog"
+      "note": "New ticket after Closure is linked as a reopen (within 48 h of the last mark). Backlog. Also seen 3 Nov 20:43: the linked task closed by today's path got resolution_minutes=1787, measured from the lineage root raised on 2 Nov"
     },
     "AC-R8-5": {
       "status": "fail",
@@ -196,6 +196,14 @@
     "AC-R5-7": {
       "status": "pass",
       "note": "Kapture Sub Status Open (disposition form) on an In Progress task never marked Resolved: no reopen, no new complaint or task; only a title re-sync (Kapture 793718287021, 3 Nov 20:36)"
+    },
+    "AC-R8-8": {
+      "status": "pass",
+      "note": "Kapture Completed on a task never marked Resolved: closed at once by today's path (Kapture closure sync, TAS completed by CC_AGENT 227688), no Pending Verification, no K-comments (Kapture 793718287021, 20:43)"
+    },
+    "AC-GRD-2": {
+      "status": "pass",
+      "note": "Task never marked Resolved closed only by the Wiom CX close, through today's flow (same run as AC-R8-8)"
     }
   }
 }

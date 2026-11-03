@@ -127,7 +127,7 @@
     },
     "AC-R8-25": {
       "status": "fail",
-      "note": "Closing comment posted 6 times on the customer-yes path (closure event taskId null, outbox resend). Raised, being fixed"
+      "note": "Partly fixed 3 Nov: the TAS 400 (taskId null) is gone. Still ~40% of closures post the closing comment twice: TAS returns 409 CONCURRENT_UPDATE_CONFLICT (race with the old completion path), the outbox resends, ticket-service has no eventId check"
     },
     "AC-R1-5": {
       "status": "pass",

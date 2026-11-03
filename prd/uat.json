@@ -126,8 +126,8 @@
       "note": "K6 names the CSP by ID (a0a0m0), not name. Minor"
     },
     "AC-R8-25": {
-      "status": "fail",
-      "note": "Partly fixed 3 Nov: the TAS 400 (taskId null) is gone. Still ~40% of closures post the closing comment twice: TAS returns 409 CONCURRENT_UPDATE_CONFLICT (race with the old completion path), the outbox resends, ticket-service has no eventId check. 3 Nov 20:20: Wiom CX close posted K10 once — TAS now skips the old COMPLAINT_RESOLVED completion for STV closures (race fix in qa merge #2184); re-check customer-yes closures"
+      "status": "pass",
+      "note": "Fixed after qa merge #2184 (3 Nov 15:33): TAS skips the old completion for STV closures, no 409 resend. Re-tested twice: Wiom CX close (Kapture 793716748464, 20:20) and customer yes (Kapture 793717614545, 20:34) each posted the closing comment once. Earlier: ~40% doubled. Ask QA to re-enable TC-STV-025/026/046"
     },
     "AC-R1-5": {
       "status": "pass",

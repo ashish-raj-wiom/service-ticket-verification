@@ -143,7 +143,7 @@
     },
     "AC-R5-5": {
       "status": "fail",
-      "note": "Out-of-hours Reopen (09:10): countdown correctly resumes at 11:00, but urgent/overdue alerts fire on the original deadline (12:28/12:33) — TAS schedules not cancelled at the mark, 409 on Reopen. Raised"
+      "note": "Out-of-hours Reopen (09:10): countdown correctly resumes at 11:00, but urgent/overdue alerts fire on the original deadline (12:28/12:33) — TAS schedules not cancelled at the mark, 409 on Reopen. Raised. 3 Nov 22:38 Reopen (after the TAS fix): alerts rescheduled without 409, deadline 15:00 next day — correct, but same as the original deadline for this after-hours ticket; re-test with an in-hours Reopen"
     },
     "AC-R7-1": {
       "status": "pass",
@@ -204,6 +204,18 @@
     "AC-GRD-2": {
       "status": "pass",
       "note": "Task never marked Resolved closed only by the Wiom CX close, through today's flow (same run as AC-R8-8)"
+    },
+    "AC-R4-17": {
+      "status": "pass",
+      "note": "Wiom CX close (Sub Status Completed) while the task was back In Progress after a customer Reopen: Closed, \"Closed by the Wiom CX team\" at once; customer closure message sent (Kapture 793725639097, 22:41)"
+    },
+    "AC-R8-29": {
+      "status": "pass",
+      "note": "K10 reads \"…at 22:41 while back with CSP a0a0m0 — reason: Closed by the Wiom CX team\". Names agent and CSP by id — see AC-R8-5"
+    },
+    "AC-R6-13": {
+      "status": "pass",
+      "note": "CX close of a reopened In Progress task counted the open round up to the close; all of it fell after 21:00, so CSP TAT 0 min, within TAT"
     }
   }
 }

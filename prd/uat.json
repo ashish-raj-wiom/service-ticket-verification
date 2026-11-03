@@ -144,6 +144,18 @@
     "AC-R5-5": {
       "status": "fail",
       "note": "Out-of-hours Reopen (09:10): countdown correctly resumes at 11:00, but urgent/overdue alerts fire on the original deadline (12:28/12:33) — TAS schedules not cancelled at the mark, 409 on Reopen. Raised"
+    },
+    "AC-R7-1": {
+      "status": "pass",
+      "note": "Ticket 1793624994687000: CSP TAT 192 min = 0 + 182 (11:00–14:02 after a 09:10 Reopen) + 10 (14:20–14:31); Pending Verification time excluded"
+    },
+    "AC-R6-4": {
+      "status": "pass",
+      "note": "Multi-round task signalled within TAT with rounds summed and Pending Verification excluded (192 min, 3 Nov)"
+    },
+    "AC-R6-5": {
+      "status": "pass",
+      "note": "Out-of-hours Reopen (09:10): TAT waited until 11:00; signal within TAT at 192 min, not ~292 min from the Reopen"
     }
   }
 }

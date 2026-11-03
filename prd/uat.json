@@ -156,6 +156,10 @@
     "AC-R6-5": {
       "status": "pass",
       "note": "Out-of-hours Reopen (09:10): TAT waited until 11:00; signal within TAT at 192 min, not ~292 min from the Reopen"
+    },
+    "AC-R8-15": {
+      "status": "pass",
+      "note": "Priority Low→High in Kapture during Pending Verification: no webhook, no state change; Kapture stays Pending / Resolved (Kapture 793716748464, 3 Nov)"
     }
   }
 }

@@ -192,6 +192,10 @@
     "AC-R5-19": {
       "status": "fail",
       "note": "Same bug as AC-R8-14: the new task sent the customer an IVR PIN message and call card"
+    },
+    "AC-R5-7": {
+      "status": "pass",
+      "note": "Kapture Sub Status Open (disposition form) on an In Progress task never marked Resolved: no reopen, no new complaint or task; only a title re-sync (Kapture 793718287021, 3 Nov 20:36)"
     }
   }
 }

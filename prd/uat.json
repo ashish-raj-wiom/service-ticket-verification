@@ -176,6 +176,22 @@
     "AC-R6-3": {
       "status": "pass",
       "note": "Quality OS signal at the CX close, marked fixed, CSP TAT 0 min within TAT"
+    },
+    "AC-R8-14": {
+      "status": "fail",
+      "note": "Kapture Sub Status Open set through the disposition form (webhook event Disposed) takes the old auto-reopen path: a NEW complaint f99a5c54 + new task c94a3d0d are created, the original 5337b71b stays in Pending Verification (ticket 1793718686291000, 3 Nov 20:26). The Reopen action (event Reopend) is routed correctly"
+    },
+    "AC-R5-3": {
+      "status": "fail",
+      "note": "Same bug as AC-R8-14: the Wiom CX reopen creates a second task instead of reopening this one"
+    },
+    "AC-R8-19": {
+      "status": "fail",
+      "note": "Same bug as AC-R8-14: no K7 comment, the old reopen path ran"
+    },
+    "AC-R5-19": {
+      "status": "fail",
+      "note": "Same bug as AC-R8-14: the new task sent the customer an IVR PIN message and call card"
     }
   }
 }

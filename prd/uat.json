@@ -1,5 +1,5 @@
 {
-  "asOf": "2 Nov 2026",
+  "asOf": "3 Nov 2026",
   "env": "QA",
   "docs": [
     "short",
@@ -15,7 +15,7 @@
     },
     "AC-R1-2": {
       "status": "pass",
-      "note": "CSP TAT stops at the mark"
+      "note": "CSP TAT stops at the mark (signal TAT correct). Note: deadline alerts keep running through Pending Verification — see AC-R5-5"
     },
     "AC-R1-4": {
       "status": "pass",
@@ -140,6 +140,10 @@
     "AC-R8-24": {
       "status": "pass",
       "note": "Neither app shows Kapture comments or the Internet Verdict (checked by Ashish)"
+    },
+    "AC-R5-5": {
+      "status": "fail",
+      "note": "Out-of-hours Reopen (09:10): countdown correctly resumes at 11:00, but urgent/overdue alerts fire on the original deadline (12:28/12:33) — TAS schedules not cancelled at the mark, 409 on Reopen. Raised"
     }
   }
 }

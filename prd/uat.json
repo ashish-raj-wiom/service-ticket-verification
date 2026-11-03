@@ -127,7 +127,7 @@
     },
     "AC-R8-25": {
       "status": "fail",
-      "note": "Partly fixed 3 Nov: the TAS 400 (taskId null) is gone. Still ~40% of closures post the closing comment twice: TAS returns 409 CONCURRENT_UPDATE_CONFLICT (race with the old completion path), the outbox resends, ticket-service has no eventId check"
+      "note": "Partly fixed 3 Nov: the TAS 400 (taskId null) is gone. Still ~40% of closures post the closing comment twice: TAS returns 409 CONCURRENT_UPDATE_CONFLICT (race with the old completion path), the outbox resends, ticket-service has no eventId check. 3 Nov 20:20: Wiom CX close posted K10 once — TAS now skips the old COMPLAINT_RESOLVED completion for STV closures (race fix in qa merge #2184); re-check customer-yes closures"
     },
     "AC-R1-5": {
       "status": "pass",
@@ -164,6 +164,18 @@
     "AC-R5-4": {
       "status": "pass",
       "note": "Wiom CX note in Kapture without a status change (\"customer asked when partner will visit\"): no webhook, task stays in Pending Verification, no new task (Kapture 793716748464, 3 Nov)"
+    },
+    "AC-R4-11": {
+      "status": "pass",
+      "note": "Kapture Sub Status Completed during Pending Verification → Closed, \"Closed by the Wiom CX team\" at once; CSP closure notification sent; customer closure message triggered (Kapture 793716748464, 3 Nov). Saving the disposition form with Sub Status still Resolved does not close — by design"
+    },
+    "AC-R8-6": {
+      "status": "pass",
+      "note": "K10 at 20:20 with the closure reason, Status Complete / Completed, posted once. Names the agent by Kapture id (227688) and CSP by id — see AC-R8-5"
+    },
+    "AC-R6-3": {
+      "status": "pass",
+      "note": "Quality OS signal at the CX close, marked fixed, CSP TAT 0 min within TAT"
     }
   }
 }

@@ -256,6 +256,18 @@
     "AC-DUP-3": {
       "status": "pass",
       "note": "Double-tap on ठीक कर दिया है (ticket 1793776805282000, 4 Nov 12:22): one Resolved mark reached the backend, one Pending Verification, one Initial Check. The app sent a single request"
+    },
+    "AC-R5-10": {
+      "status": "pass",
+      "note": "Customer chose नई शिकायत दर्ज करें (ticket 1793776805282000, 4 Nov 12:25): the app opened the dialer with the Wiom CX number; the task stayed in Pending Verification, unchanged"
+    },
+    "AC-R8-21": {
+      "status": "fail",
+      "note": "No K12 comment: on the old app flow the नई शिकायत choice is handled inside the app (opens the dialer) and nothing reaches the backend, so Kapture never records that the customer chose a new complaint (Kapture 793775100154)"
+    },
+    "AC-R5-14": {
+      "status": "pass",
+      "note": "Wiom CX created a new ticket in Kapture (8793775557856, 12:29): new complaint 18607bce + new task 93d603fd with the CSP; ticket A (ce1b160c) stayed in Pending Verification, untouched"
     }
   }
 }

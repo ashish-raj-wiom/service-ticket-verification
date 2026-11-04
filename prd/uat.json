@@ -321,5 +321,153 @@
       "status": "pass",
       "note": "Ticket 1793776686482000: no message at the 14:51 swap (chat checked); only the first message at 15:20"
     }
-  }
+  },
+  "buckets": [
+    {
+      "name": "Testable now",
+      "blocker": "Nothing: QA as it is today",
+      "how": "Reopen/Technician pushes, RDNI + ISD positive verdict, swap after a Reopen, TAT breach, duplicate answers, Kapture Sub Status Closed",
+      "ids": [
+        "AC-R2-2",
+        "AC-R2-12",
+        "AC-R3-8",
+        "AC-R5-5",
+        "AC-R5-13",
+        "AC-R5-16",
+        "AC-R5-17",
+        "AC-R6-6",
+        "AC-R6-7",
+        "AC-R8-13",
+        "AC-DUP-1",
+        "AC-DUP-2"
+      ]
+    },
+    {
+      "name": "CT notification records",
+      "blocker": "CT push campaigns (live since 4 Nov afternoon); customer app CT build for the first-message rows",
+      "how": "Run a Reopen and a Closure, then read the CT profiles of Owner 305, Manager 8653, Technician 439 and the customer",
+      "ids": [
+        "AC-R11-2",
+        "AC-R11-3",
+        "AC-R11-4",
+        "AC-R3-4",
+        "AC-R11-7",
+        "AC-R11-8",
+        "AC-R11-9",
+        "AC-R11-10",
+        "AC-R11-11"
+      ]
+    },
+    {
+      "name": "Needs the QA scheduler on",
+      "blocker": "SRS scheduler disabled on QA (C-04/C-05 auto close, Internet Verdict polling)",
+      "how": "Ask tech to enable it; then one positive-verdict no-answer ticket and one no-verdict no-answer ticket",
+      "ids": [
+        "AC-R2-1",
+        "AC-R2-4",
+        "AC-R2-7",
+        "AC-R2-8",
+        "AC-R2-10",
+        "AC-R2-11",
+        "AC-R3-6",
+        "AC-R4-2",
+        "AC-R4-7",
+        "AC-R4-10",
+        "AC-R4-13",
+        "AC-R4-19",
+        "AC-R6-8",
+        "AC-R8-9",
+        "AC-R8-11",
+        "AC-R8-12",
+        "AC-R8-18",
+        "AC-R8-28",
+        "AC-R9-2",
+        "AC-R11-5",
+        "AC-WF-2",
+        "AC-BV-1",
+        "AC-BV-2",
+        "AC-BV-12",
+        "AC-BV-14"
+      ]
+    },
+    {
+      "name": "Needs a CSP not on the rollout list",
+      "blocker": "A test CSP off the list (and a second CSP to move a task to)",
+      "how": "Must-test before launch: off-list CSPs behave exactly as today",
+      "ids": [
+        "AC-R12-2",
+        "AC-R12-3",
+        "AC-R12-4",
+        "AC-R12-5",
+        "AC-R12-6",
+        "AC-R12-7",
+        "AC-R12-8",
+        "AC-R12-9",
+        "AC-R12-10",
+        "AC-R13-5",
+        "AC-R5-15",
+        "AC-GRD-9"
+      ]
+    },
+    {
+      "name": "Quality OS: M3 and TAT periods",
+      "blocker": "Quality OS cycle data; check with the Quality owner",
+      "how": "Read the Quality OS records for counted tasks and cycle boundaries",
+      "ids": [
+        "AC-R10-1",
+        "AC-R10-2",
+        "AC-R10-3",
+        "AC-R10-4",
+        "AC-R10-5",
+        "AC-R10-6",
+        "AC-R10-7",
+        "AC-R10-8",
+        "AC-R10-9",
+        "AC-R10-10",
+        "AC-R10-11",
+        "AC-R6-12",
+        "AC-BV-7",
+        "AC-BV-8",
+        "AC-BV-9",
+        "AC-RACE-3",
+        "AC-RACE-8"
+      ]
+    },
+    {
+      "name": "Config changes",
+      "blocker": "A Wiom Product user changing timer values on QA",
+      "how": "Change C-01/C-04/C-05/C-13/C-14 and check new values apply and bad ones are refused",
+      "ids": [
+        "AC-CFG-1",
+        "AC-CFG-2",
+        "AC-CFG-3",
+        "AC-CFG-5",
+        "AC-CFG-6",
+        "AC-CFG-7",
+        "AC-BV-11"
+      ]
+    },
+    {
+      "name": "Same-instant races",
+      "blocker": "Two actions at the same instant: engineering test, not manual",
+      "how": "Ask engineering for test evidence",
+      "ids": [
+        "AC-RACE-1",
+        "AC-RACE-2",
+        "AC-RACE-5",
+        "AC-RACE-6",
+        "AC-RACE-7"
+      ]
+    },
+    {
+      "name": "Guardrail reviews over many tasks",
+      "blocker": "A day of tasks to review",
+      "how": "Review once there is volume (late QA or first days live)",
+      "ids": [
+        "AC-GRD-1",
+        "AC-GRD-3",
+        "AC-GRD-8"
+      ]
+    }
+  ]
 }

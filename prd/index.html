@@ -39,6 +39,17 @@
   .uat.todo { background:var(--code); color:var(--muted); }
   @media (prefers-color-scheme: dark) { .uat.pass { background:#1f3a25; color:#8fd6a0; } .uat.fail { background:#4a221d; color:#f2a59b; } }
   .uatsum { font-size:13px; color:var(--muted); padding:0 0 8px; }
+  details.buckets { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin:0 0 18px; font-size:14px; }
+  details.buckets summary { cursor:pointer; font-weight:600; }
+  .bk { padding:10px 0; border-top:1px solid var(--line); }
+  .bk:first-of-type { border-top:0; }
+  .bk h4 { margin:0 0 2px; font-size:14px; }
+  .bk h4 .n { font-weight:400; color:var(--muted); }
+  .bk p { margin:2px 0 6px; color:var(--muted); font-size:13px; }
+  .bk .ids { display:flex; flex-wrap:wrap; gap:4px; }
+  .bk .ids a, .bk .ids span { font-size:12px; padding:0 7px; border-radius:999px; background:var(--code); color:inherit; text-decoration:none; line-height:1.7; }
+  .bk .ids a { outline:1px solid var(--line); }
+  tr:target { outline:2px solid #e0a100; }
   @media (max-width: 600px) { nav .label { min-width:100%; } }
 </style>
 </head>
@@ -47,6 +58,7 @@
   <nav id="nav"></nav>
   <div class="src" id="src"></div>
   <div class="uatsum" id="uatsum"></div>
+  <details class="buckets" id="buckets" hidden></details>
   <main id="doc">Loading…</main>
 </div>
 <script type="module">
@@ -112,10 +124,27 @@ try {
         const s = document.createElement("span");
         s.className = "uat " + r.status; s.textContent = label[r.status]; s.title = r.note;
         td.appendChild(s);
+        if (!document.getElementById(id)) td.parentElement.id = id;
       });
       if (count.pass + count.fail + count.todo)
         document.getElementById("uatsum").textContent =
           `UAT on ${u.env}, as of ${u.asOf}: ${count.pass} passed · ${count.fail} failed · ${count.todo} yet to test. Hover a tag for the note.`;
+    }
+    // Pending buckets: every AC not yet passed or failed, grouped by what it is waiting for.
+    if (u.buckets) {
+      const done = id => ["pass", "fail"].includes((u.results[id] || {}).status);
+      const groups = u.buckets.map(b => ({ ...b, left: b.ids.filter(id => !done(id)) })).filter(b => b.left.length);
+      const total = groups.reduce((n, b) => n + b.left.length, 0);
+      if (total) {
+        const el = document.getElementById("buckets");
+        const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+        el.innerHTML = `<summary>Pending UAT: ${total} ACs in ${groups.length} buckets (all phases)</summary>` +
+          groups.map(b => `<div class="bk"><h4>${esc(b.name)} <span class="n">· ${b.left.length}</span></h4>` +
+            `<p><b>Waiting on:</b> ${esc(b.blocker)}. ${esc(b.how)}.</p><div class="ids">` +
+            b.left.map(id => document.getElementById(id) ? `<a href="#${id}">${id}</a>` : `<span>${id}</span>`).join("") +
+            `</div></div>`).join("");
+        el.hidden = false;
+      }
     }
   } catch (e) { /* no tags if uat.json is missing */ }
 

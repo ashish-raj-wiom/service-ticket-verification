@@ -252,6 +252,10 @@
     "AC-R7-2": {
       "status": "pass",
       "note": "Ticket 1793727553382000 raised 3 Nov 23:01, marked Resolved 4 Nov 12:08:43: CSP TAT for the round = 68 min (11:00–12:08); nothing from the night counted (TAS left 172 of 240 min)"
+    },
+    "AC-DUP-3": {
+      "status": "pass",
+      "note": "Double-tap on ठीक कर दिया है (ticket 1793776805282000, 4 Nov 12:22): one Resolved mark reached the backend, one Pending Verification, one Initial Check. The app sent a single request"
     }
   }
 }

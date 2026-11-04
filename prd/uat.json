@@ -316,6 +316,10 @@
     "AC-R6-11": {
       "status": "pass",
       "note": "Ticket 1793776686482000: swap at 14:51, customer yes at 16:00; Quality got one COMPLAINT_RESOLUTION_SIGNAL at 16:00:05, none at 14:51"
+    },
+    "AC-R3-9": {
+      "status": "pass",
+      "note": "Ticket 1793776686482000: no message at the 14:51 swap (chat checked); only the first message at 15:20"
     }
   }
 }

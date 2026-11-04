@@ -304,6 +304,14 @@
     "AC-R8-4": {
       "status": "pass",
       "note": "Ticket 1793786370940000: K1 15:25 (names Updated chaturvedi, Owner), K2 15:25 (positive verdict), K5 15:28 Customer confirmed. Durations still say 48/72 h"
+    },
+    "AC-R1-10": {
+      "status": "pass",
+      "note": "13:55 swap failed (Invalid New Device ID): SRS kept it In Progress, no Pending Verification, no customer message"
+    },
+    "AC-R13-4": {
+      "status": "pass",
+      "note": "Ticket 1793776686482000: PIN 023071 still shown on the CSP app at 15:56, after the 14:51 swap"
     }
   }
 }

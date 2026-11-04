@@ -54,8 +54,8 @@
       "note": "Resolved again starts a new round"
     },
     "AC-R5-13": {
-      "status": "todo",
-      "note": "Task returns to the Technician list (seen); Reopen notification sent by backend; device push not enabled on QA yet"
+      "status": "pass",
+      "note": "Ticket 1793797427341000 (Technician Saurabh 439): customer Reopen 18:36 back to In Progress with Saurabh; Reopen event to 305, 8653 and 439"
     },
     "AC-R5-18": {
       "status": "pass",
@@ -278,8 +278,8 @@
       "note": "No K13 comment: on the old app flow the नहीं tap only shows the choices inside the app and nothing reaches the backend, so Kapture never records it (same gap as AC-R8-21)"
     },
     "AC-R9-2": {
-      "status": "todo",
-      "note": "Not reachable in the current customer app: only the latest chat message has active buttons, so after Closure (rating message last) the old हाँ cannot be tapped"
+      "status": "pass",
+      "note": "Ticket 1793797427341000 (Technician Saurabh 439): yes after the 18:40 auto close: SRS NO_ACTION, still closed, no new signal"
     },
     "AC-DUP-1": {
       "status": "todo",
@@ -326,8 +326,8 @@
       "note": "Real timer: ticket 1793798006308000 marked 18:20:23 (C-04 = 2 min on QA), C-04 fired 18:22:55, closed Internet working, no response. Also by hand on 1793787416611000 at 17:33"
     },
     "AC-R4-13": {
-      "status": "pass",
-      "note": "Ticket 1793787416611000, C-04 fired by hand 17:33 (QA timers not delivering): no Technician assigned; closure sent to Owner 305 and Manager 8653 only"
+      "status": "todo",
+      "note": "Recipients right (305, 8653 only) but no Closure push is sent: CT campaign covers Reopen only. Pending product call"
     },
     "AC-R8-12": {
       "status": "pass",
@@ -336,6 +336,22 @@
     "AC-R6-8": {
       "status": "pass",
       "note": "Ticket 1793787416611000, C-04 fired by hand 17:33 (QA timers not delivering): one resolution signal to Quality at 17:33, CSP TAT 49 min within TAT"
+    },
+    "AC-R2-12": {
+      "status": "pass",
+      "note": "Ticket 1793797427341000 (Technician Saurabh 439): नहीं with no choice at round 0 changed nothing"
+    },
+    "AC-DUP-2": {
+      "status": "pass",
+      "note": "Ticket 1793797427341000 (Technician Saurabh 439): one Reopen recorded for the customer no"
+    },
+    "AC-R2-7": {
+      "status": "pass",
+      "note": "Ticket 1793797427341000 (Technician Saurabh 439): positive at each mark, no verdict asks after it, auto closed by the real C-04 at 18:40"
+    },
+    "AC-R3-8": {
+      "status": "pass",
+      "note": "Ticket 1793797427341000 (Technician Saurabh 439): not reachable: older first messages lose their buttons, so a stale yes cannot be sent; task stays In Progress"
     }
   },
   "buckets": [

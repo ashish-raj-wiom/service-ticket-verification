@@ -512,6 +512,10 @@
     "AC-R12-2": {
       "status": "pass",
       "note": "a0a0m0 off the list 19:56:16–20:00:23: R: closed at the 19:59:20 mark, resolved message triggered, Quality signal at the mark (message sent twice: see note to tech)"
+    },
+    "AC-R12-3": {
+      "status": "pass",
+      "note": "a0a0m0 re-added 20:00:23: R (marked 19:59 while off the list) stayed closed as today; T (1793803485384000) marked 20:04:53 entered Pending Verification (positive verdict at the mark)"
     }
   },
   "buckets": [

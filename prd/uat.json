@@ -516,6 +516,10 @@
     "AC-R12-3": {
       "status": "pass",
       "note": "a0a0m0 re-added 20:00:23: R (marked 19:59 while off the list) stayed closed as today; T (1793803485384000) marked 20:04:53 entered Pending Verification (positive verdict at the mark)"
+    },
+    "AC-R12-6": {
+      "status": "pass",
+      "note": "a0a0m0 off the list: R (6969715794) chat showed only today's options. Resolved message arrived twice, but prod does the same today (210 of 326 tickets in 3 h trigger it twice), so it is today's behaviour"
     }
   },
   "buckets": [

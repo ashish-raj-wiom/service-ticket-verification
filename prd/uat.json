@@ -388,6 +388,14 @@
     "AC-RACE-8": {
       "status": "na",
       "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
+    },
+    "AC-R5-16": {
+      "status": "pass",
+      "note": "Complaint 46ca69ae, Technician 439 deactivated after his 19:03 mark: customer Reopen 19:04 cleared the Technician (\"439 not active\"), task back in the CSP app unassigned; Reopen sent to 305 and 8653 only"
+    },
+    "AC-R4-19": {
+      "status": "pass",
+      "note": "Complaint 46ca69ae, Technician 439 deactivated after his 19:03 mark: real C-04 auto close 19:07:33; closure sent to 305 and 8653 only, not 439"
     }
   },
   "buckets": [

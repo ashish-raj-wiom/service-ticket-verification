@@ -42,8 +42,8 @@
       "note": "C-04 with no positive verdict keeps the task in Pending Verification"
     },
     "AC-R4-10": {
-      "status": "todo",
-      "note": "Backend sends Closure notification to CSP users and the Technician (CleverTap upload seen); device push not enabled on QA yet"
+      "status": "na",
+      "note": "Out of scope for launch (4 Nov): no Closure push to CSP/Technician; Reopen push only"
     },
     "AC-R5-1": {
       "status": "pass",
@@ -326,8 +326,8 @@
       "note": "Real timer: ticket 1793798006308000 marked 18:20:23 (C-04 = 2 min on QA), C-04 fired 18:22:55, closed Internet working, no response. Also by hand on 1793787416611000 at 17:33"
     },
     "AC-R4-13": {
-      "status": "todo",
-      "note": "Recipients right (305, 8653 only) but no Closure push is sent: CT campaign covers Reopen only. Pending product call"
+      "status": "na",
+      "note": "Out of scope for launch (4 Nov): no Closure push to CSP/Technician; Reopen push only"
     },
     "AC-R8-12": {
       "status": "pass",
@@ -352,6 +352,14 @@
     "AC-R3-8": {
       "status": "pass",
       "note": "Ticket 1793797427341000 (Technician Saurabh 439): not reachable: older first messages lose their buttons, so a stale yes cannot be sent; task stays In Progress"
+    },
+    "AC-R11-8": {
+      "status": "na",
+      "note": "Out of scope for launch (4 Nov): no Closure push to CSP/Technician; Reopen push only"
+    },
+    "AC-R11-11": {
+      "status": "na",
+      "note": "Out of scope for launch (4 Nov): no Closure push to CSP/Technician; Reopen push only"
     }
   },
   "buckets": [

@@ -240,6 +240,14 @@
     "AC-GRD-1": {
       "status": "todo",
       "note": "Partly seen: customer reopen of a Closed task refused (AC-R9-4), Wiom CX reopen refused (AC-R8-20). Still needed: customer yes after Closure (AC-R9-2)"
+    },
+    "AC-R13-1": {
+      "status": "pass",
+      "note": "Customer called the IVR with PIN 023042 during Pending Verification and was connected (ticket 1793727553382000, 4 Nov 12:09)"
+    },
+    "AC-R13-6": {
+      "status": "pass",
+      "note": "CSP called the customer from the CSP app during Pending Verification and was connected (same ticket, 4 Nov)"
     }
   }
 }

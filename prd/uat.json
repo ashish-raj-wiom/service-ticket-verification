@@ -300,6 +300,10 @@
     "AC-R3-1": {
       "status": "pass",
       "note": "Ticket 1793786370940000: positive verdict at 15:25:13, first message (push + chat) at 15:25:14, confirmed on the phone"
+    },
+    "AC-R8-4": {
+      "status": "pass",
+      "note": "Ticket 1793786370940000: K1 15:25 (names Updated chaturvedi, Owner), K2 15:25 (positive verdict), K5 15:28 Customer confirmed. Durations still say 48/72 h"
     }
   }
 }

@@ -488,6 +488,30 @@
     "AC-GRD-8": {
       "status": "na",
       "note": "Not in PM UAT (4 Nov): review over live volume after launch"
+    },
+    "AC-R12-4": {
+      "status": "fail",
+      "note": "a0a0m0 off the list 19:56:16–20:00:23: P (1793803962770000) in verification; customer yes at 19:56:40 went down the old close path (ticket service checked the live list, not the ticket stv_mode) and never reached SRS; SRS closed it at C-04 as Internet working, no response"
+    },
+    "AC-R12-9": {
+      "status": "pass",
+      "note": "a0a0m0 off the list 19:56:16–20:00:23: Q (1793804209005000) reopened before removal; marked again 19:57:43 and entered Pending Verification (stv_mode kept)"
+    },
+    "AC-R12-7": {
+      "status": "pass",
+      "note": "a0a0m0 off the list 19:56:16–20:00:23: R (1793804055857000): one Internet Verdict ask at the 19:59:20 mark, closed on it as today"
+    },
+    "AC-R12-8": {
+      "status": "pass",
+      "note": "a0a0m0 off the list 19:56:16–20:00:23: R: Kapture has only today's notes (created, assigned), none of K1–K14"
+    },
+    "AC-R13-5": {
+      "status": "pass",
+      "note": "a0a0m0 off the list 19:56:16–20:00:23: R: IVR PIN released 19:59:22, at the Resolved mark as today"
+    },
+    "AC-R12-2": {
+      "status": "pass",
+      "note": "a0a0m0 off the list 19:56:16–20:00:23: R: closed at the 19:59:20 mark, resolved message triggered, Quality signal at the mark (message sent twice: see note to tech)"
     }
   },
   "buckets": [

@@ -291,7 +291,7 @@
     },
     "AC-R8-26": {
       "status": "fail",
-      "note": "K1 on swap reads \"…by CSP at 14:51\": no person named; still says 48 h or 72 h. Minor"
+      "note": "K1 on a swap says \"by CSP\" instead of the person who swapped (a Resolved tap names \"Updated chaturvedi (Owner)\"). Hours follow the timer config. Minor"
     },
     "AC-R2-6": {
       "status": "pass",

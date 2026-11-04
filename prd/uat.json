@@ -178,20 +178,20 @@
       "note": "Quality OS signal at the CX close, marked fixed, CSP TAT 0 min within TAT"
     },
     "AC-R8-14": {
-      "status": "fail",
-      "note": "Kapture Sub Status Open set through the disposition form (webhook event Disposed) takes the old auto-reopen path: a NEW complaint f99a5c54 + new task c94a3d0d are created, the original 5337b71b stays in Pending Verification (ticket 1793718686291000, 3 Nov 20:26). The Reopen action (event Reopend) is routed correctly. Re-tested 3 Nov 22:54 with Disposition Type ReOpen (Kapture 793726273689): same old auto-reopen path, second task 86710663 / complaint 5a3884bc created. On a ticket in verification Kapture offers no Reopen button; the disposition form is the only route"
+      "status": "pass",
+      "note": "Fixed — re-tested 4 Nov 13:28 (ticket 1793780376881000, Kapture 793778946907): Disposition Open during the Initial Check is now routed to SRS (\"STV reopen via Disposed/Open\"); the same task c4c6e6fd went back In Progress (round 0→1), no new complaint or task"
     },
     "AC-R5-3": {
-      "status": "fail",
-      "note": "Same bug as AC-R8-14: the Wiom CX reopen creates a second task instead of reopening this one. Re-tested 3 Nov 22:54 with Disposition Type ReOpen (Kapture 793726273689): same old auto-reopen path, second task 86710663 / complaint 5a3884bc created. On a ticket in verification Kapture offers no Reopen button; the disposition form is the only route"
+      "status": "pass",
+      "note": "Fixed — re-tested 4 Nov 13:28 (ticket 1793780376881000, Kapture 793778946907): Disposition Open during the Initial Check is now routed to SRS (\"STV reopen via Disposed/Open\"); the same task c4c6e6fd went back In Progress (round 0→1), no new complaint or task"
     },
     "AC-R8-19": {
-      "status": "fail",
-      "note": "Same bug as AC-R8-14: no K7 comment, the old reopen path ran. Re-tested 3 Nov 22:54 with Disposition Type ReOpen (Kapture 793726273689): same old auto-reopen path, second task 86710663 / complaint 5a3884bc created. On a ticket in verification Kapture offers no Reopen button; the disposition form is the only route"
+      "status": "pass",
+      "note": "Fixed — re-tested 4 Nov 13:28 (ticket 1793780376881000, Kapture 793778946907): Disposition Open during the Initial Check is now routed to SRS (\"STV reopen via Disposed/Open\"); the same task c4c6e6fd went back In Progress (round 0→1), no new complaint or task; K7: \"Krishan Tyagi set the ticket to Open in Kapture at 13:28. Ticket reopened and sent back to CSP a0a0m0; CSP a0a0m0 notified.\" (names the agent; CSP still by id)"
     },
     "AC-R5-19": {
-      "status": "fail",
-      "note": "Same bug as AC-R8-14: the new task sent the customer an IVR PIN message and call card. Re-tested 3 Nov 22:54 with Disposition Type ReOpen (Kapture 793726273689): same old auto-reopen path, second task 86710663 / complaint 5a3884bc created. On a ticket in verification Kapture offers no Reopen button; the disposition form is the only route"
+      "status": "pass",
+      "note": "Fixed — re-tested 4 Nov 13:28 (ticket 1793780376881000, Kapture 793778946907): Disposition Open during the Initial Check is now routed to SRS (\"STV reopen via Disposed/Open\"); the same task c4c6e6fd went back In Progress (round 0→1), no new complaint or task; no workflow or message sent to the customer"
     },
     "AC-R5-7": {
       "status": "pass",
@@ -218,8 +218,8 @@
       "note": "CX close of a reopened In Progress task counted the open round up to the close; all of it fell after 21:00, so CSP TAT 0 min, within TAT"
     },
     "AC-R3-10": {
-      "status": "fail",
-      "note": "Blocked by the AC-R8-14 bug: a Wiom CX reopen during the Initial Check (disposition Open or ReOpen) creates a second task instead of reopening this one"
+      "status": "pass",
+      "note": "Fixed — re-tested 4 Nov 13:28 (ticket 1793780376881000, Kapture 793778946907): Disposition Open during the Initial Check is now routed to SRS (\"STV reopen via Disposed/Open\"); the same task c4c6e6fd went back In Progress (round 0→1), no new complaint or task; Wiom CX reopened during the Initial Check, and no first message was ever sent for round 0"
     },
     "AC-R8-10": {
       "status": "pass",

@@ -312,6 +312,10 @@
     "AC-R13-4": {
       "status": "pass",
       "note": "Ticket 1793776686482000: PIN 023071 still shown on the CSP app at 15:56, after the 14:51 swap"
+    },
+    "AC-R6-11": {
+      "status": "pass",
+      "note": "Ticket 1793776686482000: swap at 14:51, customer yes at 16:00; Quality got one COMPLAINT_RESOLUTION_SIGNAL at 16:00:05, none at 14:51"
     }
   }
 }

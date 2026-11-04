@@ -320,6 +320,22 @@
     "AC-R3-9": {
       "status": "pass",
       "note": "Ticket 1793776686482000: no message at the 14:51 swap (chat checked); only the first message at 15:20"
+    },
+    "AC-R4-2": {
+      "status": "pass",
+      "note": "Ticket 1793787416611000, C-04 fired by hand 17:33 (QA timers not delivering): closed with Internet working, no response; no customer message"
+    },
+    "AC-R4-13": {
+      "status": "pass",
+      "note": "Ticket 1793787416611000, C-04 fired by hand 17:33 (QA timers not delivering): no Technician assigned; closure sent to Owner 305 and Manager 8653 only"
+    },
+    "AC-R8-12": {
+      "status": "pass",
+      "note": "Ticket 1793787416611000, C-04 fired by hand 17:33 (QA timers not delivering): K8 comment: reason Internet working, no response, verdict positive at 16:51, CSP a0a0m0 notified"
+    },
+    "AC-R6-8": {
+      "status": "pass",
+      "note": "Ticket 1793787416611000, C-04 fired by hand 17:33 (QA timers not delivering): one resolution signal to Quality at 17:33, CSP TAT 49 min within TAT"
     }
   },
   "buckets": [

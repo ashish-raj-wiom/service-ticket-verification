@@ -292,6 +292,10 @@
     "AC-R8-26": {
       "status": "fail",
       "note": "K1 on swap reads \"…by CSP at 14:51\": no person named; still says 48 h or 72 h. Minor"
+    },
+    "AC-R2-6": {
+      "status": "pass",
+      "note": "Ticket 1793786370940000: CVS YES (High) at the 15:25:13 mark, positiveVerdictAtMark=true, T2"
     }
   }
 }

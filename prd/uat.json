@@ -284,6 +284,14 @@
     "AC-DUP-1": {
       "status": "todo",
       "note": "Not reachable by hand: after the first हाँ the rating screen opens and the old हाँ is no longer the latest message. Needs a double rating submit or QA automation"
+    },
+    "AC-R1-9": {
+      "status": "pass",
+      "note": "Committed Netbox swap (14:51, L1401-IDLE-ONT-B1 → QA_CP15_SPARE_02) moved the task to Pending Verification, not Closed"
+    },
+    "AC-R8-26": {
+      "status": "fail",
+      "note": "K1 on swap reads \"…by CSP at 14:51\": no person named; still says 48 h or 72 h. Minor"
     }
   }
 }

@@ -142,8 +142,8 @@
       "note": "Neither app shows Kapture comments or the Internet Verdict (checked by Ashish)"
     },
     "AC-R5-5": {
-      "status": "fail",
-      "note": "Out-of-hours Reopen (09:10): countdown correctly resumes at 11:00, but urgent/overdue alerts fire on the original deadline (12:28/12:33) — TAS schedules not cancelled at the mark, 409 on Reopen. Raised. 3 Nov 22:38 Reopen (after the TAS fix): alerts rescheduled without 409, deadline 15:00 next day — correct, but same as the original deadline for this after-hours ticket; re-test with an in-hours Reopen"
+      "status": "todo",
+      "note": "Deadline part FIXED and verified 4 Nov: in-hours Reopen at 12:11:16 moved the deadline from 15:00 to 15:03:16 (resume + 172 min left), urgent/overdue alerts rescheduled, no 409. Earlier failure (3 Nov, alerts on the original deadline) fixed by qa merge #2184. Still to verify: Reopen notifications received on the phones (pushes not enabled)"
     },
     "AC-R7-1": {
       "status": "pass",
@@ -248,6 +248,10 @@
     "AC-R13-6": {
       "status": "pass",
       "note": "CSP called the customer from the CSP app during Pending Verification and was connected (same ticket, 4 Nov)"
+    },
+    "AC-R7-2": {
+      "status": "pass",
+      "note": "Ticket 1793727553382000 raised 3 Nov 23:01, marked Resolved 4 Nov 12:08:43: CSP TAT for the round = 68 min (11:00–12:08); nothing from the night counted (TAS left 172 of 240 min)"
     }
   }
 }

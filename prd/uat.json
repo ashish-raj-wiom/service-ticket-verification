@@ -296,6 +296,10 @@
     "AC-R2-6": {
       "status": "pass",
       "note": "Ticket 1793786370940000: CVS YES (High) at the 15:25:13 mark, positiveVerdictAtMark=true, T2"
+    },
+    "AC-R3-1": {
+      "status": "pass",
+      "note": "Ticket 1793786370940000: positive verdict at 15:25:13, first message (push + chat) at 15:25:14, confirmed on the phone"
     }
   }
 }

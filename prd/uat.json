@@ -369,10 +369,6 @@
       "status": "na",
       "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
     },
-    "AC-RACE-3": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
-    },
     "AC-RACE-5": {
       "status": "na",
       "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
@@ -382,10 +378,6 @@
       "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
     },
     "AC-RACE-7": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
-    },
-    "AC-RACE-8": {
       "status": "na",
       "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
     },
@@ -425,55 +417,7 @@
       "status": "na",
       "note": "Not in PM UAT (4 Nov): push-send failure record, no user-facing effect"
     },
-    "AC-R10-1": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-R10-2": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-R10-3": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-R10-4": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-R10-5": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-R10-6": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-R10-7": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-R10-8": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-R10-9": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-R10-10": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-R10-11": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
     "AC-R6-12": {
-      "status": "na",
-      "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
-    },
-    "AC-BV-7": {
       "status": "na",
       "note": "Not in PM UAT (4 Nov): Quality OS back-office counting, no screen changes"
     },
@@ -589,6 +533,27 @@
         "AC-R8-9",
         "AC-R4-7",
         "AC-WF-2"
+      ]
+    },
+    {
+      "name": "Quality OS: M3 timer (1 h on QA)",
+      "blocker": "Quality scheduler target on QA: AWS_SCHEDULER_API_DESTINATION_ARN is empty, every M3 timer fails to arm",
+      "how": "Once fixed: one task In Progress past 1 h (counts), one in verification past 1 h (does not count), one reopened that crosses 1 h of active time (counts once)",
+      "ids": [
+        "AC-R10-1",
+        "AC-R10-2",
+        "AC-R10-3",
+        "AC-R10-4",
+        "AC-R10-5",
+        "AC-R10-6",
+        "AC-R10-7",
+        "AC-R10-8",
+        "AC-R10-9",
+        "AC-R10-10",
+        "AC-R10-11",
+        "AC-BV-7",
+        "AC-RACE-3",
+        "AC-RACE-8"
       ]
     },
     {

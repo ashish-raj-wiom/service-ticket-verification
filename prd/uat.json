@@ -268,6 +268,22 @@
     "AC-R5-14": {
       "status": "pass",
       "note": "Wiom CX created a new ticket in Kapture (8793775557856, 12:29): new complaint 18607bce + new task 93d603fd with the CSP; ticket A (ce1b160c) stayed in Pending Verification, untouched"
+    },
+    "AC-R5-11": {
+      "status": "pass",
+      "note": "Customer tapped नहीं and chose neither option (ticket 1793776845807000, 4 Nov 13:10): no backend call, no Reopen, no new task; the task stayed in Pending Verification"
+    },
+    "AC-R8-22": {
+      "status": "fail",
+      "note": "No K13 comment: on the old app flow the नहीं tap only shows the choices inside the app and nothing reaches the backend, so Kapture never records it (same gap as AC-R8-21)"
+    },
+    "AC-R9-2": {
+      "status": "todo",
+      "note": "Not reachable in the current customer app: only the latest chat message has active buttons, so after Closure (rating message last) the old हाँ cannot be tapped"
+    },
+    "AC-DUP-1": {
+      "status": "todo",
+      "note": "Not reachable by hand: after the first हाँ the rating screen opens and the old हाँ is no longer the latest message. Needs a double rating submit or QA automation"
     }
   }
 }

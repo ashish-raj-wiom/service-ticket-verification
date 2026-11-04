@@ -282,8 +282,8 @@
       "note": "Ticket 1793797427341000 (Technician Saurabh 439): yes after the 18:40 auto close: SRS NO_ACTION, still closed, no new signal"
     },
     "AC-DUP-1": {
-      "status": "todo",
-      "note": "Not reachable by hand: after the first हाँ the rating screen opens and the old हाँ is no longer the latest message. Needs a double rating submit or QA automation"
+      "status": "na",
+      "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
     },
     "AC-R1-9": {
       "status": "pass",
@@ -360,6 +360,34 @@
     "AC-R11-11": {
       "status": "na",
       "note": "Out of scope for launch (4 Nov): no Closure push to CSP/Technician; Reopen push only"
+    },
+    "AC-RACE-1": {
+      "status": "na",
+      "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
+    },
+    "AC-RACE-2": {
+      "status": "na",
+      "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
+    },
+    "AC-RACE-3": {
+      "status": "na",
+      "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
+    },
+    "AC-RACE-5": {
+      "status": "na",
+      "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
+    },
+    "AC-RACE-6": {
+      "status": "na",
+      "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
+    },
+    "AC-RACE-7": {
+      "status": "na",
+      "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
+    },
+    "AC-RACE-8": {
+      "status": "na",
+      "note": "Not in PM UAT (4 Nov): no user-facing effect; engineering to cover"
     }
   },
   "buckets": [

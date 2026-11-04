@@ -323,7 +323,7 @@
     },
     "AC-R4-2": {
       "status": "pass",
-      "note": "Ticket 1793787416611000, C-04 fired by hand 17:33 (QA timers not delivering): closed with Internet working, no response; no customer message"
+      "note": "Real timer: ticket 1793798006308000 marked 18:20:23 (C-04 = 2 min on QA), C-04 fired 18:22:55, closed Internet working, no response. Also by hand on 1793787416611000 at 17:33"
     },
     "AC-R4-13": {
       "status": "pass",

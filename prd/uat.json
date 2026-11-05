@@ -110,20 +110,20 @@
       "note": "IVR PIN released at Closure, not before"
     },
     "AC-R4-1": {
-      "status": "fail",
-      "note": "Yes closes only after a rating is submitted (old flow). Minor, being fixed"
+      "status": "pass",
+      "note": "PM decision 5 Nov: expected behaviour on the old app flow (yes closes after the rating step). Yes closes only after a rating is submitted (old flow). Minor, being fixed"
     },
     "AC-R4-18": {
-      "status": "fail",
-      "note": "Thank-you + rate message not sent on the old flow. Accepted: not needed while the old flow is used"
+      "status": "acc",
+      "note": "PM decision 5 Nov: accepted for launch. Thank-you + rate message not sent on the old flow. Accepted: not needed while the old flow is used"
     },
     "AC-R9-1": {
-      "status": "fail",
-      "note": "New ticket after Closure is linked as a reopen (within 48 h of the last mark). Backlog. Also seen 3 Nov 20:43: the linked task closed by today's path got resolution_minutes=1787, measured from the lineage root raised on 2 Nov"
+      "status": "acc",
+      "note": "PM decision 5 Nov: in the backlog. New ticket after Closure is linked as a reopen (within 48 h of the last mark). Backlog. Also seen 3 Nov 20:43: the linked task closed by today's path got resolution_minutes=1787, measured from the lineage root raised on 2 Nov"
     },
     "AC-R8-5": {
-      "status": "fail",
-      "note": "K6 names the CSP by ID (a0a0m0), not name. Minor"
+      "status": "acc",
+      "note": "PM decision 5 Nov: accepted for launch. K6 names the CSP by ID (a0a0m0), not name. Minor"
     },
     "AC-R8-25": {
       "status": "pass",
@@ -226,8 +226,8 @@
       "note": "Ticket 1793624994687000: reopened 3 Nov 09:10 (Kapture Open), left alone until the next mark at 14:02 — ~5 h, Kapture stayed Open, task stayed In Progress with the CSP, nothing auto-completed"
     },
     "AC-R8-27": {
-      "status": "fail",
-      "note": "K1 reads \"Marked Resolved by Updated chaturvedi (Owner) at 20:09\" and \"by Saurabh (Technician) at 17:28\": role is right, but the CSP name is missing (AC expects \"(Manager, CSP Shiv Net)\")"
+      "status": "acc",
+      "note": "PM decision 5 Nov: accepted for launch. K1 reads \"Marked Resolved by Updated chaturvedi (Owner) at 20:09\" and \"by Saurabh (Technician) at 17:28\": role is right, but the CSP name is missing (AC expects \"(Manager, CSP Shiv Net)\")"
     },
     "AC-GRD-6": {
       "status": "pass",
@@ -262,8 +262,8 @@
       "note": "Customer chose नई शिकायत दर्ज करें (ticket 1793776805282000, 4 Nov 12:25): the app opened the dialer with the Wiom CX number; the task stayed in Pending Verification, unchanged"
     },
     "AC-R8-21": {
-      "status": "fail",
-      "note": "No K12 comment: on the old app flow the नई शिकायत choice is handled inside the app (opens the dialer) and nothing reaches the backend, so Kapture never records that the customer chose a new complaint (Kapture 793775100154)"
+      "status": "acc",
+      "note": "PM decision 5 Nov: accepted for launch. No K12 comment: on the old app flow the नई शिकायत choice is handled inside the app (opens the dialer) and nothing reaches the backend, so Kapture never records that the customer chose a new complaint (Kapture 793775100154)"
     },
     "AC-R5-14": {
       "status": "pass",
@@ -274,8 +274,8 @@
       "note": "Customer tapped नहीं and chose neither option (ticket 1793776845807000, 4 Nov 13:10): no backend call, no Reopen, no new task; the task stayed in Pending Verification"
     },
     "AC-R8-22": {
-      "status": "fail",
-      "note": "No K13 comment: on the old app flow the नहीं tap only shows the choices inside the app and nothing reaches the backend, so Kapture never records it (same gap as AC-R8-21)"
+      "status": "acc",
+      "note": "PM decision 5 Nov: accepted for launch. No K13 comment: on the old app flow the नहीं tap only shows the choices inside the app and nothing reaches the backend, so Kapture never records it (same gap as AC-R8-21)"
     },
     "AC-R9-2": {
       "status": "pass",
@@ -290,8 +290,8 @@
       "note": "Committed Netbox swap (14:51, L1401-IDLE-ONT-B1 → QA_CP15_SPARE_02) moved the task to Pending Verification, not Closed"
     },
     "AC-R8-26": {
-      "status": "fail",
-      "note": "K1 on a swap says \"by CSP\" instead of the person who swapped (a Resolved tap names \"Updated chaturvedi (Owner)\"). Hours follow the timer config. Minor — accepted for launch (4 Nov)"
+      "status": "acc",
+      "note": "PM decision 5 Nov: accepted for launch. K1 on a swap says \"by CSP\" instead of the person who swapped (a Resolved tap names \"Updated chaturvedi (Owner)\"). Hours follow the timer config. Minor — accepted for launch (4 Nov)"
     },
     "AC-R2-6": {
       "status": "pass",

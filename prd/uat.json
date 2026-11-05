@@ -520,6 +520,10 @@
     "AC-R12-6": {
       "status": "pass",
       "note": "a0a0m0 off the list: R (6969715794) chat showed only today's options. Resolved message arrived twice, but prod does the same today (210 of 326 tickets in 3 h trigger it twice), so it is today's behaviour"
+    },
+    "AC-R10-1": {
+      "status": "pass",
+      "note": "QA M3 = 1 h. Ticket A 1793863754941000 (complaint 8d4f3fc6), In Progress, never marked: M3 armed 12:49:19.97, check at 13:51 breached with crossedAt 13:49:19.97 (exactly 60:00), COMPLAINT_M3_BREACHED recorded once for a0a0m0"
     }
   },
   "buckets": [

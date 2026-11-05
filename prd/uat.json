@@ -552,6 +552,14 @@
     "AC-R10-8": {
       "status": "pass",
       "note": "E 1793874508875000 (Kapture 793872476476): armed 15:24:36, closed in Kapture by CX at 16:16:37 while In Progress (~52 min); Quality ledger resolved; check at 16:44 NOT_IN_PROGRESS, no breach"
+    },
+    "AC-R10-5": {
+      "status": "na",
+      "note": "Not in PM UAT (5 Nov): M3 cycle evaluation not tested. a0a0m0 had 3 breaches on QA (A, D, C) for reference"
+    },
+    "AC-R10-6": {
+      "status": "na",
+      "note": "Not in PM UAT (5 Nov): M3 cycle evaluation not tested. a0a0m0 had 3 breaches on QA (A, D, C) for reference"
     }
   },
   "buckets": [

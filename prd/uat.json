@@ -544,6 +544,14 @@
     "AC-R10-4": {
       "status": "pass",
       "note": "Ticket A 1793863754941000: breached 13:49:19; marked 14:13, customer reopened 14:20:39; M3 check at 15:11 returned NOOP_ALREADY_BREACHED, no second count. Cycle-boundary part (counted in 1–15, not again in 16–31) relies on the same write-once guard"
+    },
+    "AC-BV-7": {
+      "status": "pass",
+      "note": "QA M3 = 1 h. G 1793872894184000: armed 15:15:57, marked 16:13:22 (M3_PAUSED activeMinutes=57), closed Customer confirmed 16:14:22; check at 16:44 NOT_IN_PROGRESS, no breach"
+    },
+    "AC-R10-8": {
+      "status": "pass",
+      "note": "E 1793874508875000 (Kapture 793872476476): armed 15:24:36, closed in Kapture by CX at 16:16:37 while In Progress (~52 min); Quality ledger resolved; check at 16:44 NOT_IN_PROGRESS, no breach"
     }
   },
   "buckets": [

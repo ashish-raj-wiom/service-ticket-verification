@@ -540,6 +540,10 @@
     "AC-R10-3": {
       "status": "pass",
       "note": "Ticket C 1793865483070000 (complaint ee4d122b): armed 13:01:42, marked 13:32:16 (paused), reopened 13:39:19 (resumed); breach crossedAt 14:09:18 = 60 min active, the 7 min in verification excluded (wall clock would be 14:01:42)"
+    },
+    "AC-R10-4": {
+      "status": "pass",
+      "note": "Ticket A 1793863754941000: breached 13:49:19; marked 14:13, customer reopened 14:20:39; M3 check at 15:11 returned NOOP_ALREADY_BREACHED, no second count. Cycle-boundary part (counted in 1–15, not again in 16–31) relies on the same write-once guard"
     }
   },
   "buckets": [

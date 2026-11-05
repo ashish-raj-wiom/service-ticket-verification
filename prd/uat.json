@@ -1,5 +1,5 @@
 {
-  "asOf": "5 Nov 2026, 18:15 IST",
+  "asOf": "5 Nov 2026, 18:45 IST",
   "env": "QA",
   "docs": [
     "short",
@@ -234,8 +234,8 @@
       "note": "Every Pending Verification exit seen in UAT carried a recorded cause: customer yes (CUSTOMER_CONFIRMED), customer Reopen, Wiom CX close (CLOSED_BY_WIOM_CX_TEAM), C-05 (NOT_VERIFIED). The Wiom CX reopen exit is broken separately (AC-R8-14)"
     },
     "AC-R8-13": {
-      "status": "todo",
-      "note": "Not reachable from the Kapture UI: \"Closed\" is not in the disposition list (only Completed, ReOpen, New, Waiting for Customer, Resolved on Call, Under Observation). Completed closes correctly (AC-R4-11)"
+      "status": "na",
+      "note": "Out of scope (PM call, 5 Nov). Sub Status Closed is not available to a CX agent in Kapture: the disposition list offers Waiting for Customer, Resolved on Call, Under Observation, New, ReOpen, Completed, Resolved, no Closed. TSJ maps Kapture CL to CLOSED, so it can only arrive from a Kapture-side or admin close. The CX closure that is reachable, Completed, passed under AC-R4-11."
     },
     "AC-GRD-1": {
       "status": "na",

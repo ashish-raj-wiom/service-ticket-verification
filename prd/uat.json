@@ -490,8 +490,8 @@
       "note": "Not in PM UAT (4 Nov): review over live volume after launch"
     },
     "AC-R12-4": {
-      "status": "fail",
-      "note": "a0a0m0 off the list 19:56:16–20:00:23: P (1793803962770000) in verification; customer yes at 19:56:40 went down the old close path (ticket service checked the live list, not the ticket stv_mode) and never reached SRS; SRS closed it at C-04 as Internet working, no response"
+      "status": "pass",
+      "note": "Retest after fix (5 Nov): G 1793872894184000 marked 16:13:22, a0a0m0 removed 16:13:59, customer yes 16:14:22 routed to SRS (routesToSrs reason=STV_MODE), closed Customer confirmed. First run 4 Nov failed (yes took the old path)"
     },
     "AC-R12-9": {
       "status": "pass",

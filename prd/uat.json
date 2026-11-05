@@ -572,6 +572,10 @@
     "AC-R2-11": {
       "status": "todo",
       "note": "QA 5 Nov, ticket 1793863754941000: swap SY108007 to GX5181 committed 17:45. Asks at 17:51 onward were for GX5181 and positive; first message T2 at 17:51, customer received it. But the ask at the mark (17:45:41, 2 s after commit) was still for SY108007, so it read NO. Awaiting PM call: fail (minor bug) or accepted."
+    },
+    "AC-R12-10": {
+      "status": "todo",
+      "note": "Partial evidence, QA 3 Nov 13:35 IST: off-list CSP 73e232, complaint b35d395b, regression-suite SWAP_COMMITTED (VL_PASS) closed it at once (COMPLAINT_RESOLVED, CLOSED in 1 s), no STV loop. Code: DeviceSwapServiceImpl handleSwapCommitted else-branch (resolutionFinalizer). Customer message not verified; swap was injected by the suite, not run from the app."
     }
   },
   "buckets": [

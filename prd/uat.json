@@ -532,6 +532,14 @@
     "AC-RACE-8": {
       "status": "na",
       "note": "Not in PM UAT (4 Nov): same-instant race, engineering to cover"
+    },
+    "AC-R10-2": {
+      "status": "pass",
+      "note": "QA M3 = 1 h. Ticket B 1793864980482000 (complaint 76b406fc): M3 armed 12:53:50, Resolved 12:54:13, paused 12:54:23, kept in verification; check at 14:12:32 (78 min later) gave no breach"
+    },
+    "AC-R10-3": {
+      "status": "pass",
+      "note": "Ticket C 1793865483070000 (complaint ee4d122b): armed 13:01:42, marked 13:32:16 (paused), reopened 13:39:19 (resumed); breach crossedAt 14:09:18 = 60 min active, the 7 min in verification excluded (wall clock would be 14:01:42)"
     }
   },
   "buckets": [

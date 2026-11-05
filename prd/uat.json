@@ -1,5 +1,5 @@
 {
-  "asOf": "5 Nov 2026, 17:50 IST",
+  "asOf": "5 Nov 2026, 18:15 IST",
   "env": "QA",
   "docs": [
     "short",
@@ -564,6 +564,14 @@
     "AC-R5-17": {
       "status": "pass",
       "note": "QA 5 Nov, ticket 1793863754941000 (6969121950): Reopened 16:53, In Progress round 2; Netbox swap SY108007 to GX5181 committed 17:45 (CSP_OVERRIDE). SRS: R1e swap committed on STV task, entering STV loop; Pending Verification round 2 at 17:45 with a new Initial Check (6 IC polls). TAS: AWAITING_VERIFICATION (Netbox swap path)."
+    },
+    "AC-R2-1": {
+      "status": "pass",
+      "note": "QA 5 Nov, ticket 1793863754941000 (6969121950), round 2: Resolved (Netbox swap commit) 17:45 with verdict not positive; positive Internet Verdict for GX5181 at 17:51, inside C-01 (30 min), first positive of the round; moved to POSITIVE_VERDICT 17:51."
+    },
+    "AC-R2-11": {
+      "status": "todo",
+      "note": "QA 5 Nov, ticket 1793863754941000: swap SY108007 to GX5181 committed 17:45. Asks at 17:51 onward were for GX5181 and positive; first message T2 at 17:51, customer received it. But the ask at the mark (17:45:41, 2 s after commit) was still for SY108007, so it read NO. Awaiting PM call: fail (minor bug) or accepted."
     }
   },
   "buckets": [

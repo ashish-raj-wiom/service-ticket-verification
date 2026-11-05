@@ -524,6 +524,14 @@
     "AC-R10-1": {
       "status": "pass",
       "note": "QA M3 = 1 h. Ticket A 1793863754941000 (complaint 8d4f3fc6), In Progress, never marked: M3 armed 12:49:19.97, check at 13:51 breached with crossedAt 13:49:19.97 (exactly 60:00), COMPLAINT_M3_BREACHED recorded once for a0a0m0"
+    },
+    "AC-RACE-3": {
+      "status": "na",
+      "note": "Not in PM UAT (4 Nov): same-instant race, engineering to cover"
+    },
+    "AC-RACE-8": {
+      "status": "na",
+      "note": "Not in PM UAT (4 Nov): same-instant race, engineering to cover"
     }
   },
   "buckets": [

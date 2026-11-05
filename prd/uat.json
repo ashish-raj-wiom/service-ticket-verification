@@ -1,5 +1,5 @@
 {
-  "asOf": "4 Nov 2026",
+  "asOf": "5 Nov 2026, 17:50 IST",
   "env": "QA",
   "docs": [
     "short",
@@ -560,6 +560,10 @@
     "AC-R10-6": {
       "status": "na",
       "note": "Not in PM UAT (5 Nov): M3 cycle evaluation not tested. a0a0m0 had 3 breaches on QA (A, D, C) for reference"
+    },
+    "AC-R5-17": {
+      "status": "pass",
+      "note": "QA 5 Nov, ticket 1793863754941000 (6969121950): Reopened 16:53, In Progress round 2; Netbox swap SY108007 to GX5181 committed 17:45 (CSP_OVERRIDE). SRS: R1e swap committed on STV task, entering STV loop; Pending Verification round 2 at 17:45 with a new Initial Check (6 IC polls). TAS: AWAITING_VERIFICATION (Netbox swap path)."
     }
   },
   "buckets": [

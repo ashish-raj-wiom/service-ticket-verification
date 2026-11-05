@@ -491,7 +491,7 @@
     },
     "AC-R12-4": {
       "status": "pass",
-      "note": "Retest after fix (5 Nov): G 1793872894184000 marked 16:13:22, a0a0m0 removed 16:13:59, customer yes 16:14:22 routed to SRS (routesToSrs reason=STV_MODE), closed Customer confirmed. First run 4 Nov failed (yes took the old path)"
+      "note": "Retest after fix (5 Nov): G 1793872894184000 marked 16:13:22, a0a0m0 removed 16:13:59, customer yes 16:14:22 routed to SRS (routesToSrs reason=STV_MODE), closed Customer confirmed. First run 4 Nov failed (yes took the old path). Reopen path also retested 5 Nov: A 1793863754941000 marked 16:52:20, a0a0m0 removed 16:52:54, customer No + reopen previous at 16:53:17 routed to SRS (routesToSrs reason=STV_MODE), task reopened to the CSP, Kapture K-comment written"
     },
     "AC-R12-9": {
       "status": "pass",
